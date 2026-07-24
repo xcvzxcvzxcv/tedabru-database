@@ -190,6 +190,7 @@
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
+  .favorite-btn { margin-left: 12px; }
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -434,6 +435,7 @@
     border: none;
     cursor: pointer;
     padding: 4px;
+    margin-left: -4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -934,7 +936,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.11</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.10</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1164,7 +1166,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.11';
+  const APP_VERSION = '0.1.10';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
