@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Лексикариум · Tedabru</title>
+<title>Справочник · Tedabru</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Inter:wght@400;500;600&display=swap');
 
@@ -175,54 +175,6 @@
     bottom: 0;
     height: 1px;
     background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
-  }
-
-  /* Карточка результата поиска — зеркальная версия word-row: статус слева
-     (добавлено/не добавлено вместо избранного), иврит справа вместо слева.
-     Та же высота/паддинг/разделитель — чтобы ощущалось как "тот же язык
-     карточек", но зеркалирование само по себе не даёт спутать поиск со
-     своим словарём. */
-  .search-result-row {
-    position: relative;
-    display: grid;
-    width: 100%;
-    grid-template-columns: 32px 1fr 105px 105px;
-    align-items: center;
-    gap: 8px;
-    padding: 14px 0;
-    background: none;
-    border: none;
-    font: inherit;
-    color: inherit;
-    text-align: left;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .search-result-row::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
-  }
-  .search-result-row .search-status-icon {
-    padding: 4px 4px 4px 0;
-  }
-  .search-result-row .search-status-icon svg { width: 20px; height: 20px; }
-  .search-result-row .hebrew-word { margin: 0; }
-  .search-result-row .meta-col { margin: 0; }
-  .search-result-row .search-definition {
-    text-align: left;
-  }
-  @media (hover: hover) {
-    .search-result-row:hover .hebrew-word,
-    .search-result-row:hover .translit,
-    .search-result-row:hover .pos,
-    .search-result-row:hover .search-definition {
-      filter: brightness(1.2);
-    }
   }
 
   .icon-btn {
@@ -1171,7 +1123,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.5.0</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.5</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1189,7 +1141,7 @@
     </div>
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="search-input" id="searchInput" placeholder="Ищите по слову, переводу или транскрипции" />
+      <input class="search-input" id="searchInput" placeholder="Слово, перевод или транскрипция" />
     </div>
     <div class="filter-bar" id="filterBar"></div>
   </div>
@@ -1515,7 +1467,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.5.0';
+  const APP_VERSION = '0.4.5';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2380,7 +2332,7 @@
       primaryActionBtn.title = 'Выйти из тренировки';
       primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
-      headerTitleEl.innerHTML = `Лексикариум <span class="app-version">v${APP_VERSION}</span>`;
+      headerTitleEl.innerHTML = `Справочник <span class="app-version">v${APP_VERSION}</span>`;
       primaryActionBtn.innerHTML = PLUS_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
@@ -3293,26 +3245,7 @@
     });
     return hebrewDictLoadPromise;
   }
-  let totalDictWordCount = null; // заполнится после того, как словарь реально загрузится
-
-  function defaultSearchPlaceholder() {
-    if (totalDictWordCount === null) return 'Ищите по слову, переводу или транскрипции';
-    return `Ищите по слову, переводу или транскрипции [${totalDictWordCount.toLocaleString('ru-RU')} слов в базе]`;
-  }
-
-  loadHebrewDict().then(() => { // запускаем загрузку сразу при открытии страницы, не дожидаясь первого поиска
-    // считаем УНИКАЛЬНЫЕ заголовочные слова — основной словарь + отдельная
-    // база глаголов (инфинитивы) — а не общее число значений/статей, это
-    // куда интуитивнее читается как "слов в базе"
-    totalDictWordCount = Object.keys(hebrewDictSkeleton).length + Object.keys(verbsDict).length;
-    const searchInputEl = document.getElementById('searchInput');
-    // обновляем текст подсказки, только если поле сейчас и так показывает
-    // подсказку по умолчанию (а не "Впишите слово..."/"Найдите слово..." —
-    // человек мог уже успеть зайти в другой режим, пока грузился словарь)
-    if (searchInputEl && (searchInputEl.placeholder === 'Ищите по слову, переводу или транскрипции' || !searchInputEl.placeholder)) {
-      searchInputEl.placeholder = defaultSearchPlaceholder();
-    }
-  });
+  loadHebrewDict(); // запускаем загрузку сразу при открытии страницы, не дожидаясь первого поиска
 
   const POS_LABELS = {
     noun: 'сущ', verb: 'глагол', adj: 'прил', adv: 'нареч', intj: 'межд',
@@ -4394,72 +4327,12 @@
     `;
     };
 
-    // Основные (не "мусорные") результаты — по образу карточки в личном
-    // словаре, но зеркально: слева статус добавлено/не добавлено (вместо
-    // избранного), иврит и транскрипция/часть речи справа, дефиниция между
-    // ними. Зеркалирование — намеренное: человек должен на глаз отличать,
-    // где он сейчас — в поиске или уже в своём словаре, даже при похожем
-    // визуальном языке карточек.
-    const visibleRowHtml = (m) => {
-      const existing = findExistingWordByHebrew(m.text);
-      return `
-      <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
-        <div class="icon-btn search-status-icon" style="pointer-events:none;">${existing ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
-        <div class="translation search-definition">${registerBadgeHtml(m.register)}${m.translation || ''}</div>
-        <div class="meta-col">
-          <div class="translit">${m.translit}</div>
-          ${m.grammarLabel ? `<div class="pos">${m.grammarLabel}</div>` : ''}
-        </div>
-        <div class="hebrew-word">${m.text}</div>
-      </button>
-    `;
-    };
-
-    resultsEl.innerHTML = visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
+    resultsEl.innerHTML = visibleMatches.map(rowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
         Скрытые результаты (${hiddenMatches.length})
       </button>
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
-
-    // Клик по всей строке — добавляет слово в личный словарь одним кликом
-    // (в обход модалки добавления), либо, если оно уже там, сразу удаляет —
-    // без подтверждения и без отмены: случайные удаления критичны только для
-    // ЛИЧНОГО словаря, а не для результатов поиска, которые всегда можно
-    // найти заново. Тонкую правку определения человек внесёт уже у себя.
-    const attachQuickToggleHandlers = (containerEl) => {
-      containerEl.querySelectorAll('.search-result-row').forEach(row => {
-        row.addEventListener('click', () => {
-          const hebrewText = decodeURIComponent(row.dataset.hebrew);
-          const existingWord = findExistingWordByHebrew(hebrewText);
-          if (existingWord) {
-            words = words.filter(w => w.id !== existingWord.id);
-            saveWords();
-            row.querySelector('.search-status-icon').innerHTML = CHECK_OFF_ICON;
-            showToast('Слово удалено из вашего словаря');
-          } else {
-            const translitEl = row.querySelector('.translit');
-            const posEl = row.querySelector('.pos');
-            const defEl = row.querySelector('.search-definition');
-            words.unshift({
-              id: Date.now(),
-              hebrew: hebrewText,
-              translit: translitEl ? translitEl.textContent : '',
-              pos: grammarLabelToPosValue(posEl ? posEl.textContent : null) || 'сущ, м.р',
-              translation: defEl ? defEl.textContent : '',
-              favorite: false,
-              collectionIds: [],
-              addedAt: Date.now()
-            });
-            saveWords();
-            row.querySelector('.search-status-icon').innerHTML = CHECK_ON_ICON;
-            showToast('Слово добавлено в ваш словарь');
-          }
-          renderFilterBar();
-          renderList();
-        });
-      });
-    };
 
     const attachClickHandlers = (containerEl, list) => {
       containerEl.querySelectorAll('.candidate-row').forEach((row, i) => {
@@ -4474,7 +4347,7 @@
       });
     };
 
-    attachQuickToggleHandlers(resultsEl);
+    attachClickHandlers(resultsEl, visibleMatches);
 
     if (hiddenMatches.length) {
       document.getElementById('showHiddenBtn').addEventListener('click', (e) => {
@@ -4674,7 +4547,7 @@
     filterBarEl.style.display = '';
     wordListEl.style.display = '';
     addWordPanel.style.display = 'none';
-    inputHebrew.placeholder = defaultSearchPlaceholder();
+    inputHebrew.placeholder = 'Слово, перевод или транскрипция';
     inputHebrew.removeAttribute('dir');
     clearTimeout(metaSuggestDebounceTimer);
     metaSuggestGeneration++;
@@ -4751,7 +4624,7 @@
     filterBarEl.style.display = '';
     wordListEl.style.display = '';
     editDbPanel.style.display = 'none';
-    inputHebrew.placeholder = defaultSearchPlaceholder();
+    inputHebrew.placeholder = 'Слово, перевод или транскрипция';
     inputHebrew.value = '';
     searchQuery = '';
     renderFilterBar();
@@ -5488,6 +5361,7 @@
         translit: inputTranslit.value.trim(),
         pos: inputPos.value,
         translation: inputTranslation.value.trim(),
+        status: 'active',
         favorite: false,
         collectionIds: Array.from(bulkTargetCollectionIds),
         addedAt: Date.now()
@@ -5644,6 +5518,7 @@
           translit: best.translit || '',
           pos: grammarLabelToPosValue(best.grammarLabel) || 'сущ, м.р',
           translation: best.translation,
+          status: 'active',
           favorite: false,
           collectionIds: Array.from(bulkTargetCollectionIds),
           addedAt: Date.now()
