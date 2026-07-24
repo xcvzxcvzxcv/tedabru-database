@@ -2067,24 +2067,69 @@
   // ===== Словари Wiktionary (kaikki.org), обработанные под наш пайплайн =====
   // Два индекса: по голому скелету иврита (без огласовок — Nakdan и
   // Wiktionary могут по-разному их расставить, скелет сравнивать надёжнее)
-  // и обратный, русский → иврит (для прямого поиска перевода без похода
-  // в DeepL). DeepL остаётся фоллбэком только для того, чего нет ни в одной
-  // из баз. Глаголы из ЭТИХ файлов убраны — для них теперь отдельная,
-  // авторитетная база (verbsDict/verbsReverse), собранная вручную, где
-  // ключевое слово — именно инфинитив, а не смешение форм от Wiktionary.
-  // wiktionaryVerbLemmas — служебный файл ТОЛЬКО для индекса спрягаемых
-  // форм (медабер → дибер): он не участвует в прямом поиске, а только
-  // подсказывает перевод/породу леммы для уже найденной формы.
+  // и обратный, русский → иврит. Обратные индексы (hebrewDictReverse,
+  // verbsReverse) теперь НЕ отдельные файлы — раньше это были
+  // hebrew_dict_v3_reverse.json/verbs_reverse.json, которые приходилось
+  // синхронно поддерживать вручную при каждой правке прямого файла (и не
+  // всегда получалось). Строим их на лету при загрузке — см. buildReverseIndex.
+  // DeepL остаётся фоллбэком только для того, чего нет ни в одной из баз.
+  // Глаголы из ЭТИХ файлов убраны — для них теперь отдельная, авторитетная
+  // база (verbsDict/verbsReverse), собранная вручную, где ключевое слово —
+  // именно инфинитив, а не смешение форм от Wiktionary.
+  // Раньше данные о лемме (перевод/порода) для спрягаемых форм подтягивались
+  // из отдельного файла wiktionary_verb_lemmas.json во время поиска — теперь
+  // они уже вшиты прямо в каждую запись hebrewVerbForms (lemma_word,
+  // lemma_gloss_ru, lemma_binyan, lemma_root, lemma_inf), отдельный файл не нужен.
   let hebrewDictSkeleton = null;
   let hebrewDictReverse = null;
   let hebrewVerbForms = null;
   let verbsDict = null;
   let verbsReverse = null;
-  let wiktionaryVerbLemmas = null;
   let translitIndex = null;
   let nounFormsIndex = null;
   let generatedVerbForms = null;
   let hebrewDictLoadPromise = null;
+
+  // Раньше *_reverse.json собирался офлайн питон-скриптом — вот тот же
+  // алгоритм (проверен построчно на всей текущей базе, 0 расхождений),
+  // портированный в JS, чтобы строить индекс на лету при каждой загрузке
+  // страницы вместо хранения отдельного файла, который легко рассинхронить
+  // с прямым при ручной правке.
+  function deriveReverseKeys(text) {
+    if (!text) return [];
+    const segments = text.split(/[,;]/);
+    const keys = [];
+    for (const rawSeg of segments) {
+      const seg = rawSeg.trim();
+      const parenIdx = seg.indexOf('(');
+      if (parenIdx !== -1) {
+        // сегмент со скобкой — берём текст ДО скобки как ключ и на этом
+        // останавливаемся совсем (все следующие сегменты игнорируются) —
+        // именно так вело себя оригинальное поведение генератора
+        let head = seg.slice(0, parenIdx).trim();
+        head = head.replace(/[.,:;!?]+$/, '').trim();
+        if (head.length >= 2) keys.push(head.toLowerCase());
+        break;
+      }
+      let plain = seg.replace(/[.,:;!?]+$/, '').trim();
+      if (plain.length >= 2) keys.push(plain.toLowerCase());
+    }
+    return keys;
+  }
+
+  function buildReverseIndex(forwardDict, textField) {
+    const reverse = {};
+    for (const skeleton in forwardDict) {
+      for (const entry of forwardDict[skeleton]) {
+        const keys = deriveReverseKeys(entry[textField]);
+        for (const key of keys) {
+          if (!reverse[key]) reverse[key] = [];
+          reverse[key].push(entry); // тот же объект, копировать не нужно — используемые поля идентичны
+        }
+      }
+    }
+    return reverse;
+  }
 
   function stripNiqqud(word) {
     return (word || '').replace(/[\u0591-\u05C7]/g, '').replace(/\|/g, '');
@@ -2225,15 +2270,12 @@
     if (hebrewDictLoadPromise) return hebrewDictLoadPromise;
     hebrewDictLoadPromise = Promise.all([
       fetch('hebrew_dict_v3.json').then(r => { if (!r.ok) throw new Error('hebrew_dict_v3.json: ' + r.status); return r.json(); }),
-      fetch('hebrew_dict_v3_reverse.json').then(r => { if (!r.ok) throw new Error('hebrew_dict_v3_reverse.json: ' + r.status); return r.json(); }),
       fetch('hebrew_verb_forms_index.json').then(r => { if (!r.ok) throw new Error('hebrew_verb_forms_index.json: ' + r.status); return r.json(); }),
       fetch('verbs_dict.json').then(r => { if (!r.ok) throw new Error('verbs_dict.json: ' + r.status); return r.json(); }),
-      fetch('verbs_reverse.json').then(r => { if (!r.ok) throw new Error('verbs_reverse.json: ' + r.status); return r.json(); }),
-      fetch('wiktionary_verb_lemmas.json').then(r => { if (!r.ok) throw new Error('wiktionary_verb_lemmas.json: ' + r.status); return r.json(); }),
       fetch('translit_index.json').then(r => { if (!r.ok) throw new Error('translit_index.json: ' + r.status); return r.json(); }),
       fetch('noun_forms_index.json').then(r => { if (!r.ok) throw new Error('noun_forms_index.json: ' + r.status); return r.json(); }),
       fetch('generated_verb_forms.json').then(r => { if (!r.ok) throw new Error('generated_verb_forms.json: ' + r.status); return r.json(); })
-    ]).then(([skeleton, reverse, verbForms, vDict, vReverse, vLemmas, tIndex, nFormsIndex, gVerbForms]) => {
+    ]).then(([skeleton, verbForms, vDict, tIndex, nFormsIndex, gVerbForms]) => {
       // ключи-скелеты нормализуем по NFC на всякий случай (хотя без огласовок
       // риск расхождения диакритики уже почти нулевой)
       const normSkeleton = {};
@@ -2242,26 +2284,25 @@
       for (const key in verbForms) normVerbForms[key.normalize('NFC')] = verbForms[key];
       const normVerbsDict = {};
       for (const key in vDict) normVerbsDict[key.normalize('NFC')] = vDict[key];
-      const normVerbLemmas = {};
-      for (const key in vLemmas) normVerbLemmas[key.normalize('NFC')] = vLemmas[key];
       const normNounForms = {};
       for (const key in nFormsIndex) normNounForms[key.normalize('NFC')] = nFormsIndex[key];
       const normGenVerbForms = {};
       for (const key in gVerbForms) normGenVerbForms[key.normalize('NFC')] = gVerbForms[key];
       hebrewDictSkeleton = normSkeleton;
-      hebrewDictReverse = reverse;
       hebrewVerbForms = normVerbForms;
       verbsDict = normVerbsDict;
-      verbsReverse = vReverse;
-      wiktionaryVerbLemmas = normVerbLemmas;
       translitIndex = tIndex;
       nounFormsIndex = normNounForms;
       generatedVerbForms = normGenVerbForms;
+      // обратные индексы строим на лету из уже загруженных прямых —
+      // см. комментарий у buildReverseIndex
+      hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
+      verbsReverse = buildReverseIndex(verbsDict, 'translation');
       console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length);
     }).catch(e => {
       console.log('[DICT] словари не загрузились, работаем только через DeepL:', e);
       hebrewDictSkeleton = {}; hebrewDictReverse = {}; hebrewVerbForms = {};
-      verbsDict = {}; verbsReverse = {}; wiktionaryVerbLemmas = {}; translitIndex = {}; nounFormsIndex = {};
+      verbsDict = {}; verbsReverse = {}; translitIndex = {}; nounFormsIndex = {};
       generatedVerbForms = {};
     });
     return hebrewDictLoadPromise;
@@ -2480,26 +2521,23 @@
   // лемму" (медабер, дибарти и т.п.) — показываем саму эту форму с её
   // транскрипцией, но перевод и часть речи берём от ЛЕММЫ (инфинитива),
   // добавляя грамматическую подсказку (лицо/род/число/время), чтобы было
-  // понятно, что именно значит эта конкретная форма. Лемму ищем в служебном
-  // файле wiktionaryVerbLemmas — сами глаголы из основного словаря убраны
-  // (у них теперь отдельная, авторитетная база), но эта форма-подсказка
-  // всё ещё нужна именно из старых данных Wiktionary (там есть таблицы
-  // спряжения, которых в новой базе пока нет).
+  // понятно, что именно значит эта конкретная форма. Данные о лемме теперь
+  // вшиты прямо в саму запись формы (lemma_word/lemma_gloss_ru/lemma_binyan/
+  // lemma_root/lemma_inf) — раньше их приходилось подтягивать отдельным
+  // файлом wiktionary_verb_lemmas.json во время поиска.
   function buildVerbFormCandidate(formEntry) {
-    const lemmaEntries = (wiktionaryVerbLemmas && wiktionaryVerbLemmas[formEntry.lemma_skeleton]) || [];
-    const lemmaVerb = lemmaEntries.find(e => e.pos === 'verb') || lemmaEntries[0];
-    const lemmaGloss = lemmaVerb ? lemmaVerb.gloss_ru : null;
-    const binyan = lemmaVerb ? (BINYAN_LABELS[lemmaVerb.binyan] || lemmaVerb.binyan) : null;
+    const lemmaGloss = formEntry.lemma_gloss_ru || null;
+    const binyan = formEntry.lemma_binyan ? (BINYAN_LABELS[formEntry.lemma_binyan] || formEntry.lemma_binyan) : null;
 
     // показываем инфинитив, если он есть в данных (редкость, ~2% глаголов) —
     // а если нет, то саму лемму (написание, под которым заведена статья),
     // с транскрипцией, чтобы всегда было видно, от какого слова эта форма
     let lemmaLine = '';
-    if (lemmaVerb) {
-      if (lemmaVerb.inf) {
-        lemmaLine = ` (инфинитив: ${lemmaVerb.inf}, ${niqqudToTranslit(lemmaVerb.inf)})`;
+    if (formEntry.lemma_word) {
+      if (formEntry.lemma_inf) {
+        lemmaLine = ` (инфинитив: ${formEntry.lemma_inf}, ${niqqudToTranslit(formEntry.lemma_inf)})`;
       } else {
-        lemmaLine = ` (форма от ${lemmaVerb.word}, ${niqqudToTranslit(lemmaVerb.word)})`;
+        lemmaLine = ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`;
       }
     }
 
@@ -2508,7 +2546,7 @@
       translit: niqqudToTranslit(formEntry.form_word),
       grammarLabel: binyan ? `глагол, ${binyan} (${formEntry.hint})` : `глагол (${formEntry.hint})`,
       translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : formEntry.hint,
-      root: lemmaVerb ? lemmaVerb.root : null,
+      root: formEntry.lemma_root || null,
       source: 'dict'
     };
   }
