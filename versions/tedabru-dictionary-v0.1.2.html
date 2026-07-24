@@ -199,13 +199,13 @@
   .filter-row::-webkit-scrollbar { display: none; }
   .chip {
     flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: 18px;
+    padding: 5px 12px;
+    border-radius: 14px;
     border: 1px solid var(--border-purple);
     background: transparent;
     color: var(--text-secondary);
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
@@ -215,20 +215,16 @@
     border-color: var(--purple);
     color: var(--gold);
   }
-  .chip.chip-add-collection {
-    border-color: var(--gold-soft);
-    color: var(--gold-soft);
-  }
   .chip.chip-icon-only {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
     padding: 0;
     flex-shrink: 0;
   }
-  .chip.chip-icon-only svg { width: 14px; height: 14px; }
+  .chip.chip-icon-only svg { width: 12px; height: 12px; }
 
   .chip.chip-input {
     width: 150px;
@@ -857,7 +853,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.3</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.2</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1087,7 +1083,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.3';
+  const APP_VERSION = '0.1.2';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1435,21 +1431,20 @@
           return `<button type="button" class="chip ${isActive ? 'active' : ''}" data-status="${c.key ?? ''}">${c.label} · ${count}</button>`;
         }).join('')}
         ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip">★ Избранное · ${favoriteCount}</button>` : ''}
-        ${creatingCollectionInline
-          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
-          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
       </div>
-      ${posValues.length ? `
       <div class="filter-row">
         ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
-      </div>` : ''}
+      </div>
       <div class="filter-row">
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
           return `<button type="button" class="chip ${isFilterActive ? 'active' : ''} ${isSelected ? 'chip-selected' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
-        <select class="sort-select" id="sortSelect" style="display:none;">
+        ${creatingCollectionInline
+          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
+          : `<button type="button" class="chip chip-icon-only" id="newCollectionChip" title="Новая подборка">${PLUS_ICON}</button>`}
+        <select class="sort-select" id="sortSelect">
           <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
           <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>По алфавиту</option>
           <option value="status" ${sortMode === 'status' ? 'selected' : ''}>По статусу</option>
@@ -2082,23 +2077,21 @@
   }, true);
 
   // ===== Перетаскивание чипов подборок: удаление и слияние =====
-  // Тащишь чип подборки — она "отрывается" и следует за пальцем (тот же
-  // drag-ghost, что и у слов), СРАЗУ по факту движения, без задержки: клик
-  // без сдвига по-прежнему просто фильтрует/выделяет (см. отдельные
-  // click-обработчики в renderFilterBar), а любое движение за порог сразу
-  // запускает перетаскивание. Дотянул до корзины (кнопка в шапке временно
-  // превращается в неё на время этого жеста) — предлагается выбор удаления;
-  // дотянул до ДРУГОЙ подборки — предлагается слияние, а сама подборка-цель
-  // визуально "раздвигается" под наведением.
+  // Держишь ~500мс на чипе подборки — она "отрывается" и следует за
+  // пальцем (тот же drag-ghost, что и у слов). Дотянул до корзины (кнопка в
+  // шапке временно превращается в неё на время этого жеста) — предлагается
+  // выбор удаления; дотянул до ДРУГОЙ подборки — предлагается слияние, а
+  // сама подборка-цель визуально "раздвигается" под наведением.
   const filterBarEl = document.getElementById('filterBar');
-  const COLLECTION_DRAG_MOVE_THRESHOLD = 10; // px — сдвиг больше этого сразу запускает драг
-  let collectionDragArmedChip = null; // чип, за который держимся, пока не подтвердилось — драг это или просто клик
-  let collectionDragArmedPointerId = null;
-  let collectionDragArmedStartX = 0, collectionDragArmedStartY = 0;
+  const COLLECTION_LONG_PRESS_MS = 500;
+  const COLLECTION_LONG_PRESS_TOLERANCE = 10;
+  let collectionLongPressTimer = null;
+  let collectionLongPressPointerId = null;
+  let collectionLongPressStartX = 0, collectionLongPressStartY = 0;
   let collectionDragSession = null; // { pointerId, collectionId, chipEl, dropTarget }
 
-  function cancelCollectionDragArm() {
-    collectionDragArmedChip = null;
+  function cancelCollectionLongPress() {
+    if (collectionLongPressTimer) { clearTimeout(collectionLongPressTimer); collectionLongPressTimer = null; }
   }
 
   function clearCollectionHoverWiden() {
@@ -2285,29 +2278,29 @@
     if (selectionMode) {
       // в режиме выделения драг стартует только с УЖЕ выделенной подборки —
       // сам клик (добавление/снятие из выделения) обрабатывает отдельный
-      // click-listener в renderFilterBar; здесь только готовимся к
-      // перетаскиванию текущего мультивыделения целиком
+      // click-listener в renderFilterBar; здесь только запускаем таймер
+      // долгого нажатия для перетаскивания текущего мультивыделения целиком
       if (!selectedCollectionIds.has(chip.dataset.coll)) return;
     }
-    collectionDragArmedChip = chip;
-    collectionDragArmedPointerId = e.pointerId;
-    collectionDragArmedStartX = e.clientX;
-    collectionDragArmedStartY = e.clientY;
+    collectionLongPressPointerId = e.pointerId;
+    collectionLongPressStartX = e.clientX;
+    collectionLongPressStartY = e.clientY;
+    collectionLongPressTimer = setTimeout(() => {
+      collectionLongPressTimer = null;
+      const ids = (selectionMode && selectedCollectionIds.size)
+        ? Array.from(selectedCollectionIds)
+        : [chip.dataset.coll];
+      startCollectionDrag(ids, chip, collectionLongPressPointerId, collectionLongPressStartX, collectionLongPressStartY);
+    }, COLLECTION_LONG_PRESS_MS);
   });
   filterBarEl.addEventListener('pointermove', (e) => {
-    if (!collectionDragArmedChip || e.pointerId !== collectionDragArmedPointerId) return;
-    const dx = e.clientX - collectionDragArmedStartX;
-    const dy = e.clientY - collectionDragArmedStartY;
-    if (Math.sqrt(dx * dx + dy * dy) <= COLLECTION_DRAG_MOVE_THRESHOLD) return;
-    const chip = collectionDragArmedChip;
-    collectionDragArmedChip = null;
-    const ids = (selectionMode && selectedCollectionIds.size)
-      ? Array.from(selectedCollectionIds)
-      : [chip.dataset.coll];
-    startCollectionDrag(ids, chip, e.pointerId, collectionDragArmedStartX, collectionDragArmedStartY);
+    if (!collectionLongPressTimer || e.pointerId !== collectionLongPressPointerId) return;
+    const dx = e.clientX - collectionLongPressStartX;
+    const dy = e.clientY - collectionLongPressStartY;
+    if (Math.sqrt(dx * dx + dy * dy) > COLLECTION_LONG_PRESS_TOLERANCE) cancelCollectionLongPress();
   });
-  filterBarEl.addEventListener('pointerup', cancelCollectionDragArm);
-  filterBarEl.addEventListener('pointercancel', cancelCollectionDragArm);
+  filterBarEl.addEventListener('pointerup', cancelCollectionLongPress);
+  filterBarEl.addEventListener('pointercancel', cancelCollectionLongPress);
 
   // ===== Поиск / встроенное добавление слова (тот же инпут, два режима) =====
   document.getElementById('searchInput').addEventListener('input', (e) => {
