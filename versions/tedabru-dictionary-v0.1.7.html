@@ -161,7 +161,6 @@
   .word-row {
     position: relative;
     display: grid;
-    width: 100%;
     grid-template-columns: 32px 90px 95px 1fr 26px 26px 22px;
     align-items: center;
     gap: 8px;
@@ -190,8 +189,7 @@
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
-  .favorite-btn { margin-left: 12px; }
-  .favorite-btn svg { width: 21px; height: 21px; } /* звезда визуально "тоньше" корзины при том же контейнере — компенсируем */
+  .favorite-btn { margin-left: 8px; }
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -235,14 +233,12 @@
   }
   .filters-collapse {
     max-height: 0;
-    margin-top: -8px; /* компенсирует gap родительского flex-контейнера — иначе даже при нулевой высоте между строками оставался лишний зазор */
     opacity: 0;
     overflow: hidden;
-    transition: max-height 0.28s ease-out, opacity 0.22s ease-out, margin-top 0.28s ease-out;
+    transition: max-height 0.28s ease-out, opacity 0.22s ease-out;
   }
   .filters-collapse.expanded {
     max-height: 200px;
-    margin-top: 0;
     opacity: 1;
   }
   .chip.chip-icon-only {
@@ -436,7 +432,6 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    margin-left: -4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -451,7 +446,6 @@
     text-align: right;
     color: var(--gold);
     white-space: nowrap;
-    overflow: hidden;
     margin-right: 7px;
   }
 
@@ -937,7 +931,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.8</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.7</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1167,7 +1161,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.8';
+  const APP_VERSION = '0.1.7';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1535,22 +1529,19 @@
           if (renamingCollectionId === c.id) {
             return `<input type="text" class="chip chip-input chip-rename-input" data-rename-coll="${c.id}" value="${c.name.replace(/"/g, '&quot;')}" />`;
           }
-          if (isSelected || isFilterActive) {
-            // выделенная подборка (в режиме выбора) ИЛИ просто активный фильтр
-            // (в обычном режиме) — оба случая "раздвигают" чип и показывают
-            // карандаш: переименовывать можно, даже не заходя в режим выбора.
-            // Тело чипа при этом переключает именно то, что и раньше
-            // (выделение или фильтр — в зависимости от режима), карандаш
-            // всегда отвечает только за переименование
-            const stateClass = isSelected ? 'chip-selected' : 'active';
+          if (isSelected) {
+            // выделенная подборка "раздвигается" — тело чипа переключает
+            // выделение, отдельная кнопка-карандаш рядом отвечает за
+            // переименование; так клик по чипу больше не конфликтует между
+            // "снять выделение" и "переименовать"
             return `
-              <div class="chip ${stateClass} chip-with-pencil">
+              <div class="chip chip-selected chip-with-pencil">
                 <button type="button" class="chip-body" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>
                 <button type="button" class="chip-pencil-btn" data-coll-rename="${c.id}" title="Переименовать">${PENCIL_ICON}</button>
               </div>
             `;
           }
-          return `<button type="button" class="chip" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
+          return `<button type="button" class="chip ${isFilterActive ? 'active' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
         <select class="sort-select" id="sortSelect" style="display:none;">
           <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
@@ -1644,13 +1635,8 @@
           }
           return;
         }
-        const wasFilterActive = filterCollectionId === val;
-        filterCollectionId = wasFilterActive ? null : val; // повторный клик снимает фильтр
+        filterCollectionId = (filterCollectionId === val) ? null : val; // повторный клик снимает фильтр
         renderFilterBar(); renderList();
-        if (!wasFilterActive) {
-          const widened = document.querySelector(`.chip-with-pencil [data-coll="${val}"]`);
-          if (widened) widened.closest('.chip-with-pencil').scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
-        }
       });
     });
     el.querySelectorAll('[data-coll-rename]').forEach(btn => {
