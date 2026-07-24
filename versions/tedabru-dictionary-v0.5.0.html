@@ -1171,7 +1171,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.0</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.5.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1515,7 +1515,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.6.0';
+  const APP_VERSION = '0.5.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1869,10 +1869,6 @@
         ).join('')}
       </div>
       <div class="filter-row">
-        ${(() => {
-          const isAllActive = !filterMastery && !filterCollectionId && !filterFavorite && !filterPos;
-          return `<button type="button" class="chip ${isAllActive ? 'active' : ''}" id="allChip">Все · ${words.length}</button>`;
-        })()}
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
           : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
@@ -1955,13 +1951,6 @@
         filterMastery = (filterMastery === val) ? null : val; // повторный клик снимает фильтр
         renderFilterBar(); renderList();
       });
-    });
-    document.getElementById('allChip').addEventListener('click', () => {
-      filterMastery = null;
-      filterCollectionId = null;
-      filterFavorite = false;
-      filterPos = null;
-      renderFilterBar(); renderList();
     });
     const favChipEl = document.getElementById('favChip');
     if (favChipEl) favChipEl.addEventListener('click', () => {
@@ -4013,12 +4002,7 @@
           result += 'у'; // шурук
           continue;
         }
-        // двойной вав (וו) — первый вав ВСЕГДА настоящая согласная "в", даже
-        // без своей огласовки: второй вав несёт собственную гласную отдельно
-        // (לְהַלְווֹת "леhальвот" — не "леhальот")
-        const nextGroup = groups[idx + 1];
-        const isFirstOfDoubleVav = nextGroup && nextGroup.letter === 'ו';
-        if (!vowelMark && !marks.includes(NIQQUD.SHVA) && idx !== 0 && !isFirstOfDoubleVav) {
+        if (!vowelMark && !marks.includes(NIQQUD.SHVA) && idx !== 0) {
           continue; // немая "мать чтения" в середине/конце слова без огласовки
         }
         // иначе — настоящая согласная "в" (в т.ч. приставка ве-/ва-)
