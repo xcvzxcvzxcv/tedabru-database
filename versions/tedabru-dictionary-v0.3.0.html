@@ -188,14 +188,11 @@
     -webkit-tap-highlight-color: transparent;
     color: var(--muted);
   }
+  .icon-btn.favorite-btn,
   .icon-btn.delete-btn,
   .icon-btn.edit-def-btn {
     justify-content: flex-end;
     padding-right: 0;
-  }
-  .icon-btn.favorite-btn {
-    justify-content: flex-start;
-    padding: 4px 4px 4px 0;
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
@@ -438,21 +435,17 @@
   }
   .drag-ghost-badge.visible { display: flex; }
 
-  .mastery-dots {
+  .status-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 4px 4px 0;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 3px;
-    padding-right: 2px;
+    justify-content: flex-start;
+    -webkit-tap-highlight-color: transparent;
   }
-  .mastery-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    flex-shrink: 0;
-  }
-  .mastery-dot.filled { background: var(--gold); }
+  .status-btn svg { width: 20px; height: 20px; }
 
   .hebrew-word {
     font-family: 'Frank Ruhl Libre', serif;
@@ -566,6 +559,7 @@
     .word-row:hover .translation {
       filter: brightness(1.2);
     }
+    .word-row:hover .status-btn,
     .word-row:hover .favorite-btn,
     .word-row:hover .delete-btn,
     .word-row:hover .edit-def-btn {
@@ -1089,7 +1083,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.0</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.3.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1321,57 +1315,30 @@
 </div>
 
 <script>
-  // ===== Уровень освоения слова =====
-  // Раньше был ручной статус "изучается/изучено" — теперь его заменяют пять
-  // уровней, которые считаются АВТОМАТИЧЕСКИ из тех же SRS-данных, что
-  // использует тренировка. Длина интервала честно отражает, насколько
-  // прочно слово "сидит" в памяти — отдельное поле для этого не нужно.
-  const MASTERY_LEVELS = [
-    { key: 'new', label: 'Новое', dots: 0 },
-    { key: 'forgot', label: 'Не помню', dots: 1 },
-    { key: 'weak', label: 'Помню плохо', dots: 2 },
-    { key: 'good', label: 'Помню хорошо', dots: 3 },
-    { key: 'mastered', label: 'Выучено', dots: 5 },
-  ];
-
-  function getMasteryLevel(word) {
-    const srs = word.srs;
-    if (!srs || srs.dueDate == null) return 'new';
-    if (srs.learning) return 'forgot';
-    if (srs.interval < 7) return 'weak';
-    if (srs.interval < 30) return 'good';
-    return 'mastered';
-  }
-
-  function masteryDotsFilled(level) {
-    const found = MASTERY_LEVELS.find(m => m.key === level);
-    return found ? found.dots : 0;
-  }
-
-  function masteryDotsHtml(word) {
-    const level = getMasteryLevel(word);
-    const filled = masteryDotsFilled(level);
-    const label = (MASTERY_LEVELS.find(m => m.key === level) || {}).label || '';
-    let dots = '';
-    for (let i = 0; i < 5; i++) {
-      dots += `<span class="mastery-dot ${i < filled ? 'filled' : ''}"></span>`;
-    }
-    return `<div class="mastery-dots" title="${label}">${dots}</div>`;
-  }
+  // ===== Иконки статуса =====
+  // Всего два состояния: пустой кружок ("изучается") и галочка ("изучено").
+  // Раньше был ещё "новое" — убрали (см. фикс со статус-чипами): у старых
+  // слов, сохранённых со статусом "new", ICONS[w.status] просто не найдётся —
+  // используем пустой кружок ("изучается") как разумный запасной вариант
+  const ICONS = {
+    active: '<svg viewBox="0 0 24 24" fill="none" stroke="#eba64a" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>',
+    known: '<svg viewBox="0 0 24 24" fill="none" stroke="#8b7fa8" stroke-width="1.8"><polyline points="5 13 10 18 19 7"/></svg>'
+  };
+  const STATUS_CYCLE = ['active', 'known'];
 
   // ===== Данные (в памяти + localStorage, если доступно) =====
   const STORAGE_KEY = 'tedabru_dictionary_v1';
   const COLLECTIONS_KEY = 'tedabru_collections_v1';
 
   const seedWords = [
-    { hebrew: 'מִשְׁפָּחָה', translit: 'мишпаха́', pos: 'сущ, ж.р', translation: 'семья', favorite: true, collectionIds: [], addedAt: Date.now() - 8*86400000, srs: { interval: 45, ease: 2.6, reps: 5, dueDate: Date.now() + 40*86400000, learning: false } },
-    { hebrew: 'לְהַסְבִּיר', translit: 'леhасбир', pos: 'хифиль', translation: 'объяснять', favorite: false, collectionIds: [], addedAt: Date.now() - 7*86400000, srs: { interval: 10, ease: 2.4, reps: 2, dueDate: Date.now() + 5*86400000, learning: false } },
-    { hebrew: 'חָשׁוּב', translit: 'хашу́в', pos: 'прил', translation: 'важный', favorite: false, collectionIds: [], addedAt: Date.now() - 6*86400000 },
-    { hebrew: 'לָרוּץ', translit: 'ларуц', pos: 'пааль', translation: 'бежать', favorite: false, collectionIds: [], addedAt: Date.now() - 5*86400000, srs: { interval: 0, ease: 2.3, reps: 0, dueDate: Date.now() - 1000, learning: true } },
-    { hebrew: 'לְקַבֵּל', translit: 'лекабэ́ль', pos: 'пиэль', translation: 'получать, принимать', favorite: false, collectionIds: [], addedAt: Date.now() - 4*86400000 },
-    { hebrew: 'הַפְתָּעָה', translit: 'hафтаа́', pos: 'сущ, ж.р', translation: 'сюрприз', favorite: true, collectionIds: [], addedAt: Date.now() - 3*86400000, srs: { interval: 2, ease: 2.3, reps: 1, dueDate: Date.now() + 86400000, learning: false } },
-    { hebrew: 'קַל', translit: 'каль', pos: 'прил', translation: 'лёгкий, простой', favorite: false, collectionIds: [], addedAt: Date.now() - 2*86400000 },
-    { hebrew: 'עָמוֹק', translit: 'амо́к', pos: 'прил', translation: 'глубокий', favorite: false, collectionIds: [], addedAt: Date.now() - 1*86400000 },
+    { hebrew: 'מִשְׁפָּחָה', translit: 'мишпаха́', pos: 'сущ, ж.р', translation: 'семья', status: 'active', favorite: true, collectionIds: [], addedAt: Date.now() - 8*86400000 },
+    { hebrew: 'לְהַסְבִּיר', translit: 'леhасбир', pos: 'хифиль', translation: 'объяснять', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 7*86400000 },
+    { hebrew: 'חָשׁוּב', translit: 'хашу́в', pos: 'прил', translation: 'важный', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 6*86400000 },
+    { hebrew: 'לָרוּץ', translit: 'ларуц', pos: 'пааль', translation: 'бежать', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 5*86400000 },
+    { hebrew: 'לְקַבֵּל', translit: 'лекабэ́ль', pos: 'пиэль', translation: 'получать, принимать', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 4*86400000 },
+    { hebrew: 'הַפְתָּעָה', translit: 'hафтаа́', pos: 'сущ, ж.р', translation: 'сюрприз', status: 'known', favorite: true, collectionIds: [], addedAt: Date.now() - 3*86400000 },
+    { hebrew: 'קַל', translit: 'каль', pos: 'прил', translation: 'лёгкий, простой', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 2*86400000 },
+    { hebrew: 'עָמוֹק', translit: 'амо́к', pos: 'прил', translation: 'глубокий', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 1*86400000 },
   ];
 
   function loadWords() {
@@ -1433,7 +1400,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.4.0';
+  const APP_VERSION = '0.3.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1637,7 +1604,7 @@
   }
 
   // ===== Состояние фильтров и сортировки =====
-  let filterMastery = null;      // null | 'new' | 'forgot' | 'weak' | 'good' | 'mastered'
+  let filterStatus = null;       // null | 'new' | 'active' | 'known'
   let filterFavorite = false;    // показывать только избранное
   let filterPos = null;          // null | конкретное значение w.pos
   let filterCollectionId = null; // null | id подборки
@@ -1663,7 +1630,7 @@
   let trainSessionStats = { studied: 0, again: 0, hard: 0, good: 0, easy: 0 };
   let selectedIds = new Set();
   let selectedCollectionIds = new Set(); // подборки, выделенные кликом в том же режиме выделения
-  let sortMode = 'added';        // 'added' | 'alpha'
+  let sortMode = 'added';        // 'added' | 'alpha' | 'status'
 
   // ===== Отложенное удаление слова (с возможностью отмены) =====
   let pendingDeleteIds = new Set();          // id слов, для которых сейчас идёт 3-секундный обратный отсчёт
@@ -1704,7 +1671,7 @@
         normalize(w.translation).includes(q)
       );
     }
-    if (filterMastery) list = list.filter(w => getMasteryLevel(w) === filterMastery);
+    if (filterStatus) list = list.filter(w => w.status === filterStatus);
     if (filterFavorite) list = list.filter(w => w.favorite);
     if (filterPos) list = list.filter(w => w.pos === filterPos);
     if (filterCollectionId) list = list.filter(w => (w.collectionIds || []).includes(filterCollectionId));
@@ -1712,6 +1679,9 @@
     const sorted = [...list];
     if (sortMode === 'alpha') {
       sorted.sort((a, b) => (a.translit || '').localeCompare(b.translit || '', 'ru'));
+    } else if (sortMode === 'status') {
+      const order = { new: 0, active: 1, known: 2 };
+      sorted.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
     } else {
       sorted.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0)); // сначала недавно добавленные
     }
@@ -1763,6 +1733,11 @@
 
   function renderFilterBar() {
     const el = document.getElementById('filterBar');
+    const statusChips = [
+      { key: null, label: 'Все' },
+      { key: 'active', label: 'Изучается' },
+      { key: 'known', label: 'Изучено' },
+    ];
     const posValues = [...new Set(words.map(w => w.pos))].sort();
     const hasFavorites = words.some(w => w.favorite);
     // если избранных слов не осталось, а фильтр "Избранное" всё ещё был
@@ -1770,9 +1745,9 @@
     // будет нечем
     if (!hasFavorites && filterFavorite) filterFavorite = false;
 
-    // ===== Счётчики для чипов =====
-    const countByMastery = { new: 0, forgot: 0, weak: 0, good: 0, mastered: 0 };
-    words.forEach(w => { countByMastery[getMasteryLevel(w)]++; });
+    // ===== Счётчики для чипов — "Все · 121" =====
+    const countByStatus = { active: 0, known: 0 };
+    words.forEach(w => { if (countByStatus[w.status] !== undefined) countByStatus[w.status]++; });
     const favoriteCount = words.filter(w => w.favorite).length;
     const countByPos = {};
     words.forEach(w => { countByPos[w.pos] = (countByPos[w.pos] || 0) + 1; });
@@ -1781,15 +1756,25 @@
 
     el.innerHTML = `
       <div class="filter-row">
-        ${MASTERY_LEVELS.map(m =>
-          `<button type="button" class="chip ${filterMastery === m.key ? 'active' : ''}" data-mastery="${m.key}">${m.label} · ${countByMastery[m.key] || 0}</button>`
-        ).join('')}
-      </div>
-      <div class="filter-row">
+        ${statusChips.map(c => {
+          // "Все" подсвечен, только если вообще ничего не выбрано — если
+          // включено "Избранное", "Все" не должен казаться тоже активным
+          const isActive = c.key === null ? (filterStatus === null && !filterFavorite) : (filterStatus === c.key);
+          const count = c.key === null ? words.length : (countByStatus[c.key] || 0);
+          return `<button type="button" class="chip ${isActive ? 'active' : ''}" data-status="${c.key ?? ''}">${c.label} · ${count}</button>`;
+        }).join('')}
+        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="Избранное">★ ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
           : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
-        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="Избранное">★ ${favoriteCount}</button>` : ''}
+        <button type="button" class="chip chip-text-only" id="filtersToggleChip">Фильтры</button>
+      </div>
+      <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
+        <div class="filter-row">
+          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
+        </div>
+      </div>
+      <div class="filter-row">
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
@@ -1813,17 +1798,12 @@
           }
           return `<button type="button" class="chip" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
-        <button type="button" class="chip chip-text-only" id="filtersToggleChip">Фильтры</button>
+        <select class="sort-select" id="sortSelect" style="display:none;">
+          <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
+          <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>По алфавиту</option>
+          <option value="status" ${sortMode === 'status' ? 'selected' : ''}>По статусу</option>
+        </select>
       </div>
-      <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
-        <div class="filter-row">
-          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
-        </div>
-      </div>
-      <select class="sort-select" id="sortSelect" style="display:none;">
-        <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
-        <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>По алфавиту</option>
-      </select>
     `;
 
     document.getElementById('filtersToggleChip').addEventListener('click', () => {
@@ -1862,16 +1842,24 @@
       }
     }
 
-    el.querySelectorAll('[data-mastery]').forEach(btn => {
+    el.querySelectorAll('[data-status]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const val = btn.dataset.mastery;
-        filterMastery = (filterMastery === val) ? null : val; // повторный клик снимает фильтр
+        filterStatus = btn.dataset.status || null;
+        // "Изучается" — единственный статус, который допустимо сочетать с
+        // "Избранное" одновременно; при выборе любого другого статуса (в том
+        // числе "Все") сбрасываем "Избранное", чтобы не подсвечивались сразу
+        // два взаимоисключающих на вид фильтра
+        if (filterStatus !== 'active') filterFavorite = false;
         renderFilterBar(); renderList();
       });
     });
     const favChipEl = document.getElementById('favChip');
     if (favChipEl) favChipEl.addEventListener('click', () => {
       filterFavorite = !filterFavorite;
+      // и в обратную сторону: включая "Избранное" при любом статусе, кроме
+      // "Изучается", сбрасываем статус — единственная разрешённая пара это
+      // "Изучается" + "Избранное"
+      if (filterFavorite && filterStatus !== 'active') filterStatus = null;
       renderFilterBar(); renderList();
     });
     el.querySelectorAll('[data-pos]').forEach(btn => {
@@ -2027,8 +2015,8 @@
         `;
       }
       return `
-      <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''}" data-id="${w.id}">
-        <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
+      <div class="word-row ${w.status === 'known' ? 'row-dimmed' : ''}" data-id="${w.id}">
+        <button class="status-btn" data-id="${w.id}">${ICONS[w.status] || ICONS.active}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
           <div class="translit">${w.translit}</div>
@@ -2037,7 +2025,7 @@
         ${editingWordId === w.id
           ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
           : `<div class="translation">${w.translation}</div>`}
-        ${masteryDotsHtml(w)}
+        <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
         <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
         <button class="icon-btn edit-def-btn" data-id="${w.id}" title="Редактировать определение (только в вашем словаре)">${PENCIL_ICON}</button>
         <div class="row-num">${i + 1}</div>
@@ -2045,6 +2033,14 @@
     `;
     }).join('') + `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
 
+    listEl.querySelectorAll('.status-btn').forEach(btn => {
+      // pointerdown вместо click — реагируем на нажатие, не дожидаясь
+      // отпускания, ощущается заметно быстрее
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        cycleStatus(parseInt(btn.dataset.id));
+      });
+    });
     listEl.querySelectorAll('.favorite-btn').forEach(btn => {
       btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
     });
@@ -2084,6 +2080,16 @@
       }));
     });
     attachGlobalSearchHandler();
+  }
+
+  function cycleStatus(id) {
+    const word = words.find(w => w.id === id);
+    if (!word) return;
+    const currentIdx = STATUS_CYCLE.indexOf(word.status);
+    word.status = STATUS_CYCLE[(currentIdx + 1) % STATUS_CYCLE.length];
+    saveWords();
+    renderFilterBar();
+    renderList();
   }
 
   function toggleFavorite(id) {
@@ -2356,8 +2362,16 @@
     renderList();
   }
 
-  // Слова, у которых искомое значение уже стоит — просто пропускаются
+  // Слова, у которых искомый статус/избранное уже стоит — просто пропускаются
   // (присвоение того же значения — no-op), остальным присваивается новое
+  function assignStatusToSelected(status) {
+    words.forEach(w => { if (selectedIds.has(w.id)) w.status = status; });
+    saveWords();
+    exitSelectionMode();
+    renderFilterBar();
+    renderList();
+  }
+
   function assignFavoriteToSelected() {
     words.forEach(w => { if (selectedIds.has(w.id)) w.favorite = true; });
     saveWords();
@@ -2394,9 +2408,11 @@
     return true;
   }
 
-  // Находит валидную "цель сброса" под указателем — чип конкретной подборки,
-  // чип "+ новая подборка", чип "Избранное" или кнопку-корзину в шапке (она
-  // помечена data-drop-delete только пока активен режим выделения)
+  // Находит валидную "цель сброса" под указателем — чип конкретной подборки
+  // чип "+ новая подборка",
+  // чипы статуса "Изучается"/"Изучено" (не "Все" — у него data-status
+  // пустой), чип "Избранное" или кнопку-корзину в шапке (она помечена
+  // data-drop-delete только пока активен режим выделения)
   function getDropTargetAt(x, y) {
     const el = document.elementFromPoint(x, y);
     if (!el) return null;
@@ -2406,6 +2422,8 @@
     if (newCollChip) return { type: 'new-collection', el: newCollChip };
     const collChip = el.closest('[data-coll]');
     if (collChip && collChip.dataset.coll) return { type: 'collection', id: collChip.dataset.coll, el: collChip };
+    const statusChip = el.closest('[data-status]');
+    if (statusChip && statusChip.dataset.status) return { type: 'status', value: statusChip.dataset.status, el: statusChip };
     const favChip = el.closest('#favChip');
     if (favChip) return { type: 'favorite', el: favChip };
     return null;
@@ -2523,6 +2541,8 @@
         assignSelectedToCollection(target.id);
       } else if (target.type === 'new-collection') {
         createCollectionViaModal((nc) => assignSelectedToCollection(nc.id));
+      } else if (target.type === 'status') {
+        assignStatusToSelected(target.value);
       } else if (target.type === 'favorite') {
         assignFavoriteToSelected();
       } else if (target.type === 'delete') {
@@ -2551,7 +2571,7 @@
 
   wordListEl.addEventListener('pointerdown', (e) => {
     if (selectionMode) return; // тут уже работает обычный обработчик выделения выше
-    if (e.target.closest('.favorite-btn') ||
+    if (e.target.closest('.status-btn') || e.target.closest('.favorite-btn') ||
         e.target.closest('.delete-btn') || e.target.closest('.undo-btn')) return;
     const row = e.target.closest('.word-row');
     if (!row || row.classList.contains('row-deleting')) return;
@@ -5382,16 +5402,15 @@
     if (!firstRow) return;
 
     const targets = [
-      ['favorite', firstRow.querySelector('.favorite-btn')],
+      ['status', firstRow.querySelector('.status-btn')],
       ['hebrew', firstRow.querySelector('.hebrew-word')],
       ['meta', firstRow.querySelector('.meta-col')],
       ['translation', firstRow.querySelector('.translation')],
-      ['mastery', firstRow.querySelector('.mastery-dots')],
+      ['favorite', firstRow.querySelector('.favorite-btn')],
       ['delete', firstRow.querySelector('.delete-btn')],
-      ['editdef', firstRow.querySelector('.edit-def-btn')],
       ['rownum', firstRow.querySelector('.row-num')],
     ];
-    const colors = ['#39ff88', '#39d3ff', '#ffe539', '#ff39d3', '#ff9e39', '#8a7bff', '#c07bff', '#ffffff'];
+    const colors = ['#39ff88', '#39d3ff', '#ffe539', '#ff39d3', '#ff9e39', '#8a7bff', '#ffffff'];
     let labelTop = 100;
     targets.forEach(([key, el], i) => {
       if (!el) return;
