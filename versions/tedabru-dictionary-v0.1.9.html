@@ -162,7 +162,7 @@
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 90px 95px 1fr 26px 26px 22px;
+    grid-template-columns: 32px 90px 95px 1fr 70px 26px 26px 22px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -191,6 +191,7 @@
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
   .favorite-btn { margin-left: 12px; }
+  .icon-btn.favorite-btn svg { width: 24px; height: 24px; } /* звезда визуально "тоньше" корзины при том же контейнере — компенсируем повышенной специфичностью, чтобы точно не проиграть каскаду */
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -435,7 +436,7 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    margin-left: -4px;
+    margin-left: -36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -936,7 +937,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.10</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.9</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1166,7 +1167,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.10';
+  const APP_VERSION = '0.1.9';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1743,7 +1744,7 @@
             <div class="pos">${w.pos}</div>
           </div>
           <div class="translation">${w.translation}</div>
-          <div></div><div></div>
+          <div></div><div></div><div></div>
           <div class="row-num">${i + 1}</div>
         </div>
       `).join('');
@@ -1776,6 +1777,7 @@
           <div class="pos">${w.pos}</div>
         </div>
         <div class="translation">${w.translation}</div>
+        <div></div>
         <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
         <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
         <div class="row-num">${i + 1}</div>
@@ -4503,74 +4505,6 @@
     exitAddMode();
     showToast(toastMessage);
   });
-
-  // ===== Дебаг-сетка (только по #debug в адресе) =====
-  // Рисует реальные, измеренные прямо в этом браузере вертикальные линии с
-  // подписями (координата в px) поверх всего интерфейса — вместо того, чтобы
-  // подбирать отступы вслепую. Активируется добавлением #debug к адресу
-  // страницы, ничего не меняет в самом приложении, только рисует поверх.
-  function clearDebugOverlay() {
-    document.querySelectorAll('.debug-overlay-el').forEach(el => el.remove());
-  }
-
-  function addDebugLine(x, color, label, labelTop) {
-    const line = document.createElement('div');
-    line.className = 'debug-overlay-el';
-    line.style.cssText = `position:fixed; top:0; bottom:0; left:${x}px; width:1px; background:${color}; z-index:99999; pointer-events:none; opacity:0.85;`;
-    document.body.appendChild(line);
-    const lbl = document.createElement('div');
-    lbl.className = 'debug-overlay-el';
-    lbl.textContent = label;
-    lbl.style.cssText = `position:fixed; top:${labelTop}px; left:${x + 2}px; background:${color}; color:#000; font-size:10px; line-height:1.3; padding:1px 4px; z-index:99999; font-family:monospace; white-space:nowrap; pointer-events:none;`;
-    document.body.appendChild(lbl);
-  }
-
-  function renderDebugGrid() {
-    clearDebugOverlay();
-    const searchInput = document.getElementById('searchInput');
-    if (!searchInput) return;
-    const searchRect = searchInput.getBoundingClientRect();
-
-    // красные линии — левый/правый край строки поиска (эталон, с которым
-    // нужно совпасть)
-    addDebugLine(Math.round(searchRect.left), '#ff3b3b', 'search L ' + Math.round(searchRect.left), 40);
-    addDebugLine(Math.round(searchRect.right), '#ff3b3b', 'search R ' + Math.round(searchRect.right), 60);
-
-    const firstRow = Array.from(document.querySelectorAll('.word-row')).find(r => !r.classList.contains('row-deleting'));
-    if (!firstRow) return;
-
-    const targets = [
-      ['status', firstRow.querySelector('.status-btn')],
-      ['hebrew', firstRow.querySelector('.hebrew-word')],
-      ['meta', firstRow.querySelector('.meta-col')],
-      ['translation', firstRow.querySelector('.translation')],
-      ['favorite', firstRow.querySelector('.favorite-btn')],
-      ['delete', firstRow.querySelector('.delete-btn')],
-      ['rownum', firstRow.querySelector('.row-num')],
-    ];
-    const colors = ['#39ff88', '#39d3ff', '#ffe539', '#ff39d3', '#ff9e39', '#8a7bff', '#ffffff'];
-    let labelTop = 100;
-    targets.forEach(([key, el], i) => {
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const color = colors[i % colors.length];
-      el.style.outline = `1px solid ${color}`;
-      el.classList.add('debug-outlined-el');
-      addDebugLine(Math.round(r.left), color, `${key} L ${Math.round(r.left)}`, labelTop);
-      labelTop += 18;
-      addDebugLine(Math.round(r.right), color, `${key} R ${Math.round(r.right)}`, labelTop);
-      labelTop += 18;
-    });
-
-    // сам row — целиком, для сверки с шириной строки поиска
-    const rowRect = firstRow.getBoundingClientRect();
-    console.log('[DEBUG GRID] search:', searchRect.left, '-', searchRect.right, '(width', searchRect.width, ')');
-    console.log('[DEBUG GRID] word-row:', rowRect.left, '-', rowRect.right, '(width', rowRect.width, ')');
-  }
-
-  if (location.hash.includes('debug')) {
-    window.addEventListener('load', () => setTimeout(renderDebugGrid, 1000));
-  }
 
   // ===== Первичный рендер =====
   renderFilterBar();
