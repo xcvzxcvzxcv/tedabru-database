@@ -1,0 +1,3674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Справочник · Tedabru</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --gold: #eba64a;
+    --gold-soft: #c9a15a;
+    --purple: #9b5de5;
+    --purple-dark: #7b35d4;
+    --text-secondary: #c4b5fd;
+    --bg-dark: #0d0618;
+    --border-purple: #6b21a8;
+    --card-bg: #150a26;
+    --muted: #7c5fa0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    font-family: 'Noto Serif', serif;
+    color: #e8ddf5;
+  }
+
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+  }
+
+  /* ===== Header / Search ===== */
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding-top: 32px;
+    margin: 0 -20px 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
+    background-attachment: fixed;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -28px;
+    height: 28px;
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
+    background-attachment: fixed;
+    -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+    mask-image: linear-gradient(to bottom, black, transparent);
+    pointer-events: none;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .title {
+    font-size: 21px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .header-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border-purple);
+    background: rgba(123,53,212,0.12);
+    color: var(--text-secondary);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .header-icon-btn svg { width: 18px; height: 18px; }
+  .header-icon-btn:active { background: rgba(123,53,212,0.3); }
+  .header-icon-btn.active { background: rgba(155,93,229,0.3); border-color: var(--purple); color: var(--gold); }
+  .header-icon-btn-gold {
+    background: linear-gradient(180deg, #ffe9a0 0%, var(--gold) 45%, #a06010 100%);
+    border: none;
+    color: #2a1608;
+  }
+  .header-icon-btn-danger {
+    background: linear-gradient(180deg, #f5a9b4 0%, #c94a5e 45%, #7a1f2c 100%);
+    border: none;
+    color: #2a0810;
+  }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    stroke: var(--muted);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-purple);
+    border-radius: 12px;
+    color: #e8ddf5;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--purple); }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* ===== Word list ===== */
+
+  .list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .word-row {
+    display: grid;
+    grid-template-columns: 32px 108px 120px 1fr 26px 26px 30px;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 4px;
+    border-bottom: 1px solid rgba(123,53,212,0.15);
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    color: var(--muted);
+  }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn.favorite-on { color: var(--gold); }
+  .icon-btn.delete-btn:active { color: #e05a5a; }
+
+  .filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0 4px;
+  }
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--border-purple);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chip.active {
+    background: rgba(155,93,229,0.25);
+    border-color: var(--purple);
+    color: var(--gold);
+  }
+  .chip.chip-icon-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .chip.chip-icon-only svg { width: 12px; height: 12px; }
+
+  .chip.chip-input {
+    width: 150px;
+    background: rgba(255,255,255,0.03);
+    color: #e8ddf5;
+    outline: none;
+  }
+  .chip.chip-input:focus { border-color: var(--purple); }
+
+  /* Подборка, которую сейчас перетаскивают, "отрывается" от полотна */
+  .chip.dragging-source { opacity: 0.25; }
+
+  /* Подборка выделена в режиме мультивыделения — отличается от обычного
+     "активного фильтра" золотой рамкой вместо фиолетовой заливки */
+  .chip.chip-selected {
+    background: rgba(235,166,74,0.2);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Подборка-цель слияния — визуально "раздвигается" под наведённым чипом */
+  .chip.coll-drop-widen {
+    padding-left: 20px;
+    padding-right: 20px;
+    background: rgba(235,166,74,0.35);
+    border-color: var(--gold);
+    color: #2a1608;
+    transition: padding 0.15s, background 0.15s;
+  }
+
+  .sort-select {
+    background: rgba(13,6,24,0.6);
+    border: 1px solid var(--border-purple);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 5px 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .word-row.selectable {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* зона выделения — чекбокс/слово/транскрипция */
+  .word-row.selectable .icon-btn,
+  .word-row.selectable .hebrew-word,
+  .word-row.selectable .meta-col {
+    cursor: pointer;
+  }
+  /* зона перетаскивания выделения на чип/корзину — перевод и номер строки */
+  .word-row.selectable .translation,
+  .word-row.selectable .row-num {
+    cursor: grab;
+  }
+  .word-row.row-selected { background: rgba(155,93,229,0.12); border-radius: 8px; }
+
+  /* Подсветка чипа/корзины, когда над ним держат перетаскиваемое выделение */
+  .drop-hover {
+    background: rgba(235,166,74,0.35) !important;
+    border-color: var(--gold) !important;
+    color: #2a1608 !important;
+  }
+
+  /* Строки, которые сейчас "оторваны" от списка и перетаскиваются */
+  .word-row.dragging-source {
+    opacity: 0.25;
+    transition: opacity 0.15s;
+  }
+
+  /* "Призрак" карточки, летящий за пальцем во время перетаскивания на чип/корзину */
+  /* Ненавязчивое уведомление о добавлении слова/слов — не модалка, просто
+     плашка снизу по центру, сама гаснет через 2 секунды */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(20,10,35,0.92);
+    border: 1px solid var(--border-purple);
+    padding: 12px 22px;
+    border-radius: 12px;
+    color: #e8ddf5;
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    z-index: 300;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    max-width: calc(100% - 40px);
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .drag-ghost {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-9999px, -9999px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    background: rgba(21,10,38,0.92);
+    border: 1px solid var(--purple);
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0.9;
+    white-space: nowrap;
+  }
+  .drag-ghost-word {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 19px;
+    direction: rtl;
+    color: var(--gold);
+  }
+  .drag-ghost-badge {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--gold);
+    color: #2a1608;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+  }
+  .drag-ghost-badge.visible { display: flex; }
+
+  .status-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .status-btn svg { width: 20px; height: 20px; }
+
+  .hebrew-word {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 20px;
+    direction: rtl;
+    text-align: right;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .meta-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .translit {
+    font-family: 'Noto Serif', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 15px;
+    color: var(--text-secondary);
+    opacity: 0.9;
+  }
+  .pos {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .translation {
+    font-family: 'Noto Serif', serif;
+    font-size: 16px;
+    color: #e8ddf5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row-num {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .word-row.row-deleting {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.02);
+  }
+  .deleting-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .undo-btn {
+    padding: 5px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-purple);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .undo-btn:active { background: rgba(107,33,168,0.2); }
+  .delete-timer-track {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: rgba(255,255,255,0.06);
+  }
+  .delete-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--gold);
+    transition: width 3s linear;
+  }
+
+  .row-dimmed .hebrew-word,
+  .row-dimmed .translation { color: #8b7fa8; }
+  .row-dimmed .translit { color: #6a5f85; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .global-search-btn {
+    display: block;
+    margin: 16px auto 0;
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px dashed var(--border-purple);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .global-search-btn:active { background: rgba(107,33,168,0.2); }
+  .global-search-btn:disabled { opacity: 0.5; cursor: default; }
+  #globalSearchResults {
+    text-align: left;
+    margin-top: 14px;
+  }
+  #globalSearchResults .candidate-row {
+    background: rgba(235,166,74,0.04);
+  }
+
+  /* ===== Bottom bar ===== */
+
+  /* ===== Универсальная модалка (замена confirm()/prompt()) ===== */
+  .action-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,2,12,0.75);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 20px;
+  }
+  .action-modal-overlay.open { display: flex; }
+  .action-modal {
+    width: 100%;
+    max-width: 360px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-purple);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .action-modal h3 {
+    font-size: 17px;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+  .action-modal p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .action-modal p:empty { display: none; }
+  #actionModalInput {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-purple);
+    border-radius: 10px;
+    color: #e8ddf5;
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    outline: none;
+  }
+  #actionModalInput:focus { border-color: var(--purple); }
+  .action-modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .action-modal-btn {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-purple);
+    background: rgba(155,93,229,0.12);
+    color: var(--text-secondary);
+    font-family: 'Noto Serif', serif;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .action-modal-btn:active { background: rgba(107,33,168,0.25); }
+  .action-modal-btn.primary { background: var(--gold); border-color: var(--gold); color: #2a1608; font-weight: 700; }
+  .action-modal-btn.danger { background: rgba(168,69,90,0.2); border-color: #a8455a; color: #e08a9a; }
+  .action-modal-btn.cancel { background: transparent; color: var(--muted); }
+
+  .add-word-panel {
+    padding-top: 4px;
+    padding-bottom: 40px;
+  }
+
+  .add-mode-toggle {
+    margin-bottom: 16px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--gold-soft);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-purple);
+    border-radius: 10px;
+    color: #e8ddf5;
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    resize: vertical;
+    outline: none;
+  }
+  .field textarea:focus { border-color: var(--purple); }
+
+  .bulk-progress {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+
+  .bulk-collection-picker {
+    margin-top: 20px;
+  }
+  .bulk-collection-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .btn-stop {
+    background: transparent;
+    color: var(--muted);
+  }
+  .btn-stop:active { background: rgba(107,33,168,0.2); }
+
+  .field {
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .field input,
+  .field select {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-purple);
+    border-radius: 10px;
+    color: #e8ddf5;
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    outline: none;
+  }
+  .field input:focus,
+  .field select:focus { border-color: var(--purple); }
+  .field input[dir="rtl"] {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 18px;
+    text-align: right;
+  }
+
+  .nikkud-suggestion {
+    display: none;
+    margin-top: 14px;
+    text-align: left;
+  }
+  .nikkud-suggestion.visible { display: block; }
+  .nikkud-suggestion.error {
+    background: rgba(220,80,80,0.08);
+    border: 1px solid rgba(220,80,80,0.3);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .nikkud-suggestion .sugg-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .candidate-row {
+    display: block;
+    width: 100%;
+    text-align: right;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .candidate-row:not(:last-child) {
+    border-bottom: 1px solid rgba(235,166,74,0.15);
+  }
+  .candidate-row:active { background: rgba(235,166,74,0.15); }
+
+  .candidate-word {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 20px;
+    direction: rtl;
+    color: var(--gold);
+    margin-bottom: 2px;
+  }
+  .candidate-translit {
+    font-family: 'Noto Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-align: left;
+    direction: ltr;
+  }
+  .candidate-grammar {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: left;
+    direction: ltr;
+    margin-top: 2px;
+  }
+  .candidate-translation {
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    color: #e8ddf5;
+    text-align: left;
+    direction: ltr;
+    margin-top: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .candidate-row.already-added { opacity: 0.75; }
+  .already-added-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    text-align: left;
+    direction: ltr;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--gold-soft);
+  }
+  .already-added-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid var(--border-purple);
+  }
+  .btn-save {
+    background: var(--gold);
+    color: #2a1608;
+    font-weight: 700;
+    border: none;
+  }
+  .btn-save:active { transform: scale(0.98); }
+  .btn-save:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="title" id="headerTitle">Справочник</div>
+      <div class="header-actions">
+        <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+        </button>
+        <button class="header-icon-btn header-icon-btn-gold" id="openModalBtn" title="Добавить слово">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" id="searchInput" placeholder="Слово, перевод или транскрипция" />
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+  </div>
+
+  <div class="add-word-panel" id="addWordPanel" style="display:none;">
+    <div class="add-mode-toggle">
+      <button type="button" class="link-btn" id="toggleBulkModeBtn">Добавить несколько слов сразу</button>
+    </div>
+
+    <div id="singleAddFields">
+      <div class="nikkud-suggestion" id="nikkudSuggestion"></div>
+
+      <div class="field">
+        <label>Транскрипция</label>
+        <input type="text" id="inputTranslit" />
+      </div>
+
+      <div class="field">
+        <label>Перевод</label>
+        <input type="text" id="inputTranslation" />
+      </div>
+
+      <div class="field">
+        <label>Часть речи</label>
+        <select id="inputPos">
+          <option value="сущ, м.р">Существительное, м.р.</option>
+          <option value="сущ, ж.р">Существительное, ж.р.</option>
+          <option value="прил">Прилагательное</option>
+          <option value="пааль">Глагол, пааль</option>
+          <option value="пиэль">Глагол, пиэль</option>
+          <option value="хифиль">Глагол, хифиль</option>
+          <option value="нифаль">Глагол, нифаль</option>
+          <option value="hитпаэль">Глагол, hитпаэль</option>
+          <option value="пуаль">Глагол, пуаль</option>
+          <option value="хуфаль">Глагол, хуфаль</option>
+          <option value="местоим">Местоимение</option>
+          <option value="числ">Числительное</option>
+          <option value="нареч">Наречие</option>
+          <option value="др">Другое</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-save" id="saveBtn" disabled>Добавить</button>
+      </div>
+    </div>
+
+    <div id="bulkAddFields" style="display:none;">
+      <div class="field">
+        <label>Слова через пробел, запятую или перенос строки</label>
+        <textarea id="bulkInput" rows="7" placeholder="мишпаха, шалом, ילד, тода раба, спасибо..."></textarea>
+      </div>
+      <div class="bulk-progress" id="bulkProgress" style="display:none;"></div>
+      <div class="modal-actions">
+        <button class="btn-save" id="bulkAddSubmitBtn">Добавить все</button>
+        <button class="btn-stop" id="bulkAddStopBtn" style="display:none;">Остановить</button>
+      </div>
+    </div>
+
+    <div class="bulk-collection-picker">
+      <div class="bulk-collection-label">Добавить сразу в подборку (необязательно)</div>
+      <div class="filter-row" id="bulkCollectionChips"></div>
+    </div>
+  </div>
+
+  <div class="list" id="wordList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="drag-ghost" id="dragGhost">
+  <span class="drag-ghost-word" id="dragGhostWord"></span>
+  <span class="drag-ghost-badge" id="dragGhostBadge"></span>
+</div>
+
+<div class="action-modal-overlay" id="actionModalOverlay">
+  <div class="action-modal">
+    <h3 id="actionModalTitle"></h3>
+    <p id="actionModalMessage"></p>
+    <input type="text" id="actionModalInput" style="display:none;" />
+    <div id="actionModalButtons" class="action-modal-buttons"></div>
+  </div>
+</div>
+
+<script>
+  // ===== Иконки статуса =====
+  // Всего два состояния: пустой кружок ("изучается") и галочка ("изучено").
+  // Раньше был ещё "новое" — убрали (см. фикс со статус-чипами): у старых
+  // слов, сохранённых со статусом "new", ICONS[w.status] просто не найдётся —
+  // используем пустой кружок ("изучается") как разумный запасной вариант
+  const ICONS = {
+    active: '<svg viewBox="0 0 24 24" fill="none" stroke="#eba64a" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>',
+    known: '<svg viewBox="0 0 24 24" fill="none" stroke="#8b7fa8" stroke-width="1.8"><polyline points="5 13 10 18 19 7"/></svg>'
+  };
+  const STATUS_CYCLE = ['active', 'known'];
+
+  // ===== Данные (в памяти + localStorage, если доступно) =====
+  const STORAGE_KEY = 'tedabru_dictionary_v1';
+  const COLLECTIONS_KEY = 'tedabru_collections_v1';
+
+  const seedWords = [
+    { hebrew: 'מִשְׁפָּחָה', translit: 'мишпаха́', pos: 'сущ, ж.р', translation: 'семья', status: 'active', favorite: true, collectionIds: [], addedAt: Date.now() - 8*86400000 },
+    { hebrew: 'לְהַסְבִּיר', translit: 'леhасбир', pos: 'хифиль', translation: 'объяснять', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 7*86400000 },
+    { hebrew: 'חָשׁוּב', translit: 'хашу́в', pos: 'прил', translation: 'важный', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 6*86400000 },
+    { hebrew: 'לָרוּץ', translit: 'ларуц', pos: 'пааль', translation: 'бежать', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 5*86400000 },
+    { hebrew: 'לְקַבֵּל', translit: 'лекабэ́ль', pos: 'пиэль', translation: 'получать, принимать', status: 'active', favorite: false, collectionIds: [], addedAt: Date.now() - 4*86400000 },
+    { hebrew: 'הַפְתָּעָה', translit: 'hафтаа́', pos: 'сущ, ж.р', translation: 'сюрприз', status: 'known', favorite: true, collectionIds: [], addedAt: Date.now() - 3*86400000 },
+    { hebrew: 'קַל', translit: 'каль', pos: 'прил', translation: 'лёгкий, простой', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 2*86400000 },
+    { hebrew: 'עָמוֹק', translit: 'амо́к', pos: 'прил', translation: 'глубокий', status: 'known', favorite: false, collectionIds: [], addedAt: Date.now() - 1*86400000 },
+  ];
+
+  function loadWords() {
+    let loaded;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      loaded = raw ? JSON.parse(raw) : null;
+    } catch (e) { /* localStorage недоступен — работаем в памяти */ }
+    if (!loaded) loaded = seedWords.map((w, i) => ({ id: i + 1, ...w }));
+    // на случай если слово сохранено ещё до появления избранного/подборок/даты —
+    // подставляем безопасные значения по умолчанию, не теряя остальные данные
+    return loaded.map(w => ({
+      favorite: false,
+      collectionIds: [],
+      addedAt: w.id || Date.now(),
+      ...w
+    }));
+  }
+
+  function saveWords() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
+    } catch (e) { /* тихо игнорируем — данные останутся только в этой сессии */ }
+  }
+
+  function loadCollections() {
+    try {
+      const raw = localStorage.getItem(COLLECTIONS_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* localStorage недоступен */ }
+    return [];
+  }
+
+  function saveCollections() {
+    try { localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections)); }
+    catch (e) { /* тихо игнорируем */ }
+  }
+
+  let words = loadWords();
+  let collections = loadCollections(); // [{ id, name }]
+  let searchQuery = '';
+
+  // ===== Универсальная модалка — замена confirm()/prompt() =====
+  // ===== Тост-уведомление (не модалка) — держится 2 секунды, потом фейд-аут =====
+  const toastEl = document.getElementById('toast');
+  let toastTimer = null;
+  function showToast(message, duration = 2000) {
+    clearTimeout(toastTimer);
+    toastEl.textContent = message;
+    toastEl.classList.add('visible');
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('visible');
+    }, duration);
+  }
+
+  const actionModalOverlay = document.getElementById('actionModalOverlay');
+  const actionModalTitleEl = document.getElementById('actionModalTitle');
+  const actionModalMessageEl = document.getElementById('actionModalMessage');
+  const actionModalInputEl = document.getElementById('actionModalInput');
+  const actionModalButtonsEl = document.getElementById('actionModalButtons');
+
+  function closeActionModal() {
+    actionModalOverlay.classList.remove('open');
+    actionModalButtonsEl.innerHTML = '';
+  }
+
+  // buttons: [{ label, variant: 'primary'|'danger'|'cancel'|undefined, action(value) }]
+  // showInput — показывает текстовое поле; value, переданное в action(),
+  // тогда будет его (обрезанным) содержимым
+  function showActionModal({ title, message, showInput, inputPlaceholder, inputValue, buttons }) {
+    actionModalTitleEl.textContent = title || '';
+    actionModalMessageEl.textContent = message || '';
+    actionModalInputEl.style.display = showInput ? '' : 'none';
+    if (showInput) {
+      actionModalInputEl.value = inputValue || '';
+      actionModalInputEl.placeholder = inputPlaceholder || '';
+    }
+    actionModalButtonsEl.innerHTML = buttons.map((b, i) =>
+      `<button type="button" class="action-modal-btn ${b.variant || ''}" data-idx="${i}">${b.label}</button>`
+    ).join('');
+    actionModalButtonsEl.querySelectorAll('.action-modal-btn').forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        const value = showInput ? actionModalInputEl.value.trim() : undefined;
+        closeActionModal();
+        if (buttons[i].action) buttons[i].action(value);
+      });
+    });
+    actionModalOverlay.classList.add('open');
+    if (showInput) {
+      setTimeout(() => { actionModalInputEl.focus(); actionModalInputEl.select(); }, 50);
+    }
+  }
+
+  // Enter в текстовом поле нажимает последнюю (обычно основную) кнопку
+  actionModalInputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const buttons = actionModalButtonsEl.querySelectorAll('.action-modal-btn');
+      if (buttons.length) buttons[buttons.length - 1].click();
+    }
+  });
+
+  // Если название уже занято — подбираем "имя (2)", "имя (3)" и т.д.
+  function uniqueCollectionName(desiredName) {
+    const existingNames = new Set(collections.map(c => c.name));
+    if (!existingNames.has(desiredName)) return desiredName;
+    let n = 2;
+    while (existingNames.has(`${desiredName} (${n})`)) n++;
+    return `${desiredName} (${n})`;
+  }
+
+  function createCollectionViaModal(onCreated) {
+    showActionModal({
+      title: 'Новая подборка',
+      showInput: true,
+      inputPlaceholder: 'Название подборки',
+      buttons: [
+        { label: 'Отмена', variant: 'cancel' },
+        { label: 'Создать', variant: 'primary', action: (name) => {
+            if (!name) return;
+            const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
+            collections.push(nc);
+            saveCollections();
+            renderFilterBar();
+            if (onCreated) onCreated(nc);
+          } },
+      ]
+    });
+  }
+
+  // ===== Состояние фильтров и сортировки =====
+  let filterStatus = null;       // null | 'new' | 'active' | 'known'
+  let filterFavorite = false;    // показывать только избранное
+  let filterPos = null;          // null | конкретное значение w.pos
+  let filterCollectionId = null; // null | id подборки
+  let creatingCollectionInline = false; // чип "+" превращён в текстовый инпут для ввода имени
+
+  // ===== Режим выбора (для массового добавления в подборку) =====
+  let selectionMode = false;
+  let addMode = false; // встроенный (не модальный) режим добавления слова
+  let selectedIds = new Set();
+  let selectedCollectionIds = new Set(); // подборки, выделенные кликом в том же режиме выделения
+  let sortMode = 'added';        // 'added' | 'alpha' | 'status'
+
+  // ===== Отложенное удаление слова (с возможностью отмены) =====
+  let pendingDeleteIds = new Set();          // id слов, для которых сейчас идёт 3-секундный обратный отсчёт
+  const pendingDeleteTimers = new Map();     // id -> таймер, который реально удалит слово
+  const pendingDeleteStartedAt = new Map();  // id -> момент старта отсчёта (Date.now()) — нужно, чтобы
+                                              // при перерендере (например, из-за удаления ДРУГОГО слова)
+                                              // полоска не начинала отсчёт заново, а продолжала с того же места
+
+  // Ищет уже сохранённое слово по ТОЧНОМУ написанию (с огласовками) — это, а
+  // не консонантный скелет, потому что омографы (разные огласовки/породы у
+  // одного и того же написания без никуда) — это разные слова, и не должны
+  // считаться дублями друг друга
+  function findExistingWordByHebrew(hebrewText) {
+    const key = (hebrewText || '').trim().normalize('NFC');
+    if (!key) return null;
+    return words.find(w => (w.hebrew || '').trim().normalize('NFC') === key) || null;
+  }
+
+  // ===== Рендер списка =====
+  function normalize(str) {
+    return (str || '')
+      .toLowerCase()
+      .trim()
+      // латинская "h" в транскрипции (леhасбир, hафтаа) часто пропускается при
+      // быстром вводе без переключения раскладки — убираем её из сравнения,
+      // чтобы "леасбир" находил "леhасбир"
+      .replace(/h/g, '');
+  }
+
+  function getFilteredWords() {
+    let list = words;
+    if (searchQuery) {
+      const q = normalize(searchQuery);
+      list = list.filter(w =>
+        normalize(w.hebrew).includes(q) ||
+        normalize(w.translit).includes(q) ||
+        normalize(w.translation).includes(q)
+      );
+    }
+    if (filterStatus) list = list.filter(w => w.status === filterStatus);
+    if (filterFavorite) list = list.filter(w => w.favorite);
+    if (filterPos) list = list.filter(w => w.pos === filterPos);
+    if (filterCollectionId) list = list.filter(w => (w.collectionIds || []).includes(filterCollectionId));
+
+    const sorted = [...list];
+    if (sortMode === 'alpha') {
+      sorted.sort((a, b) => (a.translit || '').localeCompare(b.translit || '', 'ru'));
+    } else if (sortMode === 'status') {
+      const order = { new: 0, active: 1, known: 2 };
+      sorted.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+    } else {
+      sorted.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0)); // сначала недавно добавленные
+    }
+    return sorted;
+  }
+
+  function globalSearchBlockHtml() {
+    if (!searchQuery.trim()) return '';
+    return `
+      <div id="instantDictResults"></div>
+      <button type="button" class="global-search-btn" id="globalSearchBtn">
+        Искать среди всех слов иврита по транскрипции «${searchQuery}»
+      </button>
+      <div id="globalSearchResults"></div>
+    `;
+  }
+
+  let instantSearchGeneration = 0;
+
+  async function runInstantDictSearch(query) {
+    const myGeneration = ++instantSearchGeneration;
+    const el = document.getElementById('instantDictResults');
+    if (!el) return;
+    const candidates = await resolveCandidatesDictOnly(query);
+    if (myGeneration !== instantSearchGeneration) return; // устарело — стартовал более новый ввод
+    const el2 = document.getElementById('instantDictResults'); // список мог перерисоваться за время ожидания
+    if (!el2) return;
+    renderCandidatesInto(el2, candidates);
+  }
+
+  function attachGlobalSearchHandler() {
+    const btn = document.getElementById('globalSearchBtn');
+    if (btn && searchQuery.trim()) {
+      btn.addEventListener('click', () => runGlobalTranscriptionSearch(searchQuery.trim(), btn));
+    }
+    if (searchQuery.trim()) {
+      runInstantDictSearch(searchQuery.trim());
+    }
+  }
+
+  const STAR_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  const CHECK_ON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" fill="rgba(235,166,74,0.2)"/><polyline points="7 12 10.5 15.5 17 8.5"/></svg>';
+  const CHECK_OFF_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg>';
+  const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+  const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  const EXIT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+  const FOLDER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>';
+
+  function renderFilterBar() {
+    const el = document.getElementById('filterBar');
+    const statusChips = [
+      { key: null, label: 'Все' },
+      { key: 'active', label: 'Изучается' },
+      { key: 'known', label: 'Изучено' },
+    ];
+    const posValues = [...new Set(words.map(w => w.pos))].sort();
+    const hasFavorites = words.some(w => w.favorite);
+    // если избранных слов не осталось, а фильтр "Избранное" всё ещё был
+    // включён — сбрасываем его: чип сейчас исчезнет, и включить обратно
+    // будет нечем
+    if (!hasFavorites && filterFavorite) filterFavorite = false;
+
+    // ===== Счётчики для чипов — "Все · 121" =====
+    const countByStatus = { active: 0, known: 0 };
+    words.forEach(w => { if (countByStatus[w.status] !== undefined) countByStatus[w.status]++; });
+    const favoriteCount = words.filter(w => w.favorite).length;
+    const countByPos = {};
+    words.forEach(w => { countByPos[w.pos] = (countByPos[w.pos] || 0) + 1; });
+    const countByCollection = {};
+    words.forEach(w => (w.collectionIds || []).forEach(cid => { countByCollection[cid] = (countByCollection[cid] || 0) + 1; }));
+
+    el.innerHTML = `
+      <div class="filter-row">
+        ${statusChips.map(c => {
+          // "Все" подсвечен, только если вообще ничего не выбрано — если
+          // включено "Избранное", "Все" не должен казаться тоже активным
+          const isActive = c.key === null ? (filterStatus === null && !filterFavorite) : (filterStatus === c.key);
+          const count = c.key === null ? words.length : (countByStatus[c.key] || 0);
+          return `<button type="button" class="chip ${isActive ? 'active' : ''}" data-status="${c.key ?? ''}">${c.label} · ${count}</button>`;
+        }).join('')}
+        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip">★ Избранное · ${favoriteCount}</button>` : ''}
+      </div>
+      <div class="filter-row">
+        ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
+      </div>
+      <div class="filter-row">
+        ${collections.map(c => {
+          const isSelected = selectionMode && selectedCollectionIds.has(c.id);
+          const isFilterActive = !selectionMode && filterCollectionId === c.id;
+          return `<button type="button" class="chip ${isFilterActive ? 'active' : ''} ${isSelected ? 'chip-selected' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
+        }).join('')}
+        ${creatingCollectionInline
+          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
+          : `<button type="button" class="chip chip-icon-only" id="newCollectionChip" title="Новая подборка">${PLUS_ICON}</button>`}
+        <select class="sort-select" id="sortSelect">
+          <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
+          <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>По алфавиту</option>
+          <option value="status" ${sortMode === 'status' ? 'selected' : ''}>По статусу</option>
+        </select>
+      </div>
+    `;
+
+    el.querySelectorAll('[data-status]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterStatus = btn.dataset.status || null;
+        // "Изучается" — единственный статус, который допустимо сочетать с
+        // "Избранное" одновременно; при выборе любого другого статуса (в том
+        // числе "Все") сбрасываем "Избранное", чтобы не подсвечивались сразу
+        // два взаимоисключающих на вид фильтра
+        if (filterStatus !== 'active') filterFavorite = false;
+        renderFilterBar(); renderList();
+      });
+    });
+    const favChipEl = document.getElementById('favChip');
+    if (favChipEl) favChipEl.addEventListener('click', () => {
+      filterFavorite = !filterFavorite;
+      // и в обратную сторону: включая "Избранное" при любом статусе, кроме
+      // "Изучается", сбрасываем статус — единственная разрешённая пара это
+      // "Изучается" + "Избранное"
+      if (filterFavorite && filterStatus !== 'active') filterStatus = null;
+      renderFilterBar(); renderList();
+    });
+    el.querySelectorAll('[data-pos]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.pos;
+        filterPos = (filterPos === val) ? null : val; // повторный клик снимает фильтр
+        renderFilterBar(); renderList();
+      });
+    });
+    el.querySelectorAll('[data-coll]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.coll;
+        if (selectionMode) {
+          // в режиме выделения клик по подборке добавляет/убирает её из
+          // мультивыделения (как и клик по слову), а не фильтрует список
+          if (selectedCollectionIds.has(val)) selectedCollectionIds.delete(val); else selectedCollectionIds.add(val);
+          headerTitleEl.textContent = selectionHeaderText();
+          renderFilterBar();
+          return;
+        }
+        filterCollectionId = (filterCollectionId === val) ? null : val; // повторный клик снимает фильтр
+        renderFilterBar(); renderList();
+      });
+    });
+    if (creatingCollectionInline) {
+      const inlineInput = document.getElementById('newCollectionInlineInput');
+      inlineInput.focus();
+      const finishInlineCreate = (commit) => {
+        if (!creatingCollectionInline) return; // уже обработано (Enter уже отработал, blur не нужен)
+        creatingCollectionInline = false;
+        if (commit) {
+          const name = inlineInput.value.trim();
+          if (name) {
+            collections.push({ id: 'c' + Date.now(), name: uniqueCollectionName(name) });
+            saveCollections();
+          }
+        }
+        renderFilterBar();
+      };
+      inlineInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') finishInlineCreate(true);
+        else if (e.key === 'Escape') { e.stopPropagation(); finishInlineCreate(false); }
+      });
+      // blur коммитит (как и Enter), а не отменяет — иначе клик сразу по
+      // другой кнопке без явного Enter снимает фокус С ПОЛЯ раньше, чем
+      // обработается сам клик, и введённое имя тихо терялось. Явно
+      // отменяет создание только Esc.
+      inlineInput.addEventListener('blur', () => finishInlineCreate(true));
+    } else {
+      document.getElementById('newCollectionChip').addEventListener('click', () => {
+        creatingCollectionInline = true;
+        renderFilterBar();
+      });
+    }
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      sortMode = e.target.value;
+      renderList();
+    });
+  }
+
+  function renderList() {
+    const listEl = document.getElementById('wordList');
+    const filtered = getFilteredWords();
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          Ничего не найдено в вашем словаре.
+          ${globalSearchBlockHtml()}
+        </div>
+      `;
+      attachGlobalSearchHandler();
+      return;
+    }
+
+    if (selectionMode) {
+      listEl.innerHTML = filtered.map((w, i) => `
+        <div class="word-row selectable ${selectedIds.has(w.id) ? 'row-selected' : ''}" data-id="${w.id}">
+          <div class="icon-btn" style="pointer-events:none;">${selectedIds.has(w.id) ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
+          <div class="hebrew-word">${w.hebrew}</div>
+          <div class="meta-col">
+            <div class="translit">/${w.translit}/</div>
+            <div class="pos">${w.pos}</div>
+          </div>
+          <div class="translation">${w.translation}</div>
+          <div></div><div></div>
+          <div class="row-num">${i + 1}</div>
+        </div>
+      `).join('');
+      // клики/протаскивание в режиме выделения обрабатываются один раз при
+      // инициализации (см. attachSelectionDragHandlers) через делегирование
+      // на #wordList, а не тут — строки пересоздаются на каждый renderList(),
+      // а обработчик должен жить постоянно, иначе на каждый рендер плодились
+      // бы новые слушатели
+      return;
+    }
+
+    listEl.innerHTML = filtered.map((w, i) => {
+      if (pendingDeleteIds.has(w.id)) {
+        // слово в процессе удаления — вместо обычной карточки показываем
+        // затемнённую плашку с "Удалено", отменой и полоской обратного отсчёта
+        return `
+          <div class="word-row row-deleting" data-id="${w.id}">
+            <div class="deleting-label">Удалено</div>
+            <button type="button" class="undo-btn" data-id="${w.id}">Отмена</button>
+            <div class="delete-timer-track"><div class="delete-timer-bar" data-timerbar="${w.id}"></div></div>
+          </div>
+        `;
+      }
+      return `
+      <div class="word-row ${w.status === 'known' ? 'row-dimmed' : ''}" data-id="${w.id}">
+        <button class="status-btn" data-id="${w.id}">${ICONS[w.status] || ICONS.active}</button>
+        <div class="hebrew-word">${w.hebrew}</div>
+        <div class="meta-col">
+          <div class="translit">/${w.translit}/</div>
+          <div class="pos">${w.pos}</div>
+        </div>
+        <div class="translation">${w.translation}</div>
+        <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
+        <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
+        <div class="row-num">${i + 1}</div>
+      </div>
+    `;
+    }).join('') + `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
+
+    listEl.querySelectorAll('.status-btn').forEach(btn => {
+      // pointerdown вместо click — реагируем на нажатие, не дожидаясь
+      // отпускания, ощущается заметно быстрее
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        cycleStatus(parseInt(btn.dataset.id));
+      });
+    });
+    listEl.querySelectorAll('.favorite-btn').forEach(btn => {
+      btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
+    });
+    listEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteWord(parseInt(btn.dataset.id)));
+    });
+    listEl.querySelectorAll('.undo-btn').forEach(btn => {
+      btn.addEventListener('click', () => cancelPendingDelete(parseInt(btn.dataset.id)));
+    });
+    // Анимация полоски обратного отсчёта — считаем СКОЛЬКО РЕАЛЬНО осталось
+    // относительно момента запуска удаления (pendingDeleteStartedAt), а не
+    // всегда проигрываем заново все 3 секунды. Без этого при удалении
+    // ВТОРОГО слова renderList() пересобирает DOM у ВСЕХ строк разом — и
+    // полоска уже удаляемого первого слова визуально "сбрасывалась" обратно
+    // на 100%, хотя реальный таймер (setTimeout) продолжал идти как надо.
+    listEl.querySelectorAll('[data-timerbar]').forEach(bar => {
+      const id = parseInt(bar.dataset.timerbar);
+      const startedAt = pendingDeleteStartedAt.get(id) || Date.now();
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, 3000 - elapsed);
+      const remainingPct = (remaining / 3000) * 100;
+      bar.style.transition = 'none';
+      bar.style.width = remainingPct + '%';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        bar.style.transition = `width ${remaining}ms linear`;
+        bar.style.width = '0%';
+      }));
+    });
+    attachGlobalSearchHandler();
+  }
+
+  function cycleStatus(id) {
+    const word = words.find(w => w.id === id);
+    if (!word) return;
+    const currentIdx = STATUS_CYCLE.indexOf(word.status);
+    word.status = STATUS_CYCLE[(currentIdx + 1) % STATUS_CYCLE.length];
+    saveWords();
+    renderFilterBar();
+    renderList();
+  }
+
+  function toggleFavorite(id) {
+    const word = words.find(w => w.id === id);
+    if (!word) return;
+    word.favorite = !word.favorite;
+    saveWords();
+    renderFilterBar();
+    renderList();
+  }
+
+  // Удаление теперь без модального confirm() — карточка гаснет на месте,
+  // показывает "Удалено" и кнопку отмены на 3 секунды, и только по истечении
+  // этого времени слово реально пропадает из справочника (см. finalizeDelete)
+  function deleteWord(id) {
+    if (pendingDeleteIds.has(id)) return; // уже удаляется
+    const word = words.find(w => w.id === id);
+    if (!word) return;
+    pendingDeleteIds.add(id);
+    pendingDeleteStartedAt.set(id, Date.now());
+    renderList();
+    const timer = setTimeout(() => finalizeDelete(id), 3000);
+    pendingDeleteTimers.set(id, timer);
+  }
+
+  function finalizeDelete(id) {
+    pendingDeleteTimers.delete(id);
+    pendingDeleteIds.delete(id);
+    pendingDeleteStartedAt.delete(id);
+    words = words.filter(w => w.id !== id);
+    saveWords();
+    renderFilterBar();
+    renderList();
+  }
+
+  function cancelPendingDelete(id) {
+    const timer = pendingDeleteTimers.get(id);
+    if (timer) clearTimeout(timer);
+    pendingDeleteTimers.delete(id);
+    pendingDeleteIds.delete(id);
+    pendingDeleteStartedAt.delete(id);
+    renderList();
+  }
+
+  // ===== Режим выбора: заголовок, кнопка-действие, Esc =====
+  const selectModeBtn = document.getElementById('selectModeBtn');
+  const primaryActionBtn = document.getElementById('openModalBtn');
+  const headerTitleEl = document.getElementById('headerTitle');
+  const wordListEl = document.getElementById('wordList');
+
+  function selectionHeaderText() {
+    const parts = [];
+    if (selectedIds.size) parts.push(`слов: ${selectedIds.size}`);
+    if (selectedCollectionIds.size) parts.push(`подборок: ${selectedCollectionIds.size}`);
+    return parts.length ? `Выделено — ${parts.join(', ')}` : 'Выделено: 0';
+  }
+
+  function updateHeaderForSelectionMode() {
+    if (selectionMode) {
+      headerTitleEl.textContent = selectionHeaderText();
+      primaryActionBtn.innerHTML = TRASH_ICON;
+      primaryActionBtn.classList.remove('header-icon-btn-gold');
+      primaryActionBtn.classList.add('header-icon-btn-danger');
+      primaryActionBtn.title = 'Удалить выбранное';
+      primaryActionBtn.setAttribute('data-drop-delete', '1');
+    } else if (addMode) {
+      headerTitleEl.textContent = 'Введите слово, которое хотите добавить';
+      primaryActionBtn.innerHTML = EXIT_ICON;
+      primaryActionBtn.classList.remove('header-icon-btn-danger');
+      primaryActionBtn.classList.add('header-icon-btn-gold');
+      primaryActionBtn.title = 'Отменить добавление';
+      primaryActionBtn.removeAttribute('data-drop-delete');
+    } else {
+      headerTitleEl.textContent = 'Справочник';
+      primaryActionBtn.innerHTML = PLUS_ICON;
+      primaryActionBtn.classList.remove('header-icon-btn-danger');
+      primaryActionBtn.classList.add('header-icon-btn-gold');
+      primaryActionBtn.title = 'Добавить слово';
+      primaryActionBtn.removeAttribute('data-drop-delete');
+    }
+  }
+
+  selectModeBtn.addEventListener('click', () => {
+    if (addMode) return; // нельзя одновременно выделять и добавлять
+    selectionMode = !selectionMode;
+    selectedIds = new Set();
+    selectedCollectionIds = new Set();
+    selectModeBtn.classList.toggle('active', selectionMode);
+    updateHeaderForSelectionMode();
+    renderFilterBar();
+    renderList();
+  });
+
+  function exitSelectionMode() {
+    selectionMode = false;
+    selectedIds = new Set();
+    selectedCollectionIds = new Set();
+    selectModeBtn.classList.remove('active');
+    updateHeaderForSelectionMode();
+  }
+
+  // Esc — закрывает открытую модалку, потом режим добавления слова, а если
+  // ничего из этого нет — снимает режим выделения
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (actionModalOverlay.classList.contains('open')) {
+      closeActionModal();
+    } else if (addMode) {
+      exitAddMode();
+    } else if (selectionMode) {
+      exitSelectionMode();
+      renderFilterBar();
+      renderList();
+    }
+  });
+
+  function performBulkDelete() {
+    if (!selectedIds.size) return;
+    const idsToDelete = new Set(selectedIds); // на случай, если что-то изменит selectedIds пока открыта модалка
+    showActionModal({
+      title: `Удалить ${idsToDelete.size} слов(о) из справочника?`,
+      buttons: [
+        { label: 'Отмена', variant: 'cancel' },
+        { label: 'Удалить', variant: 'danger', action: () => {
+            words = words.filter(w => !idsToDelete.has(w.id));
+            saveWords();
+            exitSelectionMode();
+            renderFilterBar();
+            renderList();
+          } },
+      ]
+    });
+  }
+
+  // кнопка в шапке работает по-разному в зависимости от режима: обычно —
+  // включает встроенное добавление слова, в режиме выделения — удаляет
+  // выбранное, в режиме добавления — сама же из него выходит (см.
+  // updateHeaderForSelectionMode)
+  primaryActionBtn.addEventListener('click', () => {
+    if (selectionMode) { performBulkDelete(); return; }
+    if (addMode) { exitAddMode(); return; }
+    enterAddMode();
+  });
+
+  function assignSelectedToCollection(collectionId) {
+    words.forEach(w => {
+      if (selectedIds.has(w.id)) {
+        w.collectionIds = w.collectionIds || [];
+        if (!w.collectionIds.includes(collectionId)) w.collectionIds.push(collectionId);
+      }
+    });
+    saveWords();
+    exitSelectionMode();
+    renderFilterBar();
+    renderList();
+  }
+
+  // Слова, у которых искомый статус/избранное уже стоит — просто пропускаются
+  // (присвоение того же значения — no-op), остальным присваивается новое
+  function assignStatusToSelected(status) {
+    words.forEach(w => { if (selectedIds.has(w.id)) w.status = status; });
+    saveWords();
+    exitSelectionMode();
+    renderFilterBar();
+    renderList();
+  }
+
+  function assignFavoriteToSelected() {
+    words.forEach(w => { if (selectedIds.has(w.id)) w.favorite = true; });
+    saveWords();
+    exitSelectionMode();
+    renderFilterBar();
+    renderList();
+  }
+
+  // ===== Два раздельных жеста в режиме выделения =====
+  // Зона статуса/слова/транскрипции — "выделение": тянешь вниз/вверх, строки
+  // под пальцем добавляются в выделение (как в приложении "Фото" на iOS).
+  // Зона перевода и номера — "перетаскивание": хватаешь ТЕКУЩЕЕ выделение
+  // (если строка ещё не выделена — выделяем и её тоже) и тащишь на чип
+  // подборки / "+ новая подборка" / корзину в шапке; во время этого жеста
+  // наведение на другие строки уже не меняет выделение — это раздельные вещи.
+  let dragSession = null; // { pointerId, type: 'select'|'move', mode, lastRowId, dropTarget }
+
+  function applyRowSelection(id, shouldSelect, row) {
+    if (shouldSelect) selectedIds.add(id); else selectedIds.delete(id);
+    if (row) {
+      row.classList.toggle('row-selected', shouldSelect);
+      const iconEl = row.querySelector('.icon-btn');
+      if (iconEl) iconEl.innerHTML = shouldSelect ? CHECK_ON_ICON : CHECK_OFF_ICON;
+    }
+    if (selectionMode) headerTitleEl.textContent = selectionHeaderText();
+  }
+
+  // Зона "перетаскивания" — всё, что НЕ является чекбоксом/словом/
+  // транскрипцией (то есть перевод, номер строки, и пустые ячейки-заполнители
+  // между ними) — по умолчанию это зона перетаскивания, а не наоборот, иначе
+  // клики по пустым ячейкам-заполнителям ошибочно засчитывались как "выделение"
+  function isDragZone(target) {
+    if (target.closest('.icon-btn') || target.closest('.hebrew-word') || target.closest('.meta-col')) return false;
+    return true;
+  }
+
+  // Находит валидную "цель сброса" под указателем — чип конкретной подборки
+  // чип "+ новая подборка",
+  // чипы статуса "Изучается"/"Изучено" (не "Все" — у него data-status
+  // пустой), чип "Избранное" или кнопку-корзину в шапке (она помечена
+  // data-drop-delete только пока активен режим выделения)
+  function getDropTargetAt(x, y) {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const deleteBtn = el.closest('[data-drop-delete]');
+    if (deleteBtn) return { type: 'delete', el: deleteBtn };
+    const newCollChip = el.closest('#newCollectionChip');
+    if (newCollChip) return { type: 'new-collection', el: newCollChip };
+    const collChip = el.closest('[data-coll]');
+    if (collChip && collChip.dataset.coll) return { type: 'collection', id: collChip.dataset.coll, el: collChip };
+    const statusChip = el.closest('[data-status]');
+    if (statusChip && statusChip.dataset.status) return { type: 'status', value: statusChip.dataset.status, el: statusChip };
+    const favChip = el.closest('#favChip');
+    if (favChip) return { type: 'favorite', el: favChip };
+    return null;
+  }
+
+  function clearDropHighlight() {
+    document.querySelectorAll('.drop-hover').forEach(el => el.classList.remove('drop-hover'));
+  }
+
+  const dragGhostEl = document.getElementById('dragGhost');
+  const dragGhostWordEl = document.getElementById('dragGhostWord');
+  const dragGhostBadgeEl = document.getElementById('dragGhostBadge');
+
+  function showDragGhost(word, count, x, y) {
+    dragGhostWordEl.textContent = word;
+    if (count > 1) {
+      dragGhostBadgeEl.textContent = count;
+      dragGhostBadgeEl.classList.add('visible');
+    } else {
+      dragGhostBadgeEl.classList.remove('visible');
+    }
+    moveDragGhost(x, y);
+  }
+
+  function moveDragGhost(x, y) {
+    // смещаем "призрак" чуть выше и левее пальца, чтобы сама карточка не
+    // пряталась под ним — так же ведут себя системные drag-превью
+    dragGhostEl.style.transform = `translate(${x}px, ${y}px) translate(-50%, -130%)`;
+  }
+
+  function hideDragGhost() {
+    dragGhostEl.style.transform = 'translate(-9999px, -9999px)';
+  }
+
+  // "Отрываем" от полотна карточки, которые сейчас перетаскиваются —
+  // визуально гасим их, пока идёт жест
+  function setDraggingSourceRows(active) {
+    wordListEl.querySelectorAll('.word-row.selectable.row-selected').forEach(row => {
+      row.classList.toggle('dragging-source', active);
+    });
+  }
+
+  wordListEl.addEventListener('pointerdown', (e) => {
+    if (!selectionMode) return;
+    const row = e.target.closest('.word-row.selectable');
+    if (!row) return;
+    const id = parseInt(row.dataset.id);
+
+    if (isDragZone(e.target)) {
+      // зона перетаскивания реагирует ТОЛЬКО на уже выделённые карточки —
+      // если карточка не выделена, ничего не происходит вовсе: остальное
+      // выделение остаётся как было, и никакого драга не начинается
+      if (!selectedIds.has(id)) return;
+      dragSession = { pointerId: e.pointerId, type: 'move', dropTarget: null, hoveredElement: null };
+      document.body.style.cursor = 'grabbing';
+      setDraggingSourceRows(true);
+      showDragGhost(row.querySelector('.hebrew-word').textContent, selectedIds.size, e.clientX, e.clientY);
+    } else {
+      // "выделение" — тянем по строкам, переключая их
+      const willSelect = !selectedIds.has(id);
+      applyRowSelection(id, willSelect, row);
+      dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
+    }
+    try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+  });
+
+  wordListEl.addEventListener('pointermove', (e) => {
+    if (!dragSession || dragSession.pointerId !== e.pointerId) return;
+    e.preventDefault(); // не даём странице скроллиться во время жеста
+
+    if (dragSession.type === 'move') {
+      moveDragGhost(e.clientX, e.clientY);
+    }
+
+    if (dragSession.type === 'select') {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const rowEl = el && el.closest && el.closest('.word-row.selectable');
+      if (rowEl) {
+        if (dragSession.dropTarget) { clearDropHighlight(); dragSession.dropTarget = null; dragSession.hoveredElement = null; }
+        const id = parseInt(rowEl.dataset.id);
+        if (id !== dragSession.lastRowId) {
+          dragSession.lastRowId = id;
+          applyRowSelection(id, dragSession.mode, rowEl);
+        }
+        return;
+      }
+    }
+    // и для 'select' (палец ушёл за пределы строк), и для 'move' — проверяем
+    // цель сброса под указателем; трогаем DOM только если цель сменилась
+    // (см. ту же оптимизацию для перетаскивания подборок)
+    const target = getDropTargetAt(e.clientX, e.clientY);
+    const newHoverEl = target ? target.el : null;
+    if (newHoverEl !== dragSession.hoveredElement) {
+      clearDropHighlight();
+      if (newHoverEl) newHoverEl.classList.add('drop-hover');
+      dragSession.hoveredElement = newHoverEl;
+    }
+    dragSession.dropTarget = target;
+  });
+
+  function endDragSession(e) {
+    if (!dragSession || dragSession.pointerId !== e.pointerId) return;
+    const wasMove = dragSession.type === 'move';
+    const target = dragSession.dropTarget;
+    clearDropHighlight();
+    document.body.style.cursor = '';
+    try { wordListEl.releasePointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+    dragSession = null;
+    if (wasMove) {
+      hideDragGhost();
+      setDraggingSourceRows(false); // если сброс сработает, renderList() всё равно всё перерисует; если нет — возвращаем карточки на место
+    }
+    if (target && selectedIds.size) {
+      if (target.type === 'collection') {
+        assignSelectedToCollection(target.id);
+      } else if (target.type === 'new-collection') {
+        createCollectionViaModal((nc) => assignSelectedToCollection(nc.id));
+      } else if (target.type === 'status') {
+        assignStatusToSelected(target.value);
+      } else if (target.type === 'favorite') {
+        assignFavoriteToSelected();
+      } else if (target.type === 'delete') {
+        performBulkDelete();
+      }
+    }
+  }
+  wordListEl.addEventListener('pointerup', endDragSession);
+  wordListEl.addEventListener('pointercancel', endDragSession);
+
+  // ===== Долгое удержание карточки (вне режима выделения) =====
+  // Держишь ~800мс на карточке — она выделяется, включается режим выделения
+  // и СРАЗУ подхватывается её drag-сессия (как будто схватили за зону
+  // перетаскивания), не отпуская палец — чтобы управлять одной карточкой
+  // без явного захода в мультивыделение через галочку в шапке.
+  const LONG_PRESS_MS = 500;
+  const LONG_PRESS_TOLERANCE = 10; // px — движение больше этого отменяет long-press
+  let longPressTimer = null;
+  let longPressPointerId = null;
+  let longPressStartX = 0, longPressStartY = 0;
+  let suppressNextClick = false;
+
+  function cancelLongPress() {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+  }
+
+  wordListEl.addEventListener('pointerdown', (e) => {
+    if (selectionMode) return; // тут уже работает обычный обработчик выделения выше
+    if (e.target.closest('.status-btn') || e.target.closest('.favorite-btn') ||
+        e.target.closest('.delete-btn') || e.target.closest('.undo-btn')) return;
+    const row = e.target.closest('.word-row');
+    if (!row || row.classList.contains('row-deleting')) return;
+    const id = parseInt(row.dataset.id);
+    if (!id) return;
+    longPressPointerId = e.pointerId;
+    longPressStartX = e.clientX;
+    longPressStartY = e.clientY;
+    longPressTimer = setTimeout(() => {
+      longPressTimer = null;
+      selectionMode = true;
+      selectedIds = new Set([id]);
+      selectModeBtn.classList.add('active');
+      updateHeaderForSelectionMode();
+      renderList();
+
+      const newRow = wordListEl.querySelector(`.word-row.selectable[data-id="${id}"]`);
+      if (newRow) {
+        dragSession = { pointerId: longPressPointerId, type: 'move', dropTarget: null, hoveredElement: null };
+        document.body.style.cursor = 'grabbing';
+        setDraggingSourceRows(true);
+        showDragGhost(newRow.querySelector('.hebrew-word').textContent, 1, longPressStartX, longPressStartY);
+        try { wordListEl.setPointerCapture(longPressPointerId); } catch (err) { /* не критично */ }
+      }
+      // после такого удержания браузер может ещё синтезировать 'click' по
+      // уже пересозданной (и поэтому отсоединённой) кнопке старой карточки —
+      // глушим ближайший click, чтобы он не дёрнул статус/избранное/удаление
+      suppressNextClick = true;
+      setTimeout(() => { suppressNextClick = false; }, 500);
+    }, LONG_PRESS_MS);
+  });
+
+  wordListEl.addEventListener('pointermove', (e) => {
+    if (!longPressTimer || e.pointerId !== longPressPointerId) return;
+    const dx = e.clientX - longPressStartX;
+    const dy = e.clientY - longPressStartY;
+    if (Math.sqrt(dx * dx + dy * dy) > LONG_PRESS_TOLERANCE) cancelLongPress();
+  });
+  wordListEl.addEventListener('pointerup', cancelLongPress);
+  wordListEl.addEventListener('pointercancel', cancelLongPress);
+
+  // капчур-фаза — перехватывает click ДО того, как он дойдёт до кнопки
+  // статуса/избранного/удаления внутри исходной (уже пересозданной) карточки
+  wordListEl.addEventListener('click', (e) => {
+    if (suppressNextClick) {
+      suppressNextClick = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }, true);
+
+  // ===== Перетаскивание чипов подборок: удаление и слияние =====
+  // Держишь ~500мс на чипе подборки — она "отрывается" и следует за
+  // пальцем (тот же drag-ghost, что и у слов). Дотянул до корзины (кнопка в
+  // шапке временно превращается в неё на время этого жеста) — предлагается
+  // выбор удаления; дотянул до ДРУГОЙ подборки — предлагается слияние, а
+  // сама подборка-цель визуально "раздвигается" под наведением.
+  const filterBarEl = document.getElementById('filterBar');
+  const COLLECTION_LONG_PRESS_MS = 500;
+  const COLLECTION_LONG_PRESS_TOLERANCE = 10;
+  let collectionLongPressTimer = null;
+  let collectionLongPressPointerId = null;
+  let collectionLongPressStartX = 0, collectionLongPressStartY = 0;
+  let collectionDragSession = null; // { pointerId, collectionId, chipEl, dropTarget }
+
+  function cancelCollectionLongPress() {
+    if (collectionLongPressTimer) { clearTimeout(collectionLongPressTimer); collectionLongPressTimer = null; }
+  }
+
+  function clearCollectionHoverWiden() {
+    document.querySelectorAll('.coll-drop-widen').forEach(el => el.classList.remove('coll-drop-widen'));
+  }
+
+  function showHeaderAsDeleteTarget() {
+    primaryActionBtn.innerHTML = TRASH_ICON;
+    primaryActionBtn.classList.remove('header-icon-btn-gold');
+    primaryActionBtn.classList.add('header-icon-btn-danger');
+    primaryActionBtn.setAttribute('data-drop-delete', '1');
+  }
+
+  function restoreHeaderAfterCollectionDrag() {
+    if (selectionMode) { updateHeaderForSelectionMode(); return; }
+    primaryActionBtn.innerHTML = PLUS_ICON;
+    primaryActionBtn.classList.remove('header-icon-btn-danger');
+    primaryActionBtn.classList.add('header-icon-btn-gold');
+    primaryActionBtn.title = 'Добавить слово';
+    primaryActionBtn.removeAttribute('data-drop-delete');
+  }
+
+  function showDeleteCollectionsModal(collectionIds) {
+    const names = collectionIds.map(id => { const c = collections.find(cc => cc.id === id); return c ? c.name : null; }).filter(Boolean);
+    if (!names.length) return;
+    const many = names.length > 1;
+    const idSet = new Set(collectionIds);
+    const hasAnyWords = words.some(w => (w.collectionIds || []).some(cid => idSet.has(cid)));
+
+    if (!hasAnyWords) {
+      // подборка(и) пустая — выбирать "и слова тоже" не из чего, простое подтверждение
+      showActionModal({
+        title: many ? `Удалить ${names.length} подборки (${names.join(', ')})?` : `Удалить подборку «${names[0]}»?`,
+        buttons: [
+          { label: 'Отмена', variant: 'cancel' },
+          { label: 'Удалить', variant: 'danger', action: () => deleteCollections(collectionIds, false) },
+        ]
+      });
+      return;
+    }
+
+    showActionModal({
+      title: many ? `Удалить ${names.length} подборки (${names.join(', ')})?` : `Удалить подборку «${names[0]}»?`,
+      buttons: [
+        { label: 'Отмена', variant: 'cancel' },
+        { label: many ? 'Удалить подборки (слова останутся)' : 'Удалить подборку (слова останутся)', action: () => deleteCollections(collectionIds, false) },
+        { label: many ? 'Удалить подборки и слова' : 'Удалить подборку и слова', variant: 'danger', action: () => deleteCollections(collectionIds, true) },
+      ]
+    });
+  }
+
+  function deleteCollections(collectionIds, alsoDeleteWords) {
+    const idSet = new Set(collectionIds);
+    if (alsoDeleteWords) {
+      words = words.filter(w => !(w.collectionIds || []).some(cid => idSet.has(cid)));
+    } else {
+      words.forEach(w => {
+        if (w.collectionIds) w.collectionIds = w.collectionIds.filter(cid => !idSet.has(cid));
+      });
+    }
+    collections = collections.filter(c => !idSet.has(c.id));
+    if (filterCollectionId && idSet.has(filterCollectionId)) filterCollectionId = null;
+    selectedCollectionIds = new Set();
+    if (selectionMode) exitSelectionMode();
+    saveWords();
+    saveCollections();
+    renderFilterBar();
+    renderList();
+  }
+
+  function showMergeCollectionsModal(sourceIds, targetId) {
+    const sources = sourceIds.map(id => collections.find(c => c.id === id)).filter(Boolean);
+    const target = collections.find(c => c.id === targetId);
+    if (!sources.length || !target) return;
+    const sourceNames = sources.map(s => s.name).join(', ');
+    showActionModal({
+      title: 'Объединить подборки?',
+      message: `«${sourceNames}» и «${target.name}» станут одной подборкой «${target.name}».`,
+      buttons: [
+        { label: 'Нет', variant: 'cancel' },
+        { label: 'Да', variant: 'primary', action: () => mergeCollections(sourceIds, targetId) },
+      ]
+    });
+  }
+
+  function mergeCollections(sourceIds, targetId) {
+    const sourceIdSet = new Set(sourceIds);
+    words.forEach(w => {
+      if (w.collectionIds && w.collectionIds.some(cid => sourceIdSet.has(cid))) {
+        w.collectionIds = w.collectionIds.filter(cid => !sourceIdSet.has(cid));
+        if (!w.collectionIds.includes(targetId)) w.collectionIds.push(targetId);
+      }
+    });
+    collections = collections.filter(c => !sourceIdSet.has(c.id));
+    if (filterCollectionId && sourceIdSet.has(filterCollectionId)) filterCollectionId = targetId;
+    selectedCollectionIds = new Set();
+    if (selectionMode) exitSelectionMode();
+    saveWords();
+    saveCollections();
+    renderFilterBar();
+    renderList();
+  }
+
+  function handleCollectionDragMove(e) {
+    if (!collectionDragSession || collectionDragSession.pointerId !== e.pointerId) return;
+    e.preventDefault();
+    moveDragGhost(e.clientX, e.clientY);
+
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    let newTarget = null;
+    let newHoverEl = null;
+    if (el) {
+      const deleteBtn = el.closest('[data-drop-delete]');
+      if (deleteBtn) {
+        newTarget = { type: 'delete' };
+        newHoverEl = deleteBtn;
+      } else {
+        const otherChip = el.closest('[data-coll]');
+        if (otherChip && otherChip.dataset.coll && !collectionDragSession.collectionIds.includes(otherChip.dataset.coll)) {
+          newTarget = { type: 'merge', id: otherChip.dataset.coll };
+          newHoverEl = otherChip;
+        }
+      }
+    }
+
+    // трогаем DOM/классы ТОЛЬКО если цель реально сменилась — иначе снятие+
+    // навешивание класса на каждый pointermove перезапускает CSS-transition,
+    // и чип начинает дёргаться (сужаться-расширяться), даже стоя на месте
+    if (newHoverEl !== collectionDragSession.hoveredElement) {
+      clearDropHighlight();
+      clearCollectionHoverWiden();
+      if (newHoverEl) {
+        newHoverEl.classList.add(newTarget.type === 'delete' ? 'drop-hover' : 'coll-drop-widen');
+      }
+      collectionDragSession.hoveredElement = newHoverEl;
+    }
+    collectionDragSession.dropTarget = newTarget;
+  }
+
+  function endCollectionDrag(e) {
+    if (!collectionDragSession || collectionDragSession.pointerId !== e.pointerId) return;
+    const target = collectionDragSession.dropTarget;
+    const draggedIds = collectionDragSession.collectionIds;
+    clearDropHighlight();
+    clearCollectionHoverWiden();
+    hideDragGhost();
+    document.body.style.cursor = '';
+    try { filterBarEl.releasePointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+    filterBarEl.removeEventListener('pointermove', handleCollectionDragMove);
+    filterBarEl.removeEventListener('pointerup', endCollectionDrag);
+    filterBarEl.removeEventListener('pointercancel', endCollectionDrag);
+    collectionDragSession = null;
+    restoreHeaderAfterCollectionDrag();
+    renderFilterBar(); // снимает dragging-source с чипов
+
+    if (target) {
+      if (target.type === 'delete') showDeleteCollectionsModal(draggedIds);
+      else if (target.type === 'merge') showMergeCollectionsModal(draggedIds, target.id);
+    }
+  }
+
+  // collectionIds — массив: обычно один элемент (перетаскивание отдельной
+  // подборки вне режима выделения), но в режиме мультивыделения это ВСЕ
+  // сейчас выделенные подборки разом
+  function startCollectionDrag(collectionIds, chipEl, pointerId, x, y) {
+    const names = collectionIds.map(id => { const c = collections.find(cc => cc.id === id); return c ? c.name : null; }).filter(Boolean);
+    if (!names.length) return;
+    collectionDragSession = { pointerId, collectionIds, dropTarget: null, hoveredElement: null };
+    document.body.style.cursor = 'grabbing';
+    filterBarEl.querySelectorAll('[data-coll]').forEach(el => {
+      if (collectionIds.includes(el.dataset.coll)) el.classList.add('dragging-source');
+    });
+    showDragGhost(names[0], names.length, x, y);
+    showHeaderAsDeleteTarget();
+    try { filterBarEl.setPointerCapture(pointerId); } catch (err) { /* не критично */ }
+    filterBarEl.addEventListener('pointermove', handleCollectionDragMove);
+    filterBarEl.addEventListener('pointerup', endCollectionDrag);
+    filterBarEl.addEventListener('pointercancel', endCollectionDrag);
+  }
+
+  filterBarEl.addEventListener('pointerdown', (e) => {
+    const chip = e.target.closest('[data-coll]');
+    if (!chip || !chip.dataset.coll) return;
+    if (selectionMode) {
+      // в режиме выделения драг стартует только с УЖЕ выделенной подборки —
+      // сам клик (добавление/снятие из выделения) обрабатывает отдельный
+      // click-listener в renderFilterBar; здесь только запускаем таймер
+      // долгого нажатия для перетаскивания текущего мультивыделения целиком
+      if (!selectedCollectionIds.has(chip.dataset.coll)) return;
+    }
+    collectionLongPressPointerId = e.pointerId;
+    collectionLongPressStartX = e.clientX;
+    collectionLongPressStartY = e.clientY;
+    collectionLongPressTimer = setTimeout(() => {
+      collectionLongPressTimer = null;
+      const ids = (selectionMode && selectedCollectionIds.size)
+        ? Array.from(selectedCollectionIds)
+        : [chip.dataset.coll];
+      startCollectionDrag(ids, chip, collectionLongPressPointerId, collectionLongPressStartX, collectionLongPressStartY);
+    }, COLLECTION_LONG_PRESS_MS);
+  });
+  filterBarEl.addEventListener('pointermove', (e) => {
+    if (!collectionLongPressTimer || e.pointerId !== collectionLongPressPointerId) return;
+    const dx = e.clientX - collectionLongPressStartX;
+    const dy = e.clientY - collectionLongPressStartY;
+    if (Math.sqrt(dx * dx + dy * dy) > COLLECTION_LONG_PRESS_TOLERANCE) cancelCollectionLongPress();
+  });
+  filterBarEl.addEventListener('pointerup', cancelCollectionLongPress);
+  filterBarEl.addEventListener('pointercancel', cancelCollectionLongPress);
+
+  // ===== Поиск / встроенное добавление слова (тот же инпут, два режима) =====
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    if (addMode) {
+      // Живой подбор по мере ввода — та же логика, что уже работает в обычном
+      // поиске (см. runInstantDictSearch), только с задержкой в 400мс: словарный
+      // путь внутри resolveCandidates мгновенный (без сети), а вот фоллбэк на
+      // Nakdan/DeepL/Gemini реально ходит в сеть — задержка не даёт запускать
+      // сетевой запрос на каждую нажатую букву, только когда набор паузится
+      const raw = e.target.value.trim();
+      clearTimeout(metaSuggestDebounceTimer);
+      if (!raw) {
+        nikkudSuggestion.classList.remove('visible', 'error');
+        nikkudSuggestion.innerHTML = '';
+        return;
+      }
+      metaSuggestDebounceTimer = setTimeout(() => runMetaSuggestion(raw), 400);
+      return;
+    }
+    searchQuery = e.target.value;
+    renderList();
+  });
+
+  // ===== DeepL API: перевод конкретной огласовки на русский =====
+  // В отличие от Google Translate, DeepL действительно различает разные
+  // огласовки одного и того же написания (мидбар/медабер переводятся
+  // по-разному) — это же попутно решает и часть проблемы неоднозначности:
+  // если у кандидата вылезет случайный/бессмысленный перевод, вручную
+  // видно, что это не тот вариант.
+  const DEEPL_URL = 'https://deepltranslate.3an3arah.workers.dev/';
+
+  async function translateToRussian(hebrewText) {
+    const response = await fetch(DEEPL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: [hebrewText],
+        target_lang: 'RU'
+      })
+    });
+    if (!response.ok) throw new Error('DeepL ответил ошибкой: ' + response.status);
+    const json = await response.json();
+    return (json.translations && json.translations[0] && json.translations[0].text) || null;
+  }
+
+  // ===== Словари Wiktionary (kaikki.org), обработанные под наш пайплайн =====
+  // Два индекса: по голому скелету иврита (без огласовок — Nakdan и
+  // Wiktionary могут по-разному их расставить, скелет сравнивать надёжнее)
+  // и обратный, русский → иврит (для прямого поиска перевода без похода
+  // в DeepL). DeepL остаётся фоллбэком только для того, чего нет ни в одной
+  // из баз. Глаголы из ЭТИХ файлов убраны — для них теперь отдельная,
+  // авторитетная база (verbsDict/verbsReverse), собранная вручную, где
+  // ключевое слово — именно инфинитив, а не смешение форм от Wiktionary.
+  // wiktionaryVerbLemmas — служебный файл ТОЛЬКО для индекса спрягаемых
+  // форм (медабер → дибер): он не участвует в прямом поиске, а только
+  // подсказывает перевод/породу леммы для уже найденной формы.
+  let hebrewDictSkeleton = null;
+  let hebrewDictReverse = null;
+  let hebrewVerbForms = null;
+  let verbsDict = null;
+  let verbsReverse = null;
+  let wiktionaryVerbLemmas = null;
+  let translitIndex = null;
+  let nounFormsIndex = null;
+  let generatedVerbForms = null;
+  let hebrewDictLoadPromise = null;
+
+  function stripNiqqud(word) {
+    return (word || '').replace(/[\u0591-\u05C7]/g, '').replace(/\|/g, '');
+  }
+
+  // ===== Варианты "краткого" (ktiv-chaser) написания из "полного" (ktiv-male) =====
+  //
+  // Формы в наших индексах строятся снятием никуда с ОГЛАСОВАННОГО слова, а
+  // огласовки вроде холам записываются точкой НАД буквой, без отдельной буквы
+  // вав — то есть скелет получается "кратким" (אכתב). Но человек почти всегда
+  // печатает слово так, как оно реально пишется без никуда в современном
+  // иврите — "полным" письмом (אכתוב, с вав для "о"), как и делает сам Пеалим
+  // (у него для этого есть отдельная "тильда"-запись). Без учёта этого разрыва
+  // такие слова не находятся вовсе, хотя формально есть в базе.
+  //
+  // Генерируем варианты, убирая ВНУТРЕННИЕ (не первую и не последнюю букву —
+  // на краях вав/йуд почти всегда настоящая согласная, а не "мать чтения")
+  // вав и йуд по одному и по нескольку сразу, от минимальных изменений к
+  // максимальным — так более вероятное (одна лишняя буква) совпадение
+  // находится раньше маловероятного (сразу три).
+  function generateChaserSkeletonVariants(skeleton) {
+    const positions = [];
+    for (let i = 1; i < skeleton.length - 1; i++) {
+      if (skeleton[i] === 'ו' || skeleton[i] === 'י') positions.push(i);
+    }
+    if (!positions.length) return [];
+    const usable = positions.slice(0, 4); // ограничиваем комбинаторику разумным числом
+    const variants = [];
+    const seen = new Set([skeleton]);
+    for (let mask = 1; mask < (1 << usable.length); mask++) {
+      let variant = '';
+      for (let i = 0; i < skeleton.length; i++) {
+        const posIdx = usable.indexOf(i);
+        if (posIdx !== -1 && (mask & (1 << posIdx))) continue; // выкидываем эту букву
+        variant += skeleton[i];
+      }
+      if (!seen.has(variant)) {
+        seen.add(variant);
+        // считаем количество выкинутых букв — для сортировки по возрастанию
+        let removed = 0;
+        for (let b = 0; b < usable.length; b++) if (mask & (1 << b)) removed++;
+        variants.push({ variant, removed });
+      }
+    }
+    variants.sort((a, b) => a.removed - b.removed);
+    return variants.map(v => v.variant);
+  }
+
+  // Собирает результаты из всех пяти источников по ОДНОМУ конкретному скелету
+  // (без похода в сеть) — общая логика, используемая и при точном совпадении,
+  // и при переборе ktiv-male → ktiv-chaser вариантов. Приоритет formHit/genFormHit
+  // тот же, что и везде: старый Wiktionary-индекс форм подключаем только если
+  // новая авторитетная база ничего не нашла (иначе дубли — "форма от" рядом с
+  // "инфинитив: ...").
+  function lookupSkeletonSources(skeleton) {
+    const dictHit = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
+    const genFormHit = (generatedVerbForms && generatedVerbForms[skeleton]) || [];
+    const verbHit = (verbsDict && verbsDict[skeleton]) || [];
+    // старый Wiktionary-индекс форм подключаем ТОЛЬКО если у этого скелета нет
+    // ничего авторитетного вообще — ни в новой базе сгенерированных форм, ни
+    // среди самих инфинитивов. Если скелет уже есть как инфинитив в verbsDict,
+    // запись "формы" для того же скелета почти наверняка мусор из старой базы
+    // (пустой hint, "форма от" со сбитым значением) — а не отдельное слово
+    const formHit = (genFormHit.length || verbHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
+    const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
+    return { dictHit, formHit, verbHit, nounFormHit, genFormHit };
+  }
+
+  function hasAnyHit(sources) {
+    return sources.dictHit.length || sources.formHit.length || sources.verbHit.length ||
+      sources.nounFormHit.length || sources.genFormHit.length;
+  }
+
+  // Объединяет кандидатов, которые на самом деле являются РАЗНЫМИ ЗНАЧЕНИЯМИ
+  // одного и того же слова (совпадают написание + транскрипция + часть речи),
+  // в ОДНУ карточку с пронумерованным списком значений — вместо того, чтобы
+  // показывать каждое значение отдельной, визуально неотличимой карточкой,
+  // среди которых приходится наугад выбирать, какую вообще сохранить
+  // (מטבע = "монета" и "валюта" — это два значения ОДНОГО слова, а не два
+  // разных слова). Настоящие разные слова с одинаковым переводом (רכב/מכונית/
+  // אוטו = все "автомобиль") группировка не затрагивает — ключ строится по
+  // написанию+транскрипции+части речи, а не по переводу.
+  function mergeCandidatesBySense(candidates) {
+    const order = [];
+    const groups = new Map();
+    for (const c of candidates) {
+      const key = `${c.text}|${c.translit}|${c.grammarLabel || ''}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = { base: c, translations: [] };
+        groups.set(key, group);
+        order.push(key);
+      } else if (!group.base.root && c.root) {
+        group.base.root = c.root;
+      }
+      const t = (c.translation || '').trim();
+      if (t && !group.translations.some(x => x.toLowerCase() === t.toLowerCase())) {
+        group.translations.push(t);
+      }
+    }
+    return order.map(key => {
+      const { base, translations } = groups.get(key);
+      let translation;
+      if (translations.length <= 1) {
+        translation = translations[0] || base.translation || null;
+      } else {
+        translation = translations.map((t, i) => `${i + 1}. ${t}`).join('; ');
+      }
+      return { ...base, translation };
+    });
+  }
+
+  function buildCombinedFromSources(sources) {
+    const combined = [
+      ...sources.dictHit.map(buildDictCandidate),
+      ...sources.formHit.map(buildVerbFormCandidate),
+      ...sources.verbHit.map(buildVerbDictCandidate),
+      ...sources.nounFormHit.map(buildNounFormCandidate),
+      ...sources.genFormHit.map(buildGeneratedVerbFormCandidate)
+    ];
+    return mergeCandidatesBySense(combined);
+  }
+
+  // Пробует точный скелет, а если пусто — по очереди ktiv-male → ktiv-chaser
+  // варианты (см. generateChaserSkeletonVariants). Возвращает первый непустой
+  // набор источников вместе со скелетом, по которому он нашёлся (для лога).
+  function lookupSkeletonWithChaserFallback(skeleton) {
+    const direct = lookupSkeletonSources(skeleton);
+    if (hasAnyHit(direct)) return { sources: direct, matchedSkeleton: skeleton };
+    for (const variant of generateChaserSkeletonVariants(skeleton)) {
+      const alt = lookupSkeletonSources(variant);
+      if (hasAnyHit(alt)) return { sources: alt, matchedSkeleton: variant };
+    }
+    return { sources: direct, matchedSkeleton: skeleton };
+  }
+
+  function loadHebrewDict() {
+    if (hebrewDictLoadPromise) return hebrewDictLoadPromise;
+    hebrewDictLoadPromise = Promise.all([
+      fetch('hebrew_dict_v3.json').then(r => { if (!r.ok) throw new Error('hebrew_dict_v3.json: ' + r.status); return r.json(); }),
+      fetch('hebrew_dict_v3_reverse.json').then(r => { if (!r.ok) throw new Error('hebrew_dict_v3_reverse.json: ' + r.status); return r.json(); }),
+      fetch('hebrew_verb_forms_index.json').then(r => { if (!r.ok) throw new Error('hebrew_verb_forms_index.json: ' + r.status); return r.json(); }),
+      fetch('verbs_dict.json').then(r => { if (!r.ok) throw new Error('verbs_dict.json: ' + r.status); return r.json(); }),
+      fetch('verbs_reverse.json').then(r => { if (!r.ok) throw new Error('verbs_reverse.json: ' + r.status); return r.json(); }),
+      fetch('wiktionary_verb_lemmas.json').then(r => { if (!r.ok) throw new Error('wiktionary_verb_lemmas.json: ' + r.status); return r.json(); }),
+      fetch('translit_index.json').then(r => { if (!r.ok) throw new Error('translit_index.json: ' + r.status); return r.json(); }),
+      fetch('noun_forms_index.json').then(r => { if (!r.ok) throw new Error('noun_forms_index.json: ' + r.status); return r.json(); }),
+      fetch('generated_verb_forms.json').then(r => { if (!r.ok) throw new Error('generated_verb_forms.json: ' + r.status); return r.json(); })
+    ]).then(([skeleton, reverse, verbForms, vDict, vReverse, vLemmas, tIndex, nFormsIndex, gVerbForms]) => {
+      // ключи-скелеты нормализуем по NFC на всякий случай (хотя без огласовок
+      // риск расхождения диакритики уже почти нулевой)
+      const normSkeleton = {};
+      for (const key in skeleton) normSkeleton[key.normalize('NFC')] = skeleton[key];
+      const normVerbForms = {};
+      for (const key in verbForms) normVerbForms[key.normalize('NFC')] = verbForms[key];
+      const normVerbsDict = {};
+      for (const key in vDict) normVerbsDict[key.normalize('NFC')] = vDict[key];
+      const normVerbLemmas = {};
+      for (const key in vLemmas) normVerbLemmas[key.normalize('NFC')] = vLemmas[key];
+      const normNounForms = {};
+      for (const key in nFormsIndex) normNounForms[key.normalize('NFC')] = nFormsIndex[key];
+      const normGenVerbForms = {};
+      for (const key in gVerbForms) normGenVerbForms[key.normalize('NFC')] = gVerbForms[key];
+      hebrewDictSkeleton = normSkeleton;
+      hebrewDictReverse = reverse;
+      hebrewVerbForms = normVerbForms;
+      verbsDict = normVerbsDict;
+      verbsReverse = vReverse;
+      wiktionaryVerbLemmas = normVerbLemmas;
+      translitIndex = tIndex;
+      nounFormsIndex = normNounForms;
+      generatedVerbForms = normGenVerbForms;
+      console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length);
+    }).catch(e => {
+      console.log('[DICT] словари не загрузились, работаем только через DeepL:', e);
+      hebrewDictSkeleton = {}; hebrewDictReverse = {}; hebrewVerbForms = {};
+      verbsDict = {}; verbsReverse = {}; wiktionaryVerbLemmas = {}; translitIndex = {}; nounFormsIndex = {};
+      generatedVerbForms = {};
+    });
+    return hebrewDictLoadPromise;
+  }
+  loadHebrewDict(); // запускаем загрузку сразу при открытии страницы, не дожидаясь первого поиска
+
+  const POS_LABELS = {
+    noun: 'сущ', verb: 'глагол', adj: 'прил', adv: 'нареч', intj: 'межд',
+    name: 'имя собств.', num: 'числ', pron: 'местоим', prep: 'предлог',
+    conj: 'союз', particle: 'частица', phrase: 'фраза', proverb: 'погов.',
+    det: 'местоим', article: 'артикль', root: 'корень'
+  };
+
+  const BINYAN_LABELS = {
+    pa: 'пааль', pi: 'пиэль', hif: 'хифиль', nif: 'нифаль',
+    pu: 'пуаль', huf: 'хуфаль', hitp: 'hитпаэль'
+  };
+
+  // ===== Nakdan API: получение никуда =====
+  // Прямой вызов nakdan-u1-0.loadbalancer.dicta.org.il блокируется CORS —
+  // запрос идёт через собственный прокси на Cloudflare Workers.
+  const NAKDAN_URL = 'https://nakdan-proxy.3an3arah.workers.dev/';
+
+  async function fetchNikkud(hebrewText) {
+    const response = await fetch(NAKDAN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task: 'nakdan',
+        genre: 'modern',
+        data: hebrewText,
+        addmorph: true,
+        keepmetagim: true,
+        keepqq: false,
+        nodageshdefmem: false,
+        patachma: false,
+        useTokenization: true
+      })
+    });
+    if (!response.ok) throw new Error('Сервер Nakdan ответил ошибкой: ' + response.status);
+    const json = await response.json();
+    return json.data; // сырые токены — обработка кандидатов делается отдельно
+  }
+
+  // Строит список кандидатов-огласовок для подсказки.
+  // Если ввели одно слово — берём несколько РАЗНЫХ по написанию вариантов
+  // огласовки этого же слова (Nakdan часто предлагает 2-3 равноправных
+  // прочтения вроде "мидбар"/"медабер" для одного и того же написания без
+  // никуда) и показываем их все, каждый со своей транскрипцией и грамматикой.
+  // Если ввели фразу из нескольких слов — как раньше, просто берём по
+  // одному лучшему варианту на каждое слово и склеиваем в одну строку.
+  // извлекает до 8 кандидатов-огласовок из ОДНОГО токена Nakdan (одно слово).
+  // Вынесено отдельно от buildCandidates, чтобы использовать одинаково для
+  // разных источников скелета (догадки по транскрипции, перевод с русского)
+  function extractCandidatesFromToken(token) {
+    const options = token && token.nakdan && token.nakdan.options;
+    if (!options || !options.length) return [];
+
+    const sorted = [...options].sort((a, b) => {
+      if (a.levelChoice !== b.levelChoice) return a.levelChoice - b.levelChoice;
+      const aw = a.w.replace(/\|/g, '');
+      const bw = b.w.replace(/\|/g, '');
+      const aMatches = a.lex === aw ? 0 : 1;
+      const bMatches = b.lex === bw ? 0 : 1;
+      return aMatches - bMatches;
+    });
+    const seen = new Set();
+    const candidates = [];
+    for (const opt of sorted) {
+      if (opt.prefix_len) continue;
+      const w = opt.w.replace(/\|/g, '');
+      if (seen.has(w)) continue;
+      seen.add(w);
+      candidates.push({ text: w, morph: opt.morph || null, lex: opt.lex || null });
+      if (candidates.length >= 8) break;
+    }
+    return candidates;
+  }
+
+  function buildCandidates(tokens) {
+    if (tokens.length === 1) {
+      const candidates = extractCandidatesFromToken(tokens[0]);
+      if (candidates.length) return candidates;
+    }
+
+    // фраза из нескольких слов (или у единственного слова совсем нет
+    // вариантов огласовки) — прежнее поведение: один результат на всю фразу
+    let firstMorph = null;
+    const joined = tokens.map((item, tokenIdx) => {
+      const options = item.nakdan && item.nakdan.options;
+      if (!options || !options.length) return item.str;
+      const best = options.reduce((a, b) => (a.levelChoice <= b.levelChoice ? a : b));
+      if (tokenIdx === 0) firstMorph = best.morph || null;
+      return best.w.replace(/\|/g, '');
+    }).join(' ');
+    return [{ text: joined, morph: firstMorph }];
+  }
+
+  // ===== Определение типа ввода: иврит / транскрипция / русское слово =====
+  function containsHebrew(str) {
+    return /[\u0590-\u05FF]/.test(str || '');
+  }
+
+  async function translateToHebrew(russianText) {
+    const response = await fetch(DEEPL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: [russianText], target_lang: 'HE' })
+    });
+    if (!response.ok) throw new Error('DeepL ответил ошибкой: ' + response.status);
+    const json = await response.json();
+    return (json.translations && json.translations[0] && json.translations[0].text) || null;
+  }
+
+  function computeGrammarLabelFromMorph(c) {
+    const binyanGuess = detectBinyanFromMorph(c.morph) || (c.morph ? null : detectBinyan(c.text));
+    if (binyanGuess) return `глагол, ${binyanGuess}`;
+    return detectPosFromMorph(c.morph);
+  }
+
+  function grammarLabelForEntry(entry) {
+    if (entry.pos === 'verb') {
+      const binyan = BINYAN_LABELS[entry.binyan] || entry.binyan;
+      return binyan ? `глагол, ${binyan}` : 'глагол';
+    }
+    if (entry.pos === 'noun') {
+      if (entry.gender === 'm') return 'сущ, м.р';
+      if (entry.gender === 'f') return 'сущ, ж.р';
+      return 'сущ';
+    }
+    if ((entry.pos === 'pron' || entry.pos === 'name' || entry.pos === 'det') && entry.gender) {
+      return (POS_LABELS[entry.pos] || entry.pos) + (entry.gender === 'm' ? ', м.р' : ', ж.р');
+    }
+    return POS_LABELS[entry.pos] || entry.pos;
+  }
+
+  // ===== Ударение =====
+  // Поле tr в словаре — романизация с ударением (напр. "mishpakhá") в
+  // латинице/IPA. Сама по себе она нам не нужна для отображения — но
+  // позиция ударного гласного в ней надёжно указывает, на какой гласный
+  // ставить ударение в НАШЕЙ собственной кириллической транскрипции.
+  // Считаем гласные С КОНЦА в обеих строках (не с начала) — так меньше
+  // риск разъехаться, если в начале слова расхождение из-за приставки.
+  function findStressIndexFromEnd(trText) {
+    if (!trText) return null;
+    const first = trText.split(',')[0].trim();
+    const ACCENTED = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ɛ́': 'ɛ', 'ɔ́': 'ɔ' };
+    const VOWELS = 'aeiouɛɔə';
+    let count = 0, stressedCount = -1;
+    for (let i = 0; i < first.length; i++) {
+      const ch = first[i];
+      const chLower = ch.toLowerCase();
+      let isVowel = false, isStressed = false;
+      if (ACCENTED[chLower]) { isVowel = true; isStressed = true; }
+      else if (VOWELS.includes(chLower)) {
+        isVowel = true;
+        if (first[i + 1] === '\u0301') isStressed = true; // комбинирующий акут отдельным символом
+      }
+      if (isVowel) {
+        count++;
+        if (isStressed) stressedCount = count;
+      }
+    }
+    if (stressedCount === -1 || count === 0) return null;
+    return count - stressedCount; // сколько гласных ПОСЛЕ ударной, считая с конца (0 = последняя гласная)
+  }
+
+  function applyStressFromEnd(translit, indexFromEnd) {
+    if (indexFromEnd === null || indexFromEnd === undefined || !translit) return translit;
+    const RU_VOWELS = 'аеиоуяюёэ';
+    const positions = [];
+    for (let i = 0; i < translit.length; i++) {
+      if (RU_VOWELS.includes(translit[i].toLowerCase())) positions.push(i);
+    }
+    if (!positions.length) return translit;
+    const targetPos = positions.length - 1 - indexFromEnd;
+    if (targetPos < 0 || targetPos >= positions.length) return translit;
+    const idx = positions[targetPos];
+    return translit.slice(0, idx + 1) + '\u0301' + translit.slice(idx + 1);
+  }
+
+  function translitWithStress(word, trField) {
+    const base = niqqudToTranslit(word);
+    const stressIdx = findStressIndexFromEnd(trField);
+    return applyStressFromEnd(base, stressIdx);
+  }
+
+  function buildDictCandidate(entry) {
+    return {
+      text: entry.word,
+      translit: translitWithStress(entry.word, entry.tr),
+      grammarLabel: grammarLabelForEntry(entry),
+      translation: entry.gloss_ru,
+      root: entry.root || null,
+      source: 'dict'
+    };
+  }
+
+  // Кандидат из НОВОЙ авторитетной базы глаголов (собрана вручную, ключевое
+  // слово — инфинитив, а не смешение форм от Wiktionary). Отдельная функция
+  // от buildDictCandidate, потому что структура записи немного другая
+  // (translation вместо gloss_ru, нет отдельного поля gender и т.п.)
+  function buildVerbDictCandidate(entry) {
+    const binyan = BINYAN_LABELS[entry.binyan] || entry.binyan;
+    return {
+      text: entry.word,
+      translit: niqqudToTranslit(entry.word),
+      grammarLabel: binyan ? `глагол, ${binyan}` : 'глагол',
+      translation: entry.translation,
+      root: entry.root || null,
+      source: 'dict'
+    };
+  }
+
+  // Кандидат для случая "ввели СПРЯГАЕМУЮ ФОРМУ глагола, а не словарную
+  // лемму" (медабер, дибарти и т.п.) — показываем саму эту форму с её
+  // транскрипцией, но перевод и часть речи берём от ЛЕММЫ (инфинитива),
+  // добавляя грамматическую подсказку (лицо/род/число/время), чтобы было
+  // понятно, что именно значит эта конкретная форма. Лемму ищем в служебном
+  // файле wiktionaryVerbLemmas — сами глаголы из основного словаря убраны
+  // (у них теперь отдельная, авторитетная база), но эта форма-подсказка
+  // всё ещё нужна именно из старых данных Wiktionary (там есть таблицы
+  // спряжения, которых в новой базе пока нет).
+  function buildVerbFormCandidate(formEntry) {
+    const lemmaEntries = (wiktionaryVerbLemmas && wiktionaryVerbLemmas[formEntry.lemma_skeleton]) || [];
+    const lemmaVerb = lemmaEntries.find(e => e.pos === 'verb') || lemmaEntries[0];
+    const lemmaGloss = lemmaVerb ? lemmaVerb.gloss_ru : null;
+    const binyan = lemmaVerb ? (BINYAN_LABELS[lemmaVerb.binyan] || lemmaVerb.binyan) : null;
+
+    // показываем инфинитив, если он есть в данных (редкость, ~2% глаголов) —
+    // а если нет, то саму лемму (написание, под которым заведена статья),
+    // с транскрипцией, чтобы всегда было видно, от какого слова эта форма
+    let lemmaLine = '';
+    if (lemmaVerb) {
+      if (lemmaVerb.inf) {
+        lemmaLine = ` (инфинитив: ${lemmaVerb.inf}, ${niqqudToTranslit(lemmaVerb.inf)})`;
+      } else {
+        lemmaLine = ` (форма от ${lemmaVerb.word}, ${niqqudToTranslit(lemmaVerb.word)})`;
+      }
+    }
+
+    return {
+      text: formEntry.form_word,
+      translit: niqqudToTranslit(formEntry.form_word),
+      grammarLabel: binyan ? `глагол, ${binyan} (${formEntry.hint})` : `глагол (${formEntry.hint})`,
+      translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : formEntry.hint,
+      root: lemmaVerb ? lemmaVerb.root : null,
+      source: 'dict'
+    };
+  }
+
+  // Кандидат для случая "ввели форму МНОЖЕСТВЕННОГО ЧИСЛА / сопряжённого
+  // состояния существительного, или форму женского рода / мн.ч.
+  // прилагательного" (батим → баит, товим → тов) — та же логика, что и для
+  // глаголов: показываем саму введённую форму, но перевод берём от леммы
+  // (словарной формы, ед.ч.), добавляя грамматическую подсказку.
+  function buildNounFormCandidate(formEntry) {
+    const lemmaEntries = (hebrewDictSkeleton && hebrewDictSkeleton[formEntry.lemma_skeleton]) || [];
+    const lemmaEntry = lemmaEntries[0];
+    const lemmaGloss = lemmaEntry ? lemmaEntry.gloss_ru : null;
+    const baseLabel = lemmaEntry ? grammarLabelForEntry(lemmaEntry) : null;
+    const lemmaLine = lemmaEntry ? ` (форма от ${lemmaEntry.word}, ${niqqudToTranslit(lemmaEntry.word)})` : '';
+
+    return {
+      text: formEntry.form_word,
+      translit: niqqudToTranslit(formEntry.form_word),
+      grammarLabel: baseLabel ? `${baseLabel} (${formEntry.hint})` : formEntry.hint,
+      translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : formEntry.hint,
+      root: lemmaEntry ? lemmaEntry.root : null,
+      source: 'dict'
+    };
+  }
+
+  // Кандидат для формы, найденной через НОВЫЙ индекс спрягаемых форм —
+  // построенный из авторитетного списка глаголов (verbsDict), а не из
+  // Wiktionary. Лемму (перевод, породу) берём из verbsDict по lemma_skeleton
+  // и сверяем по lemma_word (у одного скелета может быть несколько значений).
+  function buildGeneratedVerbFormCandidate(formEntry) {
+    const lemmaEntries = (verbsDict && verbsDict[formEntry.lemma_skeleton]) || [];
+    const lemmaEntry = lemmaEntries.find(e => e.word === formEntry.lemma_word) || lemmaEntries[0];
+    const binyan = lemmaEntry ? (BINYAN_LABELS[lemmaEntry.binyan] || lemmaEntry.binyan) : null;
+    const lemmaLine = formEntry.lemma_word ? ` (инфинитив: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})` : '';
+
+    return {
+      text: formEntry.form_word,
+      translit: niqqudToTranslit(formEntry.form_word),
+      grammarLabel: binyan ? `глагол, ${binyan} (${formEntry.hint})` : `глагол (${formEntry.hint})`,
+      translation: lemmaEntry ? `${lemmaEntry.translation}${lemmaLine}` : formEntry.hint,
+      root: lemmaEntry ? lemmaEntry.root : null,
+      source: 'dict'
+    };
+  }
+
+  // Простой повтор на случай единичного сбоя сети/API — раз это последний
+  // рубеж (после него добавить слово будет уже нечем), даём ему на одну
+  // попытку больше шансов
+  async function withRetry(fn, times = 2) {
+    let lastErr;
+    for (let i = 0; i < times; i++) {
+      try { return await fn(); } catch (err) { lastErr = err; }
+    }
+    throw lastErr;
+  }
+
+  // Общая точка входа для поиска/подбора меты. Порядок такой:
+  // 1) Иврит на входе → ищем ГОЛЫЙ СКЕЛЕТ (без огласовок) в словаре — не
+  //    важно, как именно Nakdan/Wiktionary его вокализуют, скелет один.
+  //    Нашли — отдаём все статьи сразу, без единого сетевого запроса.
+  //    Не нашли — единственный фоллбэк: озвучиваем через Nakdan, берём
+  //    ТОЛЬКО топ-кандидат (самый уверенный), переводим через DeepL.
+  // 2) Русское слово на входе → сначала обратный индекс (русский → иврит).
+  //    Нашли — отдаём статьи сразу. Не нашли — переводим через DeepL,
+  //    озвучиваем через Nakdan, тоже только топ-кандидат.
+  // Поиск по транскрипции (гиль, медабер и т.п. без точного совпадения)
+  // временно отключён из этого потока — отдельная задача на будущее.
+  async function resolveCandidates(raw) {
+    await loadHebrewDict();
+
+    if (containsHebrew(raw)) {
+      const skeleton = stripNiqqud(raw).normalize('NFC');
+      const { sources, matchedSkeleton } = lookupSkeletonWithChaserFallback(skeleton);
+      const { dictHit, formHit, verbHit, nounFormHit, genFormHit } = sources;
+      if (hasAnyHit(sources)) {
+        if (matchedSkeleton !== skeleton) {
+          console.log('[RC] точного скелета нет, но нашлось по краткому написанию (ktiv-chaser):', skeleton, '→', matchedSkeleton);
+        }
+        console.log('[RC] найдено по скелету:', matchedSkeleton, '—', dictHit.length, 'словарных значений +', formHit.length, 'форм глагола +', verbHit.length, 'глаголов (инфинитив) +', nounFormHit.length, 'форм сущ/прил +', genFormHit.length, 'форм глагола (новая база)');
+        // объединяем все источники — то же самое написание может одновременно
+        // быть и отдельным словом (сленговое "классно"), и спрягаемой формой
+        // совсем другого глагола ("зажигаю"), и настоящим глаголом-инфинитивом
+        // из авторитетной базы, и формой мн.ч./ж.р. существительного или
+        // прилагательного, и спрягаемой формой из НОВОЙ базы глаголов —
+        // без объединения теряли бы что-то из этого
+        return buildCombinedFromSources(sources);
+      }
+      console.log('[RC] в словаре нет — иду в Nakdan + DeepL (топ-кандидат):', raw);
+      const tokens = await withRetry(() => fetchNikkud(raw)).catch(() => []);
+      const candidates = buildCandidates(tokens);
+      // если Nakdan не смог озвучить (сеть/API подвели) — не сдаёмся сразу:
+      // используем то, что ввёл человек, как есть (транслитерация по тому,
+      // что реально написано — без огласовок выйдет неполной, но лучше
+      // добавить слово так, чем не добавить вовсе)
+      const chosen = candidates.length ? candidates[0] : null;
+      const chosenText = chosen ? chosen.text : raw;
+      const chosenTranslit = chosen ? niqqudToTranslit(chosen.text) : niqqudToTranslit(raw);
+      const chosenGrammar = chosen ? computeGrammarLabelFromMorph(chosen) : null;
+      let translation = null;
+      try { translation = await withRetry(() => translateToRussian(chosenText)); } catch (e) {}
+      if (!translation) return []; // без перевода добавлять действительно нечего
+      return [{ text: chosenText, translit: chosenTranslit, grammarLabel: chosenGrammar, translation, source: 'hebrew-api' }];
+    }
+
+    const ruKey = raw.trim().toLowerCase();
+    const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
+    const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
+    if (dictHit.length || verbRuHit.length) {
+      console.log('[RC] найдено в обратном индексе:', ruKey, '—', dictHit.length, 'словарных значений +', verbRuHit.length, 'глаголов');
+      return mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)]);
+    }
+
+    // раз это не перевод — возможно, это ТРАНСКРИПЦИЯ ивритского слова
+    // ("махшев" вместо перевода "компьютер"). Пробуем нечёткое совпадение по
+    // собственному индексу транскрипции (посчитан заранее по всей базе,
+    // локально, без сети) — и только если совсем ничего не нашлось, идём
+    // к Джемини гадать написание по звучанию.
+    const transcriptionHit = fuzzyMatchTranslitIndex(raw);
+    if (transcriptionHit.length) {
+      console.log('[RC] найдено по индексу транскрипции (локально, без Джемини):', ruKey, '—', transcriptionHit.length, 'кандидатов');
+      return transcriptionHit;
+    }
+
+    console.log('[RC] в индексе транскрипции нет — иду к Джемини гадать написание:', raw);
+    const guessedSkeletons = await guessHebrewSpellings(raw).catch(() => []);
+    const fromGemini = [];
+    for (const guessedSkeleton of guessedSkeletons) {
+      const gDictHit = (hebrewDictSkeleton && hebrewDictSkeleton[guessedSkeleton]) || [];
+      const gVerbHit = (verbsDict && verbsDict[guessedSkeleton]) || [];
+      fromGemini.push(...gDictHit.map(buildDictCandidate), ...gVerbHit.map(buildVerbDictCandidate));
+    }
+    if (fromGemini.length) {
+      console.log('[RC] Джемини угадал написание, нашлось в базе:', fromGemini.length, 'кандидатов');
+      return mergeCandidatesBySense(fromGemini);
+    }
+
+    console.log('[RC] и Джемини не помог — иду в DeepL + Nakdan (топ-кандидат):', raw);
+    const hebrewFromRussian = await withRetry(() => translateToHebrew(raw)).catch(() => null);
+    if (!hebrewFromRussian) return [];
+    const tokens = await withRetry(() => fetchNikkud(hebrewFromRussian)).catch(() => []);
+    const candidates = buildCandidates(tokens);
+    if (candidates.length) {
+      const top = candidates[0];
+      return [{ text: top.text, translit: niqqudToTranslit(top.text), grammarLabel: computeGrammarLabelFromMorph(top), translation: raw, source: 'translation-api' }];
+    }
+    // Nakdan не смог озвучить то, что перевёл DeepL — всё равно отдаём слово
+    // как есть, без огласовок, вместо того чтобы вовсе не добавить его
+    return [{ text: hebrewFromRussian, translit: niqqudToTranslit(hebrewFromRussian), grammarLabel: null, translation: raw, source: 'translation-api' }];
+  }
+
+  // Нечёткий поиск по собственному индексу транскрипции (translitIndex) —
+  // посчитан заранее по всей базе (основной словарь + глаголы), локально,
+  // без сети. Используется как шаг ПЕРЕД обращением к Джемини — если
+  // человек ввёл "махшев", это почти наверняка совпадёт с транскрипцией
+  // מַחְשֵׁב ("компьютер") уже без единого сетевого запроса.
+  function fuzzyMatchTranslitIndex(raw) {
+    if (!translitIndex) return [];
+    const query = normalizeForCompare(raw);
+    if (!query) return [];
+    // для каждого подходящего скелета запоминаем ЛУЧШЕЕ (наименьшее)
+    // расстояние среди всех ключей индекса, которые на него сослались —
+    // без этого результаты шли в произвольном порядке перебора объекта,
+    // и менее точное совпадение могло случайно оказаться раньше точного
+    const skeletonDistance = new Map();
+    for (const key in translitIndex) {
+      const dist = levenshtein(key, query); // ключи индекса уже нормализованы при сборке
+      const maxLen = Math.max(key.length, query.length);
+      const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
+      if (dist > allowedDistance) continue;
+      for (const entry of translitIndex[key]) {
+        const cur = skeletonDistance.get(entry.skeleton);
+        if (cur === undefined || dist < cur) skeletonDistance.set(entry.skeleton, dist);
+      }
+    }
+    if (!skeletonDistance.size) return [];
+    const results = [];
+    for (const [skeleton] of skeletonDistance) {
+      const dictHit = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
+      const verbHit = (verbsDict && verbsDict[skeleton]) || [];
+      const genFormHit = (generatedVerbForms && generatedVerbForms[skeleton]) || [];
+      // см. комментарий в lookupSkeletonSources — старые формы только если у
+      // скелета нет ничего авторитетного вообще (ни новых форм, ни инфинитива)
+      const formHit = (genFormHit.length || verbHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
+      const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
+      const candidates = [
+        ...dictHit.map(buildDictCandidate),
+        ...verbHit.map(buildVerbDictCandidate),
+        ...formHit.map(buildVerbFormCandidate),
+        ...nounFormHit.map(buildNounFormCandidate),
+        ...genFormHit.map(buildGeneratedVerbFormCandidate)
+      ];
+      for (const c of candidates) {
+        // дистанцию для сортировки считаем по СОБСТВЕННОЙ транскрипции этого
+        // конкретного кандидата, а не по скелету в целом — иначе омографы
+        // (одно консонантное написание, разные огласовки/породы — לִפְנוֹת
+        // "лифнот" и לְפַנוֹת "лефанот") получают одну и ту же "лучшую" дистанцию
+        // скелета и сортируются между собой произвольно, даже если запрос
+        // буква-в-букву совпадает с транскрипцией только ОДНОГО из них
+        const ownDist = levenshtein(normalizeForCompare(c.translit), query);
+        results.push({ c, dist: ownDist });
+      }
+    }
+    // сортируем по точности совпадения — точнее звучащие кандидаты первыми
+    results.sort((a, b) => a.dist - b.dist);
+    return mergeCandidatesBySense(results.map(r => r.c));
+  }
+
+  // Только словарная часть resolveCandidates — БЕЗ похода в Nakdan/DeepL.
+  // Все обращения к ней синхронны по сути (скелет-словарь и обратный индекс
+  // уже загружены в память), поэтому это можно безопасно вызывать на КАЖДОЕ
+  // нажатие клавиши — в отличие от полного resolveCandidates, который при
+  // отсутствии слова в словаре идёт в сеть, а это уже нельзя дёргать на
+  // каждую букву. Возвращает [] (мгновенно), если слова нет в словаре —
+  // тогда решение идти в сеть остаётся за явной кнопкой пользователя.
+  async function resolveCandidatesDictOnly(raw) {
+    await loadHebrewDict();
+    if (!raw || !raw.trim()) return [];
+
+    if (containsHebrew(raw)) {
+      const skeleton = stripNiqqud(raw).normalize('NFC');
+      const { sources } = lookupSkeletonWithChaserFallback(skeleton);
+      if (!hasAnyHit(sources)) return [];
+      return buildCombinedFromSources(sources);
+    }
+
+    const ruKey = raw.trim().toLowerCase();
+    const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
+    const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
+    if (dictHit.length || verbRuHit.length) {
+      return mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)]);
+    }
+    // ни перевод, ни точное совпадение — пробуем как транскрипцию ("махшев")
+    // по собственному индексу, тоже мгновенно и локально
+    return fuzzyMatchTranslitIndex(raw);
+  }
+
+
+
+  // ===== Конвертация никуда → транскрипция (черновая, по правилам Tedabru) =====
+  //
+  // ВАЖНО: это черновой алгоритм для ускорения ручного ввода, а не финальная
+  // истина. Он не умеет надёжно определять ударение и не всегда угадывает
+  // "живой"/"немой" шва — результат всегда нужно проверять глазами перед
+  // сохранением.
+
+  const NIQQUD = {
+    SHVA: '\u05B0', HATAF_SEGOL: '\u05B1', HATAF_PATAH: '\u05B2', HATAF_QAMATS: '\u05B3',
+    HIRIQ: '\u05B4', TSERE: '\u05B5', SEGOL: '\u05B6', PATAH: '\u05B7', QAMATS: '\u05B8',
+    HOLAM: '\u05B9', HOLAM_HASER: '\u05BA', QUBUTS: '\u05BB', DAGESH: '\u05BC',
+    METEG: '\u05BD', RAFE: '\u05BF', SHIN_DOT: '\u05C1', SIN_DOT: '\u05C2', QAMATS_QATAN: '\u05C7'
+  };
+
+  const VOWEL_MAP = {
+    [NIQQUD.PATAH]: 'а', [NIQQUD.QAMATS]: 'а', [NIQQUD.QAMATS_QATAN]: 'а',
+    [NIQQUD.HATAF_PATAH]: 'а', [NIQQUD.HATAF_QAMATS]: 'а',
+    [NIQQUD.TSERE]: 'е', [NIQQUD.SEGOL]: 'е', [NIQQUD.HATAF_SEGOL]: 'е',
+    [NIQQUD.HIRIQ]: 'и',
+    [NIQQUD.HOLAM]: 'о', [NIQQUD.HOLAM_HASER]: 'о',
+    [NIQQUD.QUBUTS]: 'у'
+    // ШВА сюда не входит — обрабатывается отдельно (по умолчанию считаем немым)
+  };
+
+  // базовое звучание согласной (без дагеша)
+  const CONSONANT_BASE = {
+    'א': '', 'ב': 'в', 'ג': 'г', 'ד': 'д', 'ה': 'h', 'ו': 'в', 'ז': 'з',
+    'ח': 'х', 'ט': 'т', 'י': 'й', 'כ': 'х', 'ך': 'х', 'ל': 'л', 'מ': 'м', 'ם': 'м',
+    'נ': 'н', 'ן': 'н', 'ס': 'с', 'ע': '', 'פ': 'ф', 'ף': 'ф', 'צ': 'ц', 'ץ': 'ц',
+    'ק': 'к', 'ר': 'р', 'ש': 'ш', 'ת': 'т'
+  };
+  // звучание с дагешем (только для тех букв, где оно реально меняет звук в иврите)
+  const CONSONANT_DAGESH = { 'ב': 'б', 'כ': 'к', 'ך': 'к', 'פ': 'п', 'ף': 'п' };
+
+  // разбивает слово с никудом на группы {letter, marks} — согласная + идущие
+  // следом диакритики. Используется и транскрипцией, и распознаванием биньяна.
+  function tokenizeNiqqud(word) {
+    word = word.replace(/\|/g, '');
+    const groups = [];
+    let i = 0;
+    while (i < word.length) {
+      const ch = word[i];
+      if (Object.prototype.hasOwnProperty.call(CONSONANT_BASE, ch)) {
+        let marks = '';
+        i++;
+        while (i < word.length && /[\u0591-\u05BF\u05C1\u05C2\u05C7]/.test(word[i])) {
+          marks += word[i];
+          i++;
+        }
+        groups.push({ letter: ch, marks });
+      } else {
+        i++; // пропускаем кантилляцию/прочее, что нам не нужно
+      }
+    }
+    return groups;
+  }
+
+  // niqqudToTranslit работает с целой фразой — разбивает её на отдельные
+  // ивритские слова по пробелу, конвертирует каждое отдельно и склеивает
+  // обратно с пробелом. Без этого пробел между словами "терялся" при
+  // токенизации (он не согласная и не огласовка, просто пропускался).
+  function niqqudToTranslit(text) {
+    return text
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(convertSingleWord)
+      .join(' ');
+  }
+
+  function convertSingleWord(word) {
+    const groups = tokenizeNiqqud(word);
+
+    let result = '';
+    for (let idx = 0; idx < groups.length; idx++) {
+      const { letter, marks } = groups[idx];
+      const hasDagesh = marks.includes(NIQQUD.DAGESH);
+      const isLast = idx === groups.length - 1;
+      const vowelMark = Object.keys(VOWEL_MAP).find(v => marks.includes(v));
+
+      // ===== ФУРТИВНЫЙ ПАТАХ (patach genuvah) =====
+      // Когда слово оканчивается на гортанную (ח, ע, иногда ה) с патахом
+      // после "не-а"-гласной, этот патах на самом деле произносится ПЕРЕД
+      // согласной, а не после: רוּחַ = "руах", не "руха"; לִשְׁלוֹחַ = "лишлоах",
+      // не "лишлоха". У ח согласная слышна (х), у ע/ה в конце слова она
+      // практически беззвучна — остаётся только сама гласная "а".
+      if (isLast && vowelMark === NIQQUD.PATAH && (letter === 'ח' || letter === 'ע' || letter === 'ה')) {
+        result += 'а' + (letter === 'ח' ? 'х' : '');
+        continue;
+      }
+
+      // финальная немая "ה" — всегда молчит, даже с мапиком (точка внутри,
+      // формально означающая "здесь h всё-таки произносится", напр. לָהּ,
+      // אוֹתָהּ). В разговорном современном иврите мапик практически никогда
+      // не звучит вслух — это литургический/формальный остаток, а не то,
+      // чему учит Tedabru, поэтому финальный ה немой без исключений.
+      if (letter === 'ה' && isLast) {
+        continue;
+      }
+
+      // ===== ВАВ: чаще всего это не согласная "в", а огласовка =====
+      // холам мале (וֹ) = "о"; шурук (וּ, дагеш без отдельной гласной) = "у".
+      // Настоящая согласная "в" — только когда вав действительно несёт свой
+      // "обычный" гласный (патах/камац/еtc.) или стоит первой буквой слова
+      // (чаще всего это приставка ве-/ва-).
+      if (letter === 'ו') {
+        if (marks.includes(NIQQUD.HOLAM) || marks.includes(NIQQUD.HOLAM_HASER)) {
+          result += 'о';
+          continue;
+        }
+        if (hasDagesh && !vowelMark) {
+          result += 'у'; // шурук
+          continue;
+        }
+        if (!vowelMark && !marks.includes(NIQQUD.SHVA) && idx !== 0) {
+          continue; // немая "мать чтения" в середине/конце слова без огласовки
+        }
+        // иначе — настоящая согласная "в" (в т.ч. приставка ве-/ва-)
+        let vowel = '';
+        if (vowelMark) {
+          vowel = VOWEL_MAP[vowelMark];
+        } else if (marks.includes(NIQQUD.SHVA)) {
+          if (idx === 0) {
+            vowel = 'е';
+          } else {
+            vowel = ''; // немой шва — правило смягчения "ль" относится только к букве ламед
+          }
+        }
+        result += 'в' + vowel;
+        continue;
+      }
+
+      // ===== ЙУД как "мать чтения" (хирик мале) — не добавляет отдельного звука =====
+      // Пропускаем ТОЛЬКО когда йуд продолжает хирик предыдущей буквы (долгое "и").
+      // Если же йуд стоит без своей гласной перед чем-то другим (например перед
+      // вав-холам, как в יוֹדֵעַ = "йодеа") — это настоящая согласная "й", не немая.
+      if (letter === 'י' && !vowelMark && !hasDagesh) {
+        const prevGroup = groups[idx - 1];
+        // "мать чтения" бывает не только после хирика (хирик мале), но и
+        // после цере (цере мале) — тот же принцип, другая долгая гласная:
+        // לְהֵירָשֵׁם ("леhерашем") — йуд после цере тоже немой
+        const isMaterLectionisContinuation = prevGroup &&
+          (prevGroup.marks.includes(NIQQUD.HIRIQ) || prevGroup.marks.includes(NIQQUD.TSERE));
+        if (isMaterLectionisContinuation) {
+          continue;
+        }
+        // шва НА САМОМ йуде (а не мать чтения) — частый случай приставки
+        // будущего времени יְ- (יְדַבֵּר "йедабер" — "он поговорит"). Без этого
+        // шва проглатывалась, и согласная слипалась с "й" ("йдабер"). "е",
+        // не "и" — той же логике, что и у остальных приставок этого же
+        // спряжения (те-, не-, а-): шва озвучивается кратким "е".
+        if (marks.includes(NIQQUD.SHVA)) {
+          result += 'йе';
+          continue;
+        }
+        result += 'й';
+        continue;
+      }
+
+      let sound = hasDagesh && CONSONANT_DAGESH[letter] ? CONSONANT_DAGESH[letter] : CONSONANT_BASE[letter];
+
+      // ш/с различаются точкой шин/син
+      if (letter === 'ש') {
+        sound = marks.includes(NIQQUD.SIN_DOT) ? 'с' : 'ш';
+      }
+
+      let vowel = '';
+      if (vowelMark) {
+        vowel = VOWEL_MAP[vowelMark];
+      } else if (idx === 0 && marks.includes(NIQQUD.SHVA)) {
+        // ШВА под самой первой буквой слова обычно озвучивается кратким "е"
+        // (לְ- → "ле-", בְּ- → "бе-"), НО перед сонорными согласными (מ, נ, ר)
+        // в разговорном иврите он почти всегда "проглатывается": שלושה →
+        // "шлоша", не "шелоша"; שני → "шней", не "шеней". Это относится
+        // только к случаям, когда САМА шва-носитель — НЕ сонорная согласная
+        // (ש, כ и т.п.), а следующая — сонорная. Если же сама первая буква
+        // тоже сонорная (מ, נ, ר, ל), проглатывание не происходит: מְנוֹרָה =
+        // "менора", а не "мнора" — согласная+шва+согласная тут звучат как
+        // отдельный слог, а не сливаются.
+        const SONORANTS = ['ל', 'מ', 'נ', 'ר'];
+        const nextGroup = groups[1];
+        const nextIsSonorant = !SONORANTS.includes(letter) && nextGroup && SONORANTS.includes(nextGroup.letter);
+        vowel = nextIsSonorant ? '' : 'е';
+      } else if (letter !== 'ל' && marks.includes(NIQQUD.SHVA)) {
+        // шва посреди слова перед йудом, у которого есть СВОЯ гласная
+        // (типичный паттерн заимствований на -ция/-сия: סִימוּלַצְיָה, где
+        // сама йуд озвучивается как "йа" по общему правилу) — если эту шва
+        // не озвучить, согласная слипается с "й" в непроизносимый на письме
+        // кусок ("цйа" вместо "ция"). Озвучиваем такую шва как "и".
+        const nextGroup = groups[idx + 1];
+        const nextIsYudWithOwnVowel = nextGroup && nextGroup.letter === 'י' &&
+          Object.keys(VOWEL_MAP).some(v => nextGroup.marks.includes(v));
+        vowel = nextIsYudWithOwnVowel ? 'и' : '';
+      } else if (letter === 'ל') {
+        // буква ламед (ל) без собственной гласной смягчается мягким знаком —
+        // но только если она действительно "повисает" без огласовки (беззвучный
+        // шва перед следующей согласной: лильмод, йальда; или в самом конце
+        // слова: леhациль). Если же следующая буква — вав-холам/шурук, то
+        // гласная "о"/"у" на самом деле принадлежит именно этому ламеду и
+        // просто записана на следующей букве (שְׁלוֹשָׁה = "шлоша", не "шльоша") —
+        // тогда смягчать не нужно, ламед остаётся просто согласной без "ь".
+        const nextGroup = groups[idx + 1];
+        const nextCarriesVowelForThis = nextGroup && nextGroup.letter === 'ו' &&
+          (nextGroup.marks.includes(NIQQUD.HOLAM) || nextGroup.marks.includes(NIQQUD.HOLAM_HASER) ||
+           (nextGroup.marks.includes(NIQQUD.DAGESH) && !Object.keys(VOWEL_MAP).some(v => nextGroup.marks.includes(v))));
+        vowel = nextCarriesVowelForThis ? '' : 'ь';
+      }
+
+      // йуд + гласная = всегда "й" + чистая гласная (никогда я/ю/ё) — правило Tedabru
+      if (letter === 'י' && vowel) {
+        result += 'й' + vowel;
+        continue;
+      }
+
+      // ===== Э vs Е в начале слова =====
+      // "е" после согласной звучит мягко (как в "лес") — это верно для тех же
+      // цере/сеголь после обычной согласной (לֶמֶד = "лемед"). Но если сама
+      // первая буква слова беззвучна (א или ע без собственного звука) и несёт
+      // цере/сеголь, никакой предшествующей согласной на самом деле нет — слово
+      // фонетически начинается с чистого гласного (как русское "этот", а не
+      // "его"), и его нужно передавать через "э": אֶלְמַד = "эльмад", а не "ельмад".
+      if (idx === 0 && sound === '' && vowel === 'е') {
+        vowel = 'э';
+      }
+
+      result += sound + vowel;
+    }
+
+    // Двойной йуд (геминация согласной, например дагеш на одном йуде сразу
+    // перед другим йудом со своей гласной — לְסַיֵּים) в разговорном иврите не
+    // звучит как два отдельных "й" подряд — это одна и та же согласная,
+    // просто орфографически удвоенная. лесаййем → лесайем.
+    result = result.replace(/йй+/g, 'й');
+
+    return result || '?';
+  }
+
+  // ===== Распознавание биньяна по шаблону инфинитива (черновая эвристика) =====
+  //
+  // Предполагается, что слово вводится в форме инфинитива (как принято в
+  // курсе Tedabru: לִכְתוֹב, לְקַבֵּל и т.д.). Пуаль и хуфаль сюда не входят —
+  // у них нет формы инфинитива, поэтому глагол в инфинитиве может быть только
+  // одним из пяти: пааль, пиэль, хифиль, нифаль, hитпаэль.
+  //
+  // ВАЖНО: это эвристика по внешнему виду огласовок, а не морфологический
+  // анализ — пааль как биньян неоднороден (разные корни дают разный шаблон),
+  // поэтому он используется как запасной вариант по умолчанию. Результат
+  // всегда стоит проверять глазами, как и с транскрипцией.
+  function detectBinyan(niqqudWord) {
+    const groups = tokenizeNiqqud(niqqudWord);
+    if (groups.length < 2 || groups[0].letter !== 'ל') return null; // не похоже на инфинитив
+
+    const has = (marks, mark) => marks.includes(mark);
+    const second = groups[1];
+
+    // לְהִתְ... → hитпаэль
+    if (second.letter === 'ה' && has(second.marks, NIQQUD.HIRIQ) &&
+        groups[2] && groups[2].letter === 'ת') {
+      return 'hитпаэль';
+    }
+    // לְהִ... (без ת следом) → нифаль
+    if (second.letter === 'ה' && has(second.marks, NIQQUD.HIRIQ)) {
+      return 'нифаль';
+    }
+    // לְהַ... → хифиль
+    if (second.letter === 'ה' && has(second.marks, NIQQUD.PATAH)) {
+      return 'хифиль';
+    }
+    // לְהוֹ... → хифиль (подтип с "слабой" первой корневой буквой: להודיע,
+    // להוציא, להושיב — гласная "о" стоит не на самой ה, а на следующей ו)
+    if (second.letter === 'ה' && groups[2] && groups[2].letter === 'ו' &&
+        has(groups[2].marks, NIQQUD.HOLAM)) {
+      return 'хифиль';
+    }
+    // дагеш + цере на одной и той же согласной (не первой и не последней) —
+    // самая узнаваемая сигнатура пиэль (לְקַבֵּל, לְדַבֵּר)
+    for (let i = 1; i < groups.length - 1; i++) {
+      if (has(groups[i].marks, NIQQUD.DAGESH) && has(groups[i].marks, NIQQUD.TSERE)) {
+        return 'пиэль';
+      }
+    }
+    // ничего из вышеперечисленного — самый частый случай, пааль
+    return 'пааль';
+  }
+
+  // ===== Распознавание части речи и рода по битовой маске "morph" =====
+  //
+  // Поле morph, которое Nakdan и так возвращает бесплатно с каждым запросом,
+  // оказалось битовой маской, где отдельные биты устойчиво соответствуют
+  // грамматическим категориям (проверено эмпирически на наборе тестовых слов,
+  // официальной документации по расшифровке у Dicta нет):
+  //   биты 18 И 17 вместе → существительное
+  //   бит 16 (без 17)     → прилагательное
+  //   бит 17 в одиночку (без 16 и без 18) → наречие
+  //   бит 22              → женский род (для сущ./прил.)
+  // Это тоже эвристика на ограниченной выборке — не официальный контракт API,
+  // так что результат может не покрывать все случаи.
+  function hasBit(morphStr, bit) {
+    if (!morphStr) return false;
+    try {
+      return (BigInt(morphStr) & (1n << BigInt(bit))) !== 0n;
+    } catch (e) {
+      return false; // на случай неожиданного формата morph — просто не угадываем
+    }
+  }
+
+  // ===== Распознавание биньяна по битам 51/52/53 в morph =====
+  //
+  // Проверено на семи глагольных формах (по одной на каждый биньян, включая
+  // пуаль/хуфаль через причастие, раз у них нет инфинитива) — комбинация
+  // этих трёх битов однозначно и без исключений соответствует биньяну:
+  //   51            → пааль
+  //   52            → нифаль
+  //   51+52         → хифиль
+  //   51+53         → пиэль
+  //   52+53         → пуаль
+  //   53            → хуфаль
+  //   51+52+53      → hитпаэль
+  // Это надёжнее прежней эвристики по написанию (которая ложно принимала за
+  // глагол некоторые наречия вроде "леат") — здесь используется реальный
+  // грамматический разбор Nakdan, а не угадывание по внешнему виду слова.
+  function detectBinyanFromMorph(morphStr) {
+    if (!morphStr) return null;
+    const b51 = hasBit(morphStr, 51);
+    const b52 = hasBit(morphStr, 52);
+    const b53 = hasBit(morphStr, 53);
+
+    if (b51 && !b52 && !b53) return 'пааль';
+    if (!b51 && b52 && !b53) return 'нифаль';
+    if (b51 && b52 && !b53) return 'хифиль';
+    if (b51 && !b52 && b53) return 'пиэль';
+    if (!b51 && b52 && b53) return 'пуаль';
+    if (!b51 && !b52 && b53) return 'хуфаль';
+    if (b51 && b52 && b53) return 'hитпаэль';
+    return null; // ни одна из известных комбинаций не подошла — не глагол
+  }
+
+  function detectPosFromMorph(morphStr) {
+    if (!morphStr) return null;
+    // числительное (количественное) и местоимение проверяем ПЕРВЫМИ — они
+    // используют тот же бит 16, что и прилагательное, но в других сочетаниях,
+    // поэтому порядок проверки важен, иначе прилагательное перехватит их.
+    const isCardinalNumeral = hasBit(morphStr, 16) && hasBit(morphStr, 17) && hasBit(morphStr, 18);
+    const isPronoun = hasBit(morphStr, 16) && hasBit(morphStr, 19) &&
+      !hasBit(morphStr, 17) && !hasBit(morphStr, 18);
+    const isNoun = hasBit(morphStr, 18) && hasBit(morphStr, 17);
+    const isAdjective = hasBit(morphStr, 16) && !hasBit(morphStr, 17);
+    const isAdverb = hasBit(morphStr, 17) && !hasBit(morphStr, 16) && !hasBit(morphStr, 18);
+    const isFeminine = hasBit(morphStr, 22);
+
+    // порядковые числительные (ראשון и т.п.) отдельного кода не имеют —
+    // Nakdan размечает их как обычное прилагательное, что грамматически
+    // верно (они склоняются как прилагательные), так что правило isAdjective
+    // уже подхватывает их само по себе.
+    if (isCardinalNumeral) return 'числ';
+    if (isPronoun) return 'местоим';
+    if (isNoun) return isFeminine ? 'сущ, ж.р' : 'сущ, м.р';
+    if (isAdjective) return 'прил';
+    if (isAdverb) return 'нареч';
+    return null; // не подошло ни под одну категорию — оставляем выбор пользователю
+  }
+
+  // ===== Gemini API: догадки написания иврита по транскрипции =====
+  // Модель не обязана быть точной — она только предлагает "сырые" варианты
+  // написания (без никуда), а проверяем их мы сами через уже отлаженный
+  // пайплайн Nakdan + niqqudToTranslit, сравнивая с тем, что ввёл человек.
+  const GEMINI_URL = 'https://tedabrutranscriptiongemini.3an3arah.workers.dev/';
+
+  async function guessHebrewSpellings(transcription) {
+    const response = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcription })
+    });
+    if (!response.ok) throw new Error('Gemini ответил ошибкой: ' + response.status);
+    const json = await response.json();
+    const rawText = json.candidates && json.candidates[0] && json.candidates[0].content
+      && json.candidates[0].content.parts && json.candidates[0].content.parts[0]
+      && json.candidates[0].content.parts[0].text;
+    if (!rawText) return [];
+    try {
+      const arr = JSON.parse(rawText.trim());
+      // убираем дубликаты, которые модель иногда выдаёт (как с "шлоша")
+      return [...new Set(arr)];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // мапик на финальной ה (например מַחְשָׁבָהּ "её мысль") транскрибируется
+  // так же, как обычное слово без него (מַחְשָׁבָה "мысль") — специально, по
+  // нашему правилу "финальная ה всегда немая". Но это значит, что дедупликация
+  // по транскрипции+грамматике может случайно перепутать обычное слово с его
+  // формой "+её/его" — используем этот признак ТОЛЬКО для различения при
+  // дедупликации, не для отображения.
+  function hasFinalMapiq(text) {
+    return /ה\u05BC$/.test(text);
+  }
+
+  // сравнение "нестрого" — снимаем ударение, приводим к нижнему регистру,
+  // убираем лишние пробелы. ВАЖНО: правила транслитерации Tedabru (й перед
+  // гласной, мягкий знак у ламеда, латинская h) — это ТОЛЬКО наш внутренний
+  // стандарт для подписи слов, ищущий человек им не обязан следовать, поэтому
+  // при сравнении с чужим вводом эти особенности снимаем с обеих сторон.
+  function normalizeForCompare(str) {
+    return (str || '')
+      .toLowerCase()
+      .replace(/´|́/g, '')
+      .replace(/h/g, '')
+      .replace(/й(?=[аеиоуэ])/g, '') // "йелед" ищущий может ввести просто "елед"
+      .replace(/ь/g, '') // "лильмод" ищущий может ввести просто "лилмод"
+      .trim();
+  }
+
+  // расстояние Левенштейна — допускаем небольшую опечатку/расхождение,
+  // а не требуем побуквенного совпадения
+  function levenshtein(a, b) {
+    const m = a.length, n = b.length;
+    const dp = [];
+    for (let i = 0; i <= m; i++) dp.push(new Array(n + 1).fill(0));
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+    return dp[m][n];
+  }
+
+  function isFuzzyMatch(candidate, query) {
+    const a = normalizeForCompare(candidate);
+    const b = normalizeForCompare(query);
+    if (a === b) return true;
+    const maxLen = Math.max(a.length, b.length);
+    const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
+    return levenshtein(a, b) <= allowedDistance;
+  }
+
+  let searchGeneration = 0; // счётчик "поколений" запроса — защита от гонки
+
+  // Общая логика обработки и отрисовки кандидатов — используется и мгновенным
+  // словарным поиском (при вводе), и поиском через сеть (по кнопке). Отдельно
+  // вынесено, чтобы не дублировать дедупликацию/фильтр мусора/рендер дважды.
+  function renderCandidatesInto(resultsEl, rawCandidates) {
+    if (!rawCandidates.length) {
+      resultsEl.innerHTML = '';
+      return false;
+    }
+
+    // объединяем карточки одного и того же слова с разными значениями в одну
+    // (см. mergeCandidatesBySense) — настоящие разные синонимы с одинаковым
+    // кратким переводом (רכב/מכונית/אוטו = все "автомобиль") не трогает, у
+    // них разное написание/транскрипция, группировка идёт не по переводу
+    const uniqueMatches = mergeCandidatesBySense(rawCandidates);
+
+    // тот же признак мусора, что и раньше — перевод почти дословно
+    // совпадает с транскрипцией самого слова. Актуально только для
+    // API-фоллбэка (у словарных статей такого не бывает, они не
+    // "придумываются" DeepL, а берутся из готового словаря).
+    const looksLikeFallbackTransliteration = (m) => {
+      if (!m.translation) return false;
+      const a = normalizeForCompare(m.translation);
+      const b = normalizeForCompare(m.translit);
+      if (!a || !b) return false;
+      return levenshtein(a, b) <= 1;
+    };
+    const containsLatinScript = (m) => /[a-zA-Z]/.test(m.translation || '');
+    const isJunk = (m) => looksLikeFallbackTransliteration(m) || containsLatinScript(m);
+
+    const hasGenuineTranslation = uniqueMatches.some(m => !isJunk(m));
+    const visibleMatches = hasGenuineTranslation ? uniqueMatches.filter(m => !isJunk(m)) : uniqueMatches;
+    const hiddenMatches = hasGenuineTranslation ? uniqueMatches.filter(m => isJunk(m)) : [];
+
+    const rowHtml = (m) => {
+      const existing = findExistingWordByHebrew(m.text);
+      return `
+      <button type="button" class="candidate-row ${existing ? 'already-added' : ''}">
+        <div class="candidate-word">${m.text}</div>
+        <div class="candidate-translit">/${m.translit}/</div>
+        ${m.grammarLabel ? `<div class="candidate-grammar">${m.grammarLabel}</div>` : ''}
+        ${m.translation ? `<div class="candidate-translation">${m.translation}</div>` : ''}
+        ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
+      </button>
+    `;
+    };
+
+    resultsEl.innerHTML = visibleMatches.map(rowHtml).join('') + (hiddenMatches.length ? `
+      <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
+        Скрытые результаты (${hiddenMatches.length})
+      </button>
+      <div id="hiddenResults" style="display:none;"></div>
+    ` : '');
+
+    const attachClickHandlers = (containerEl, list) => {
+      containerEl.querySelectorAll('.candidate-row').forEach((row, i) => {
+        row.addEventListener('click', () => {
+          const m = list[i];
+          // слово уже в справочнике — из результатов поиска повторно не
+          // добавляем (галочка на карточке и так всё объясняет); изменить его
+          // можно только через саму карточку слова в списке справочника
+          if (findExistingWordByHebrew(m.text)) return;
+          enterAddMode(m);
+        });
+      });
+    };
+
+    attachClickHandlers(resultsEl, visibleMatches);
+
+    if (hiddenMatches.length) {
+      document.getElementById('showHiddenBtn').addEventListener('click', (e) => {
+        const hiddenEl = document.getElementById('hiddenResults');
+        hiddenEl.innerHTML = hiddenMatches.map(rowHtml).join('');
+        attachClickHandlers(hiddenEl, hiddenMatches);
+        hiddenEl.style.display = 'block';
+        e.target.remove();
+      });
+    }
+    return true;
+  }
+
+  async function runGlobalTranscriptionSearch(query, btn) {
+    const myGeneration = ++searchGeneration;
+    const resultsEl = document.getElementById('globalSearchResults');
+    btn.disabled = true;
+    btn.textContent = 'Ищу среди вариантов написания...';
+    resultsEl.innerHTML = '';
+
+    // если пока этот запрос летал по сети, стартовал более новый запрос —
+    // не даём устаревшему ответу перезаписать уже показанный свежий результат
+    const isStale = () => myGeneration !== searchGeneration;
+
+    try {
+      const rawCandidates = await resolveCandidates(query);
+      if (isStale()) return;
+      console.log('[DEBUG] кандидаты от resolveCandidates:', rawCandidates.map(c => ({ text: c.text, source: c.source, translation: c.translation })));
+      if (!rawCandidates.length) {
+        resultsEl.innerHTML = '<div class="sugg-note">Не удалось найти это слово ни в словаре, ни через перевод.</div>';
+        return;
+      }
+      if (isStale()) return; // за время запроса стартовал более новый поиск — не перезаписываем его результат
+      renderCandidatesInto(resultsEl, rawCandidates);
+    } catch (err) {
+      if (!isStale()) resultsEl.innerHTML = `<div class="sugg-note">Не удалось выполнить поиск (${err.message}).</div>`;
+    } finally {
+      if (!isStale()) {
+        btn.disabled = false;
+        btn.textContent = `Искать среди всех слов иврита по транскрипции «${query}»`;
+      }
+    }
+  }
+
+
+  const nikkudSuggestion = document.getElementById('nikkudSuggestion');
+
+  // сопоставляем grammarLabel (человекочитаемый, из словаря или от Nakdan)
+  // со значением <select id="inputPos"> — форматы слегка расходятся
+  // ("глагол, пааль" vs просто "пааль"), поэтому не полагаемся на точное
+  // совпадение строки целиком
+  function grammarLabelToPosValue(label) {
+    if (!label) return null;
+    if (label.startsWith('глагол, ')) {
+      const binyan = label.slice('глагол, '.length);
+      return binyan || null;
+    }
+    const direct = ['сущ, м.р', 'сущ, ж.р', 'прил', 'местоим', 'числ', 'нареч'];
+    return direct.includes(label) ? label : null;
+  }
+
+  let metaSuggestGeneration = 0; // защита от гонки при живом наборе — устаревший ответ не перезаписывает более новый ввод
+  let metaSuggestDebounceTimer = null;
+
+  // Подбор меты по мере ввода — единственный способ вызвать её теперь
+  // (кнопка "Подобрать мету" была не нужна: подсказки и так всплывают
+  // вживую, см. подписку на 'input' на inputHebrew ниже)
+  async function runMetaSuggestion(raw) {
+    const myGeneration = ++metaSuggestGeneration;
+    nikkudSuggestion.className = 'nikkud-suggestion';
+
+    try {
+      const candidates = await resolveCandidates(raw);
+      if (myGeneration !== metaSuggestGeneration) return; // за время запроса ввод уже изменился
+
+      if (!candidates.length) {
+        nikkudSuggestion.classList.add('visible');
+        nikkudSuggestion.innerHTML = '<div class="sugg-note">Не удалось найти это слово ни в словаре, ни через перевод.</div>';
+        return;
+      }
+
+      // объединяем карточки одного и того же слова с разными значениями в одну
+      // пронумерованную (см. mergeCandidatesBySense) — иначе одно и то же
+      // слово ("матбеа" = и "монета", и "валюта") показывалось бы отдельными
+      // карточками, из которых пришлось бы наугад выбирать одну для сохранения
+      const uniqueCandidates = mergeCandidatesBySense(candidates);
+
+      // при нечётком поиске по транскрипции (fuzzyMatchTranslitIndex) кандидатов
+      // может быть по-настоящему много — все они "похожи" по расстоянию
+      // Левенштейна, но за экраном без прокрутки нужного слова уже не видно.
+      // Кандидаты уже отсортированы от наиболее к наименее вероятному, так что
+      // просто показываем первые 5, а остальное отбрасываем
+      const finalCandidates = uniqueCandidates.slice(0, 5);
+
+      nikkudSuggestion.innerHTML = finalCandidates.map((c, i) => {
+        const existing = findExistingWordByHebrew(c.text);
+        return `
+        <button type="button" class="candidate-row ${existing ? 'already-added' : ''}" data-index="${i}">
+          <div class="candidate-word">${c.text}</div>
+          <div class="candidate-translit">/${c.translit}/</div>
+          ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
+          ${c.translation ? `<div class="candidate-translation">${c.translation}</div>` : ''}
+          ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
+        </button>
+      `;
+      }).join('') + (uniqueCandidates.length > finalCandidates.length ? `
+        <div class="sugg-note" style="margin-top:8px;">Показаны 5 наиболее вероятных вариантов из ${uniqueCandidates.length}.</div>
+      ` : '');
+      nikkudSuggestion.classList.add('visible');
+
+      nikkudSuggestion.querySelectorAll('.candidate-row').forEach((row, i) => {
+        row.addEventListener('click', () => {
+          const c = finalCandidates[i];
+          inputHebrew.value = c.text;
+          inputTranslit.value = c.translit;
+          const posValue = grammarLabelToPosValue(c.grammarLabel);
+          if (posValue) inputPos.value = posValue;
+          if (c.translation) inputTranslation.value = c.translation;
+          updateSaveState();
+        });
+      });
+    } catch (err) {
+      if (myGeneration !== metaSuggestGeneration) return;
+      nikkudSuggestion.classList.add('visible', 'error');
+      nikkudSuggestion.innerHTML = `
+        <div class="sugg-note">
+          Не удалось получить никуд автоматически (${err.message}).
+          Возможно, сервер блокирует прямые запросы из браузера (CORS) — введите слово и транскрипцию вручную.
+        </div>
+      `;
+    }
+  }
+
+  // ===== Встроенное добавление слова (без модалки) =====
+  const addWordPanel = document.getElementById('addWordPanel');
+  const inputHebrew = document.getElementById('searchInput'); // тот же инпут, что и обычный поиск
+  const inputTranslit = document.getElementById('inputTranslit');
+  const inputPos = document.getElementById('inputPos');
+  const inputTranslation = document.getElementById('inputTranslation');
+  const saveBtn = document.getElementById('saveBtn');
+
+  // prefill (необязателен) — {text, translit, grammarLabel, translation}, тот
+  // же формат, что и у кандидата из поиска: используется, когда входим в
+  // режим добавления кликом по ещё не сохранённому слову в результатах поиска
+  function enterAddMode(prefill) {
+    if (selectionMode) return; // не пересекаемся с режимом выделения
+    addMode = true;
+    updateHeaderForSelectionMode();
+    selectModeBtn.style.display = 'none';
+    filterBarEl.style.display = 'none';
+    wordListEl.style.display = 'none';
+    addWordPanel.style.display = '';
+    setBulkMode(false); // всегда открываемся в одиночном режиме
+    bulkTargetCollectionId = null;
+    bulkCreatingCollectionInline = false;
+    renderBulkCollectionChips();
+    inputHebrew.placeholder = 'Впишите слово, транскрипцию или перевод';
+    inputHebrew.setAttribute('dir', 'rtl');
+    clearTimeout(metaSuggestDebounceTimer);
+    metaSuggestGeneration++; // инвалидируем любой ещё летящий запрос от прошлого раза
+    nikkudSuggestion.classList.remove('visible', 'error');
+    nikkudSuggestion.innerHTML = '';
+
+    if (prefill) {
+      inputHebrew.value = prefill.text || '';
+      inputTranslit.value = prefill.translit || '';
+      const posValue = grammarLabelToPosValue(prefill.grammarLabel);
+      if (posValue) inputPos.value = posValue; else inputPos.selectedIndex = 0;
+      inputTranslation.value = prefill.translation || '';
+    } else {
+      inputHebrew.value = '';
+      inputTranslit.value = '';
+      inputTranslation.value = '';
+      inputPos.selectedIndex = 0;
+      setTimeout(() => inputHebrew.focus(), 50);
+    }
+    updateSaveState();
+  }
+
+  function exitAddMode() {
+    if (bulkAddRunning) return; // не выходим, пока идёт массовое добавление — сначала "Остановить"
+    addMode = false;
+    updateHeaderForSelectionMode();
+    selectModeBtn.style.display = '';
+    filterBarEl.style.display = '';
+    wordListEl.style.display = '';
+    addWordPanel.style.display = 'none';
+    inputHebrew.placeholder = 'Слово, перевод или транскрипция';
+    inputHebrew.removeAttribute('dir');
+    clearTimeout(metaSuggestDebounceTimer);
+    metaSuggestGeneration++;
+    searchQuery = '';
+    inputHebrew.value = '';
+    renderFilterBar();
+    renderList();
+  }
+
+  function updateSaveState() {
+    const ready = inputHebrew.value.trim() && inputTranslation.value.trim();
+    saveBtn.disabled = !ready;
+  }
+
+  [inputHebrew, inputTranslit, inputTranslation].forEach(el => {
+    el.addEventListener('input', updateSaveState);
+  });
+
+  saveBtn.addEventListener('click', () => {
+    const hebrewValue = inputHebrew.value.trim();
+    const existing = findExistingWordByHebrew(hebrewValue);
+
+    if (existing) {
+      // слово с таким написанием уже есть в справочнике — обновляем его
+      // на месте вместо того, чтобы завести дубликат; статус/избранное/
+      // подборки уже существующего слова не трогаем (кроме явно выбранной
+      // подборки в пикере ниже — её всё же добавляем)
+      existing.translit = inputTranslit.value.trim();
+      existing.pos = inputPos.value;
+      existing.translation = inputTranslation.value.trim();
+      if (bulkTargetCollectionId) {
+        existing.collectionIds = existing.collectionIds || [];
+        if (!existing.collectionIds.includes(bulkTargetCollectionId)) existing.collectionIds.push(bulkTargetCollectionId);
+      }
+    } else {
+      const newWord = {
+        id: Date.now(),
+        hebrew: hebrewValue,
+        translit: inputTranslit.value.trim(),
+        pos: inputPos.value,
+        translation: inputTranslation.value.trim(),
+        status: 'active',
+        favorite: false,
+        collectionIds: bulkTargetCollectionId ? [bulkTargetCollectionId] : [],
+        addedAt: Date.now()
+      };
+      words.unshift(newWord);
+    }
+    saveWords();
+    exitAddMode();
+    showToast(`Слово «${hebrewValue}» добавлено`);
+  });
+
+  // ===== Массовое добавление (несколько слов сразу) =====
+  const toggleBulkModeBtn = document.getElementById('toggleBulkModeBtn');
+  const singleAddFieldsEl = document.getElementById('singleAddFields');
+  const bulkAddFieldsEl = document.getElementById('bulkAddFields');
+  const bulkInputEl = document.getElementById('bulkInput');
+  const bulkProgressEl = document.getElementById('bulkProgress');
+  const bulkAddSubmitBtn = document.getElementById('bulkAddSubmitBtn');
+  const bulkAddStopBtn = document.getElementById('bulkAddStopBtn');
+  const bulkCollectionChipsEl = document.getElementById('bulkCollectionChips');
+
+  let bulkMode = false;
+  let bulkAddRunning = false;
+  let bulkAddAborted = false;
+  let bulkTargetCollectionId = null;      // в какую подборку класть добавляемые слова (необязательно)
+  let bulkCreatingCollectionInline = false;
+
+  function renderBulkCollectionChips() {
+    bulkCollectionChipsEl.innerHTML = collections.map(c =>
+      `<button type="button" class="chip ${bulkTargetCollectionId === c.id ? 'chip-selected' : ''}" data-bulk-coll="${c.id}">${c.name}</button>`
+    ).join('') + (
+      bulkCreatingCollectionInline
+        ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="Название подборки" />`
+        : `<button type="button" class="chip chip-icon-only" id="bulkNewCollectionChip" title="Новая подборка">${PLUS_ICON}</button>`
+    );
+
+    bulkCollectionChipsEl.querySelectorAll('[data-bulk-coll]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.bulkColl;
+        bulkTargetCollectionId = (bulkTargetCollectionId === id) ? null : id; // повторный клик снимает выбор
+        renderBulkCollectionChips();
+      });
+    });
+
+    if (bulkCreatingCollectionInline) {
+      const inlineInput = document.getElementById('bulkNewCollectionInput');
+      inlineInput.focus();
+      const finishInlineCreate = (commit) => {
+        if (!bulkCreatingCollectionInline) return;
+        bulkCreatingCollectionInline = false;
+        if (commit) {
+          const name = inlineInput.value.trim();
+          if (name) {
+            const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
+            collections.push(nc);
+            saveCollections();
+            bulkTargetCollectionId = nc.id; // сразу выбираем только что созданную
+          }
+        }
+        renderBulkCollectionChips();
+      };
+      inlineInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') finishInlineCreate(true);
+        else if (e.key === 'Escape') { e.stopPropagation(); finishInlineCreate(false); }
+      });
+      // blur коммитит (как и Enter), а не отменяет — та же причина, что и
+      // в главном фильтр-баре: клик по "Добавить все" без явного Enter
+      // раньше снимал фокус и тихо терял введённое имя подборки
+      inlineInput.addEventListener('blur', () => finishInlineCreate(true));
+    } else {
+      document.getElementById('bulkNewCollectionChip').addEventListener('click', () => {
+        bulkCreatingCollectionInline = true;
+        renderBulkCollectionChips();
+      });
+    }
+  }
+
+  function setBulkMode(on) {
+    bulkMode = on;
+    singleAddFieldsEl.style.display = on ? 'none' : '';
+    bulkAddFieldsEl.style.display = on ? '' : 'none';
+    toggleBulkModeBtn.textContent = on ? 'Добавить одно слово' : 'Добавить несколько слов сразу';
+    if (on) {
+      bulkInputEl.value = '';
+      bulkProgressEl.style.display = 'none';
+      bulkAddSubmitBtn.style.display = '';
+      bulkAddStopBtn.style.display = 'none';
+      setTimeout(() => bulkInputEl.focus(), 50);
+    }
+  }
+
+  toggleBulkModeBtn.addEventListener('click', () => setBulkMode(!bulkMode));
+
+  bulkAddStopBtn.addEventListener('click', () => {
+    bulkAddAborted = true;
+    bulkProgressEl.textContent = 'Останавливаю после текущего слова…';
+  });
+
+  bulkAddSubmitBtn.addEventListener('click', async () => {
+    // делим по пробелам/запятым/переносам строк — ровно как попросили;
+    // убираем пустые токены и дубликаты (одно и то же слово дважды в
+    // списке незачем гонять через API повторно)
+    const tokens = [...new Set(
+      bulkInputEl.value.split(/[\s,]+/).map(s => s.trim()).filter(Boolean)
+    )];
+    if (!tokens.length) return;
+
+    bulkAddRunning = true;
+    bulkAddAborted = false;
+    bulkAddSubmitBtn.style.display = 'none';
+    bulkAddStopBtn.style.display = '';
+    bulkInputEl.disabled = true;
+    bulkProgressEl.style.display = '';
+    primaryActionBtn.style.opacity = '0.4';
+    primaryActionBtn.style.pointerEvents = 'none';
+
+    let added = 0, updated = 0;
+    const failed = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (bulkAddAborted) break;
+      const token = tokens[i];
+      bulkProgressEl.textContent = `Обрабатываю ${i + 1} из ${tokens.length}: «${token}»…`;
+
+      let best = null;
+      try {
+        const candidates = await resolveCandidates(token);
+        best = candidates && candidates[0];
+      } catch (err) {
+        best = null;
+      }
+
+      if (!best || !best.text || !best.translation) {
+        failed.push(token);
+        continue;
+      }
+
+      const existing = findExistingWordByHebrew(best.text);
+      if (existing) {
+        existing.translit = best.translit || existing.translit;
+        existing.pos = grammarLabelToPosValue(best.grammarLabel) || existing.pos;
+        existing.translation = best.translation;
+        if (bulkTargetCollectionId) {
+          existing.collectionIds = existing.collectionIds || [];
+          if (!existing.collectionIds.includes(bulkTargetCollectionId)) existing.collectionIds.push(bulkTargetCollectionId);
+        }
+        updated++;
+      } else {
+        words.unshift({
+          id: Date.now() + i,
+          hebrew: best.text,
+          translit: best.translit || '',
+          pos: grammarLabelToPosValue(best.grammarLabel) || 'сущ, м.р',
+          translation: best.translation,
+          status: 'active',
+          favorite: false,
+          collectionIds: bulkTargetCollectionId ? [bulkTargetCollectionId] : [],
+          addedAt: Date.now()
+        });
+        added++;
+      }
+    }
+
+    saveWords();
+    bulkAddRunning = false;
+    primaryActionBtn.style.opacity = '';
+    primaryActionBtn.style.pointerEvents = '';
+    bulkInputEl.disabled = false;
+    bulkProgressEl.style.display = 'none';
+    bulkAddSubmitBtn.style.display = '';
+    bulkAddStopBtn.style.display = 'none';
+
+    const summaryParts = [`добавлено: ${added}`, `обновлено: ${updated}`];
+    if (failed.length) summaryParts.push(`не найдено: ${failed.length}`);
+    const toastMessage = (bulkAddAborted ? 'Остановлено — ' : '') + summaryParts.join(', ');
+
+    exitAddMode();
+    showToast(toastMessage);
+  });
+
+  // ===== Первичный рендер =====
+  renderFilterBar();
+  renderList();
+</script>
+
+</body>
+</html>
