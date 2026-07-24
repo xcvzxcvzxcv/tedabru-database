@@ -162,7 +162,7 @@
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 105px 105px 1fr 94px 26px;
+    grid-template-columns: 32px 105px 105px 1fr 60px 26px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -237,18 +237,16 @@
     color: var(--muted);
   }
   .icon-btn.delete-btn,
-  .icon-btn.edit-def-btn,
-  .icon-btn.favorite-btn {
+  .icon-btn.edit-def-btn {
     justify-content: flex-end;
     padding-right: 0;
   }
-  .icon-btn.listen-btn {
+  .icon-btn.favorite-btn {
     justify-content: flex-start;
     padding: 4px 4px 4px 0;
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
-  .icon-btn.listen-btn.playing { color: var(--gold); }
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -645,7 +643,6 @@
     .word-row:hover .translation {
       filter: brightness(1.2);
     }
-    .word-row:hover .listen-btn,
     .word-row:hover .favorite-btn,
     .word-row:hover .delete-btn,
     .word-row:hover .edit-def-btn {
@@ -1174,7 +1171,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.1</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1518,7 +1515,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.6.1';
+  const APP_VERSION = '0.6.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1839,7 +1836,6 @@
   }
 
   const STAR_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-  const SPEAKER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15" fill="currentColor" stroke="none"/><path d="M16 8a5 5 0 0 1 0 8"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   const CHECK_ON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" fill="rgba(235,166,74,0.2)"/><polyline points="7 12 10.5 15.5 17 8.5"/></svg>';
   const CHECK_OFF_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg>';
   const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
@@ -2145,7 +2141,7 @@
       }
       return `
       <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''}" data-id="${w.id}">
-        <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="Прослушать">${SPEAKER_ICON}</button>
+        <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
           <div class="translit">${w.translit}</div>
@@ -2157,7 +2153,6 @@
         <div class="row-actions-cell" data-id="${w.id}">
           <div class="mastery-dots-wrap">${masteryDotsHtml(w)}</div>
           <div class="row-actions-buttons">
-            <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
             <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
             <button class="icon-btn edit-def-btn" data-id="${w.id}" title="Редактировать определение (только в вашем словаре)">${PENCIL_ICON}</button>
           </div>
@@ -2168,9 +2163,6 @@
     }).join('') + `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
     fitHebrewWordsInList(listEl);
 
-    listEl.querySelectorAll('.listen-btn').forEach(btn => {
-      btn.addEventListener('click', () => playWordAudio(decodeURIComponent(btn.dataset.hebrew), btn));
-    });
     listEl.querySelectorAll('.favorite-btn').forEach(btn => {
       btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
     });
@@ -2223,97 +2215,6 @@
       }));
     });
     attachGlobalSearchHandler();
-  }
-
-  // ===== Прослушивание слова =====
-  // Неофициальный, но давно и широко используемый эндпоинт Google Translate
-  // TTS — никакого API-ключа не требует, просто URL. client=tw-ob — тот
-  // самый "трюк"-параметр, без которого запрос отклоняется как невалидный.
-  // ВАЖНО: это НЕ официальный API — Google может поменять поведение без
-  // предупреждения. Кэшируем результат в IndexedDB, чтобы не дёргать
-  // эндпоинт повторно для уже озвученных слов — но если сам fetch() не
-  // прошёл (например, из-за CORS — у этого эндпоинта нет гарантии
-  // permissive-заголовков), тихо откатываемся на прямое воспроизведение по
-  // URL без кэша, а не ломаем фичу целиком.
-  const TTS_DB_NAME = 'tedabru_audio_cache';
-  const TTS_STORE_NAME = 'audio';
-  let ttsDbPromise = null;
-
-  function openTtsDb() {
-    if (ttsDbPromise) return ttsDbPromise;
-    ttsDbPromise = new Promise((resolve) => {
-      if (!window.indexedDB) { resolve(null); return; }
-      try {
-        const req = indexedDB.open(TTS_DB_NAME, 1);
-        req.onupgradeneeded = () => { req.result.createObjectStore(TTS_STORE_NAME); };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => resolve(null); // не критично — просто работаем без кэша
-      } catch (e) { resolve(null); }
-    });
-    return ttsDbPromise;
-  }
-
-  async function getCachedAudioBlob(key) {
-    const db = await openTtsDb();
-    if (!db) return null;
-    return new Promise((resolve) => {
-      try {
-        const req = db.transaction(TTS_STORE_NAME, 'readonly').objectStore(TTS_STORE_NAME).get(key);
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => resolve(null);
-      } catch (e) { resolve(null); }
-    });
-  }
-
-  async function setCachedAudioBlob(key, blob) {
-    const db = await openTtsDb();
-    if (!db) return;
-    return new Promise((resolve) => {
-      try {
-        const tx = db.transaction(TTS_STORE_NAME, 'readwrite');
-        const req = tx.objectStore(TTS_STORE_NAME).put(blob, key);
-        req.onsuccess = () => resolve();
-        req.onerror = () => resolve(); // не критично — просто не сохранилось в кэш на этот раз
-      } catch (e) { resolve(); }
-    });
-  }
-
-  function ttsUrl(text) {
-    return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=iw&client=tw-ob`;
-  }
-
-  let currentAudioEl = null;
-
-  async function playWordAudio(hebrewText, btnEl) {
-    if (!hebrewText) return;
-    if (currentAudioEl) { currentAudioEl.pause(); currentAudioEl = null; }
-    document.querySelectorAll('.listen-btn.playing').forEach(b => b.classList.remove('playing'));
-    if (btnEl) btnEl.classList.add('playing');
-
-    let audioSrc;
-    try {
-      let blob = await getCachedAudioBlob(hebrewText);
-      if (!blob) {
-        const response = await fetch(ttsUrl(hebrewText));
-        if (!response.ok) throw new Error('tts fetch failed: ' + response.status);
-        blob = await response.blob();
-        setCachedAudioBlob(hebrewText, blob); // в фоне, не блокируем воспроизведение
-      }
-      audioSrc = URL.createObjectURL(blob);
-    } catch (e) {
-      // fetch не прошёл (сеть/CORS) — играем напрямую по URL, без кэша
-      audioSrc = ttsUrl(hebrewText);
-    }
-
-    const audio = new Audio(audioSrc);
-    currentAudioEl = audio;
-    const clearPlaying = () => {
-      if (btnEl) btnEl.classList.remove('playing');
-      if (currentAudioEl === audio) currentAudioEl = null;
-    };
-    audio.addEventListener('ended', clearPlaying);
-    audio.addEventListener('error', clearPlaying);
-    audio.play().catch(clearPlaying);
   }
 
   function toggleFavorite(id) {
@@ -2781,7 +2682,7 @@
 
   wordListEl.addEventListener('pointerdown', (e) => {
     if (selectionMode) return; // тут уже работает обычный обработчик выделения выше
-    if (e.target.closest('.listen-btn') || e.target.closest('.favorite-btn') ||
+    if (e.target.closest('.favorite-btn') ||
         e.target.closest('.delete-btn') || e.target.closest('.undo-btn')) return;
     const row = e.target.closest('.word-row');
     if (!row || row.classList.contains('row-deleting')) return;
