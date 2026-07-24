@@ -162,7 +162,7 @@
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 90px 105px 1fr 26px 26px 26px 26px;
+    grid-template-columns: 32px 90px 95px 1fr 26px 26px 26px 26px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -954,7 +954,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.2.1</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.2.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1077,21 +1077,6 @@
       <button class="btn-save" id="editDbSaveGithubBtn" disabled>Сохранить в GitHub</button>
     </div>
     <button type="button" class="link-btn" id="editDbChangeTokenBtn" style="margin-top:10px;">Сменить токен GitHub</button>
-
-    <div style="margin-top:24px; border-top:1px solid var(--border-purple); padding-top:16px;">
-      <button type="button" class="link-btn" id="findMissingNiqqudBtn">Найти слова без огласовок</button>
-      <div id="missingNiqqudPanel" style="display:none; margin-top:12px;">
-        <div class="edit-db-status" id="missingNiqqudStatus"></div>
-        <div id="missingNiqqudResults"></div>
-        <div class="modal-actions" style="margin-top:14px;">
-          <button class="btn-stop" id="missingNiqqudCancelBtn">Закрыть</button>
-          <button class="btn-save" id="missingNiqqudRunBtn">Озвучить все</button>
-        </div>
-        <div class="modal-actions" id="missingNiqqudApplyRow" style="display:none; margin-top:10px;">
-          <button class="btn-save" id="missingNiqqudApplyBtn">Применить отмеченные</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="list" id="wordList"></div>
@@ -1199,7 +1184,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.2.1';
+  const APP_VERSION = '0.2.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1773,7 +1758,7 @@
           <div class="icon-btn" style="pointer-events:none;">${selectedIds.has(w.id) ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
           <div class="hebrew-word">${w.hebrew}</div>
           <div class="meta-col">
-            <div class="translit">${w.translit}</div>
+            <div class="translit">/${w.translit}/</div>
             <div class="pos">${w.pos}</div>
           </div>
           <div class="translation">${w.translation}</div>
@@ -1806,7 +1791,7 @@
         <button class="status-btn" data-id="${w.id}">${ICONS[w.status] || ICONS.active}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
-          <div class="translit">${w.translit}</div>
+          <div class="translit">/${w.translit}/</div>
           <div class="pos">${w.pos}</div>
         </div>
         ${editingWordId === w.id
@@ -3910,7 +3895,7 @@
       return `
       <button type="button" class="candidate-row ${existing ? 'already-added' : ''}">
         <div class="candidate-word">${m.text}</div>
-        <div class="candidate-translit">${m.translit}</div>
+        <div class="candidate-translit">/${m.translit}/</div>
         ${m.grammarLabel ? `<div class="candidate-grammar">${m.grammarLabel}</div>` : ''}
         ${registerBadgeHtml(m.register)}
         ${m.translation ? `<div class="candidate-translation">${m.translation}</div>` : ''}
@@ -4048,7 +4033,7 @@
         return `
         <button type="button" class="candidate-row ${existing ? 'already-added' : ''}" data-index="${i}">
           <div class="candidate-word">${c.text}</div>
-          <div class="candidate-translit">${c.translit}</div>
+          <div class="candidate-translit">/${c.translit}/</div>
           ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
           ${registerBadgeHtml(c.register)}
           ${c.translation ? `<div class="candidate-translation">${c.translation}</div>` : ''}
@@ -4457,99 +4442,6 @@
   document.getElementById('editDbChangeTokenBtn').addEventListener('click', () => {
     setGithubToken('');
     ensureGithubToken();
-  });
-
-  // ===== Слова без огласовок: поиск + массовая озвучка через Nakdan =====
-  const HAS_NIQQUD_RE = /[\u0591-\u05C7]/;
-  let missingNiqqudList = [];    // [{ skeleton, entry }]
-  let missingNiqqudResults = []; // [{ skeleton, entry, suggested }]
-
-  document.getElementById('findMissingNiqqudBtn').addEventListener('click', () => {
-    missingNiqqudList = [];
-    for (const skeleton in hebrewDictSkeleton) {
-      for (const entry of hebrewDictSkeleton[skeleton]) {
-        if (entry.word && !HAS_NIQQUD_RE.test(entry.word)) {
-          missingNiqqudList.push({ skeleton, entry });
-        }
-      }
-    }
-    missingNiqqudResults = [];
-    document.getElementById('missingNiqqudPanel').style.display = '';
-    document.getElementById('missingNiqqudResults').innerHTML = '';
-    document.getElementById('missingNiqqudApplyRow').style.display = 'none';
-    document.getElementById('missingNiqqudStatus').textContent =
-      missingNiqqudList.length
-        ? `Найдено без огласовок: ${missingNiqqudList.length}. Нажмите «Озвучить все».`
-        : 'Слов без огласовок не найдено.';
-  });
-
-  document.getElementById('missingNiqqudCancelBtn').addEventListener('click', () => {
-    document.getElementById('missingNiqqudPanel').style.display = 'none';
-  });
-
-  document.getElementById('missingNiqqudRunBtn').addEventListener('click', async () => {
-    if (!missingNiqqudList.length) return;
-    const runBtn = document.getElementById('missingNiqqudRunBtn');
-    const statusEl = document.getElementById('missingNiqqudStatus');
-    runBtn.disabled = true;
-    missingNiqqudResults = [];
-
-    for (let i = 0; i < missingNiqqudList.length; i++) {
-      const { skeleton, entry } = missingNiqqudList[i];
-      statusEl.textContent = `Озвучиваю ${i + 1} из ${missingNiqqudList.length}: «${entry.word}»…`;
-      let suggested = null;
-      try {
-        const tokens = await fetchNikkud(entry.word);
-        const candidates = buildCandidates(tokens);
-        suggested = (candidates[0] && candidates[0].text) || null;
-      } catch (e) {
-        suggested = null; // сеть подвела/Nakdan не смог — просто не предлагаем вариант, отмечаем как "не удалось"
-      }
-      missingNiqqudResults.push({ skeleton, entry, suggested });
-    }
-
-    renderMissingNiqqudResults();
-    const okCount = missingNiqqudResults.filter(r => r.suggested).length;
-    statusEl.textContent = `Готово: озвучено ${okCount} из ${missingNiqqudResults.length}. Проверьте список ниже и нажмите «Применить отмеченные».`;
-    runBtn.disabled = false;
-    document.getElementById('missingNiqqudApplyRow').style.display = '';
-  });
-
-  function renderMissingNiqqudResults() {
-    const el = document.getElementById('missingNiqqudResults');
-    el.innerHTML = missingNiqqudResults.map((r, i) => {
-      const ok = !!r.suggested;
-      return `
-        <div class="edit-db-entry">
-          <label style="display:flex; align-items:flex-start; gap:10px; cursor:${ok ? 'pointer' : 'default'};">
-            <input type="checkbox" data-niqqud-index="${i}" ${ok ? 'checked' : 'disabled'} style="margin-top:4px;" />
-            <span>
-              <div class="edit-db-word" style="direction:rtl; font-size:17px;">${r.entry.word} → ${ok ? r.suggested : '<em style="font-family:\'Inter\',sans-serif; font-size:13px; color:var(--muted);">не удалось озвучить</em>'}</div>
-              <div style="font-family:'Inter',sans-serif; font-size:12px; color:var(--muted); margin-top:2px;">${r.entry.gloss_ru || ''}</div>
-            </span>
-          </label>
-        </div>
-      `;
-    }).join('');
-  }
-
-  document.getElementById('missingNiqqudApplyBtn').addEventListener('click', () => {
-    const checkboxes = document.querySelectorAll('[data-niqqud-index]');
-    let applied = 0;
-    checkboxes.forEach(cb => {
-      if (!cb.checked) return;
-      const r = missingNiqqudResults[parseInt(cb.dataset.niqqudIndex)];
-      if (r && r.suggested) {
-        r.entry.word = r.suggested;
-        applied++;
-      }
-    });
-    if (applied) {
-      hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
-      markEditDbDirty('hebrewDict');
-      showToast(`Применено: ${applied}. Не забудьте «Сохранить в GitHub».`);
-    }
-    document.getElementById('missingNiqqudPanel').style.display = 'none';
   });
 
   function updateSaveState() {
