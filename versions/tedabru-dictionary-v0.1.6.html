@@ -161,10 +161,10 @@
   .word-row {
     position: relative;
     display: grid;
-    grid-template-columns: 32px 90px 95px 1fr 26px 26px 22px;
+    grid-template-columns: 32px 108px 120px 1fr 26px 26px 22px;
     align-items: center;
     gap: 8px;
-    padding: 14px 0;
+    padding: 14px 4px;
   }
   .word-row::after {
     content: '';
@@ -189,7 +189,7 @@
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
-  .favorite-btn { margin-left: 8px; }
+  .favorite-btn { margin-left: 4px; }
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -446,16 +446,12 @@
     text-align: right;
     color: var(--gold);
     white-space: nowrap;
-    margin-right: 7px;
   }
 
   .meta-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 1px;
-    margin-left: 7px;
-    margin-right: 7px;
   }
   .translit {
     font-family: 'Noto Serif', serif;
@@ -931,7 +927,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.7</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.6</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1161,7 +1157,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.7';
+  const APP_VERSION = '0.1.6';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1621,18 +1617,9 @@
           // в режиме выделения клик по телу чипа — чистое выделение/снятие
           // выделения, без побочных эффектов; переименование теперь отдельно
           // через кнопку-карандаш, которая появляется у выделенного чипа
-          const wasSelected = selectedCollectionIds.has(val);
-          if (wasSelected) selectedCollectionIds.delete(val); else selectedCollectionIds.add(val);
+          if (selectedCollectionIds.has(val)) selectedCollectionIds.delete(val); else selectedCollectionIds.add(val);
           headerTitleEl.textContent = selectionHeaderText();
           renderFilterBar();
-          if (!wasSelected) {
-            // чип только что "раздвинулся" под карандаш — если это случилось
-            // у самого края строки, новая (более широкая) часть могла попасть
-            // в зону fade-out или вовсе за пределы видимой области. Докручиваем
-            // сами, а не полагаемся на то, что человек додумается скроллить чипы
-            const widened = document.querySelector(`.chip-with-pencil [data-coll="${val}"]`);
-            if (widened) widened.closest('.chip-with-pencil').scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
-          }
           return;
         }
         filterCollectionId = (filterCollectionId === val) ? null : val; // повторный клик снимает фильтр
