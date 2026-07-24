@@ -853,7 +853,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.1</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -975,7 +975,6 @@
     <div class="modal-actions" style="margin-top:20px;">
       <button class="btn-save" id="editDbSaveGithubBtn" disabled>Сохранить в GitHub</button>
     </div>
-    <button type="button" class="link-btn" id="editDbChangeTokenBtn" style="margin-top:10px;">Сменить токен GitHub</button>
   </div>
 
   <div class="list" id="wordList"></div>
@@ -1083,7 +1082,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.1';
+  const APP_VERSION = '0.1.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1134,15 +1133,7 @@
     if (!res.ok) {
       let bodyText = '';
       try { bodyText = await res.text(); } catch (e) { /* ignore */ }
-      if (res.status === 401 || res.status === 403) {
-        // токен неверный/просроченный/недостаточно прав — стираем его, иначе
-        // ensureGithubToken() будет молча повторять один и тот же неверный
-        // токен бесконечно, и ввести новый станет попросту невозможно
-        setGithubToken('');
-      }
-      const err = new Error(`GitHub API ${res.status}: ${bodyText.slice(0, 300)}`);
-      err.status = res.status;
-      throw err;
+      throw new Error(`GitHub API ${res.status}: ${bodyText.slice(0, 300)}`);
     }
     return res.json();
   }
@@ -4025,10 +4016,7 @@
     if (!editDbDirtyFiles.size) return;
     const token = await ensureGithubToken();
     if (!token) return;
-    await performEditDbSave();
-  });
 
-  async function performEditDbSave() {
     editDbSaveGithubBtn.disabled = true;
     editDbStatusEl.textContent = 'Проверяю, не изменился ли файл на GitHub тем временем…';
 
@@ -4068,29 +4056,10 @@
       editDbStatusEl.textContent = 'Сохранено ✓';
       showToast('Правки сохранены в GitHub');
     } catch (err) {
-      if (err.status === 401 || err.status === 403) {
-        // ghRequest уже стёр неверный токен сам — тут же переспрашиваем и,
-        // если ввели новый, сразу повторяем сохранение этим же кликом,
-        // не заставляя нажимать "Сохранить в GitHub" второй раз
-        editDbStatusEl.textContent = 'Токен неверный или устарел.';
-        const newToken = await ensureGithubToken();
-        if (newToken) {
-          await performEditDbSave();
-          return;
-        }
-      } else {
-        editDbStatusEl.textContent = 'Не удалось сохранить: ' + err.message;
-      }
+      editDbStatusEl.textContent = 'Не удалось сохранить: ' + err.message;
     } finally {
       editDbSaveGithubBtn.disabled = editDbDirtyFiles.size === 0;
     }
-  }
-
-  // На случай, если вы ЗНАЕТЕ заранее, что токен неверный/просрочен, и не
-  // хотите ждать неудачной попытки сохранения — можно сменить его вручную
-  document.getElementById('editDbChangeTokenBtn').addEventListener('click', () => {
-    setGithubToken('');
-    ensureGithubToken();
   });
 
   function updateSaveState() {
