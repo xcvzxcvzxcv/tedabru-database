@@ -77,13 +77,6 @@
     color: var(--gold);
     letter-spacing: 0.5px;
   }
-  .app-version {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: normal;
-    vertical-align: middle;
-  }
 
   .header-actions {
     display: flex;
@@ -620,69 +613,6 @@
     margin-bottom: 8px;
   }
 
-  /* ===== Редактирование базы ===== */
-  .edit-db-panel {
-    padding-top: 4px;
-    padding-bottom: 40px;
-  }
-  .edit-db-entry {
-    border: 1px solid var(--border-purple);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-  .edit-db-entry-head {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 8px;
-    direction: rtl;
-  }
-  .edit-db-word {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 20px;
-    color: var(--gold);
-  }
-  .edit-db-pos {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: var(--muted);
-    direction: ltr;
-  }
-  .edit-db-entry textarea.edit-db-gloss {
-    width: 100%;
-    min-height: 60px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border-purple);
-    border-radius: 10px;
-    color: #e8ddf5;
-    font-family: 'Noto Serif', serif;
-    font-size: 15px;
-    resize: vertical;
-    outline: none;
-    margin-bottom: 8px;
-  }
-  .edit-db-entry textarea.edit-db-gloss:focus { border-color: var(--purple); }
-  .edit-db-entry select.edit-db-register {
-    padding: 6px 10px;
-    background: rgba(13,6,24,0.6);
-    border: 1px solid var(--border-purple);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-  }
-  .edit-db-entry.edit-db-dirty { border-color: var(--gold); }
-  .edit-db-status {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-top: 14px;
-    line-height: 1.4;
-    white-space: pre-line;
-  }
-
   .btn-stop {
     background: transparent;
     color: var(--muted);
@@ -808,19 +738,6 @@
   }
   .already-added-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
 
-  .register-badge {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 1px 7px;
-    border-radius: 999px;
-    border: 1px solid rgba(196,181,253,0.35);
-    color: var(--text-secondary);
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    text-align: left;
-    direction: ltr;
-  }
-
   .modal-actions {
     display: flex;
     gap: 10px;
@@ -853,13 +770,10 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.0</span></div>
+      <div class="title" id="headerTitle">Справочник</div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
-        </button>
-        <button class="header-icon-btn" id="editDbBtn" title="Редактировать базу">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
         <button class="header-icon-btn header-icon-btn-gold" id="openModalBtn" title="Добавить слово">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -931,49 +845,6 @@
     <div class="bulk-collection-picker">
       <div class="bulk-collection-label">Добавить сразу в подборку (необязательно)</div>
       <div class="filter-row" id="bulkCollectionChips"></div>
-    </div>
-  </div>
-
-  <div class="edit-db-panel" id="editDbPanel" style="display:none;">
-    <div id="editDbResults"></div>
-
-    <button type="button" class="link-btn" id="editDbAddNewToggle" style="display:none; margin-top:10px;">+ добавить новое значение к этому слову</button>
-
-    <div id="editDbAddNewForm" style="display:none; margin-top:12px;">
-      <div class="field">
-        <label>Слово на иврите (с огласовками)</label>
-        <input type="text" id="editDbNewWord" dir="rtl" />
-      </div>
-      <div class="field">
-        <label>Часть речи</label>
-        <select id="editDbNewPos">
-          <option value="noun-m">Существительное, м.р.</option>
-          <option value="noun-f">Существительное, ж.р.</option>
-          <option value="adj">Прилагательное</option>
-          <option value="other">Другое</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Перевод</label>
-        <textarea id="editDbNewGloss" rows="2"></textarea>
-      </div>
-      <div class="field">
-        <label>Метка</label>
-        <select id="editDbNewRegister">
-          <option value="">обычное</option>
-          <option value="archaic">устаревшее</option>
-          <option value="biblical">библейское</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-stop" id="editDbAddNewCancel">Отмена</button>
-        <button class="btn-save" id="editDbAddNewSubmit">Добавить значение</button>
-      </div>
-    </div>
-
-    <div class="edit-db-status" id="editDbStatus"></div>
-    <div class="modal-actions" style="margin-top:20px;">
-      <button class="btn-save" id="editDbSaveGithubBtn" disabled>Сохранить в GitHub</button>
     </div>
   </div>
 
@@ -1076,133 +947,6 @@
     }, duration);
   }
 
-  // ===== GitHub API — прямой бэкенд, пишем правки базы прямо из браузера =====
-  // ===== Версия приложения =====
-  // 0.x.y — первая цифра пока всегда 0; x — номер апдейта; y — багфикс/
-  // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
-  // y — на мелких правках между ними. Предыдущие версии архивируются в
-  // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.0';
-
-  const GH_OWNER = 'xcvzxcvzxcv';
-  const GH_REPO = 'tedabru-database';
-  const GH_BRANCH = 'main';
-  const GH_API = 'https://api.github.com';
-  const GH_TOKEN_KEY = 'tedabru_github_token';
-
-  function getGithubToken() {
-    return localStorage.getItem(GH_TOKEN_KEY) || '';
-  }
-  function setGithubToken(token) {
-    localStorage.setItem(GH_TOKEN_KEY, token);
-  }
-
-  // Спрашивает токен, если его ещё нет — через ту же встроенную модалку,
-  // а не браузерный prompt(). Возвращает Promise<string|null>.
-  function ensureGithubToken() {
-    const existing = getGithubToken();
-    if (existing) return Promise.resolve(existing);
-    return new Promise((resolve) => {
-      showActionModal({
-        title: 'Токен GitHub',
-        message: 'Нужен personal access token с правом Contents: Read and write на репозиторий ' + GH_OWNER + '/' + GH_REPO + '. Сохранится только в этом браузере.',
-        showInput: true,
-        inputPlaceholder: 'github_pat_...',
-        buttons: [
-          { label: 'Отмена', variant: 'cancel', action: () => resolve(null) },
-          { label: 'Сохранить', variant: 'primary', action: (value) => {
-              if (!value) { resolve(null); return; }
-              setGithubToken(value);
-              resolve(value);
-            } },
-        ]
-      });
-    });
-  }
-
-  async function ghRequest(path, options = {}) {
-    const token = getGithubToken();
-    const res = await fetch(`${GH_API}${path}`, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github+json',
-        ...(options.headers || {})
-      }
-    });
-    if (!res.ok) {
-      let bodyText = '';
-      try { bodyText = await res.text(); } catch (e) { /* ignore */ }
-      throw new Error(`GitHub API ${res.status}: ${bodyText.slice(0, 300)}`);
-    }
-    return res.json();
-  }
-
-  // base64 из произвольной unicode-строки — btoa сам по себе не умеет не-ASCII,
-  // а строка целиком (несколько МБ) не влезает в String.fromCharCode.apply за
-  // один вызов, поэтому кодируем чанками
-  function stringToBase64(text) {
-    const bytes = new TextEncoder().encode(text);
-    let binary = '';
-    const chunkSize = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
-    }
-    return btoa(binary);
-  }
-
-  // Коммитит один или несколько файлов разом (Git Data API — blob → tree →
-  // commit → обновление ветки). Тем же способом, каким это делает Claude из
-  // песочницы: простой Contents API не годится для файлов крупнее ~1МБ.
-  // fileMap: { 'путь/в/репо.json': объект_или_строка }
-  async function commitFilesToGithub(fileMap, message) {
-    const ref = await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/ref/heads/${GH_BRANCH}`);
-    const baseCommitSha = ref.object.sha;
-    const commit = await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/commits/${baseCommitSha}`);
-    const baseTreeSha = commit.tree.sha;
-
-    const treeEntries = [];
-    for (const path in fileMap) {
-      const content = fileMap[path];
-      const text = typeof content === 'string' ? content : JSON.stringify(content);
-      const b64 = stringToBase64(text);
-      const blob = await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/blobs`, {
-        method: 'POST',
-        body: JSON.stringify({ content: b64, encoding: 'base64' })
-      });
-      treeEntries.push({ path, mode: '100644', type: 'blob', sha: blob.sha });
-    }
-
-    const tree = await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/trees`, {
-      method: 'POST',
-      body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
-    });
-
-    const newCommit = await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/commits`, {
-      method: 'POST',
-      body: JSON.stringify({ message, tree: tree.sha, parents: [baseCommitSha] })
-    });
-
-    // force:false — если ветка успела сдвинуться (кто-то другой закоммитил
-    // между нашим чтением и записью), эта команда явно провалится вместо
-    // того, чтобы молча затереть чужие изменения
-    await ghRequest(`/repos/${GH_OWNER}/${GH_REPO}/git/refs/heads/${GH_BRANCH}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ sha: newCommit.sha, force: false })
-    });
-
-    return newCommit.sha;
-  }
-
-  // Забирает СЕЙЧАС актуальное содержимое файла с GitHub (не то, что было
-  // загружено при открытии страницы) — используется для проверки конфликтов
-  // прямо перед сохранением
-  async function fetchCurrentFileFromGithub(path) {
-    const res = await fetch(`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${path}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error(`raw fetch ${path}: ${res.status}`);
-    return res.json();
-  }
-
   const actionModalOverlay = document.getElementById('actionModalOverlay');
   const actionModalTitleEl = document.getElementById('actionModalTitle');
   const actionModalMessageEl = document.getElementById('actionModalMessage');
@@ -1287,7 +1031,6 @@
   // ===== Режим выбора (для массового добавления в подборку) =====
   let selectionMode = false;
   let addMode = false; // встроенный (не модальный) режим добавления слова
-  let editDbMode = false; // режим редактирования базы (пишет прямо на GitHub)
   let selectedIds = new Set();
   let selectedCollectionIds = new Set(); // подборки, выделенные кликом в том же режиме выделения
   let sortMode = 'added';        // 'added' | 'alpha' | 'status'
@@ -1705,15 +1448,8 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = 'Отменить добавление';
       primaryActionBtn.removeAttribute('data-drop-delete');
-    } else if (editDbMode) {
-      headerTitleEl.textContent = 'Редактирование базы';
-      primaryActionBtn.innerHTML = EXIT_ICON;
-      primaryActionBtn.classList.remove('header-icon-btn-danger');
-      primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = 'Выйти из редактирования';
-      primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
-      headerTitleEl.innerHTML = `Справочник <span class="app-version">v${APP_VERSION}</span>`;
+      headerTitleEl.textContent = 'Справочник';
       primaryActionBtn.innerHTML = PLUS_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
@@ -1723,7 +1459,7 @@
   }
 
   selectModeBtn.addEventListener('click', () => {
-    if (addMode || editDbMode) return; // нельзя одновременно выделять и добавлять/редактировать базу
+    if (addMode) return; // нельзя одновременно выделять и добавлять
     selectionMode = !selectionMode;
     selectedIds = new Set();
     selectedCollectionIds = new Set();
@@ -1741,16 +1477,14 @@
     updateHeaderForSelectionMode();
   }
 
-  // Esc — закрывает открытую модалку, потом режим редактирования базы или
-  // добавления слова, а если ничего из этого нет — снимает режим выделения
+  // Esc — закрывает открытую модалку, потом режим добавления слова, а если
+  // ничего из этого нет — снимает режим выделения
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (actionModalOverlay.classList.contains('open')) {
       closeActionModal();
     } else if (addMode) {
       exitAddMode();
-    } else if (editDbMode) {
-      exitEditDbMode();
     } else if (selectionMode) {
       exitSelectionMode();
       renderFilterBar();
@@ -1778,19 +1512,12 @@
 
   // кнопка в шапке работает по-разному в зависимости от режима: обычно —
   // включает встроенное добавление слова, в режиме выделения — удаляет
-  // выбранное, в режиме добавления/редактирования базы — сама же из него
-  // выходит (см. updateHeaderForSelectionMode)
+  // выбранное, в режиме добавления — сама же из него выходит (см.
+  // updateHeaderForSelectionMode)
   primaryActionBtn.addEventListener('click', () => {
     if (selectionMode) { performBulkDelete(); return; }
     if (addMode) { exitAddMode(); return; }
-    if (editDbMode) { exitEditDbMode(); return; }
     enterAddMode();
-  });
-
-  document.getElementById('editDbBtn').addEventListener('click', () => {
-    if (selectionMode || addMode) return; // не пересекаемся с другими режимами
-    if (editDbMode) { exitEditDbMode(); return; }
-    enterEditDbMode();
   });
 
   function assignSelectedToCollection(collectionId) {
@@ -2311,12 +2038,6 @@
       metaSuggestDebounceTimer = setTimeout(() => runMetaSuggestion(raw), 400);
       return;
     }
-    if (editDbMode) {
-      // тут ищем только по уже загруженным в память данным (никакой сети),
-      // поэтому дебаунс не нужен вовсе — мгновенно на каждую букву
-      renderEditDbResults(e.target.value.trim());
-      return;
-    }
     searchQuery = e.target.value;
     renderList();
   });
@@ -2368,10 +2089,6 @@
   let nounFormsIndex = null;
   let generatedVerbForms = null;
   let hebrewDictLoadPromise = null;
-  let hebrewDictEntrySkeleton = null; // WeakMap: запись -> её скелет-ключ (для редактора базы)
-  let verbsEntrySkeleton = null;
-  let hebrewDictKeyCountAtLoad = null; // снимок на момент загрузки — для грубой проверки конфликтов при сохранении
-  let verbsDictKeyCountAtLoad = null;
 
   // Раньше *_reverse.json собирался офлайн питон-скриптом — вот тот же
   // алгоритм (проверен построчно на всей текущей базе, 0 расхождений),
@@ -2412,16 +2129,6 @@
       }
     }
     return reverse;
-  }
-
-  function buildEntrySkeletonMap(forwardDict) {
-    const map = new WeakMap();
-    for (const skeleton in forwardDict) {
-      for (const entry of forwardDict[skeleton]) {
-        map.set(entry, skeleton);
-      }
-    }
-    return map;
   }
 
   function stripNiqqud(word) {
@@ -2523,7 +2230,7 @@
         group.translations.push(t);
       }
     }
-    const merged = order.map(key => {
+    return order.map(key => {
       const { base, translations } = groups.get(key);
       let translation;
       if (translations.length <= 1) {
@@ -2533,10 +2240,6 @@
       }
       return { ...base, translation };
     });
-    // пессимизация: слова с меткой уст./библ. — в конец списка, а не наравне
-    // с современными синонимами (сортировка стабильна — внутри своей группы
-    // порядок не меняется, просто архаичные группы целиком уезжают позже)
-    return merged.slice().sort((a, b) => (a.register ? 1 : 0) - (b.register ? 1 : 0));
   }
 
   function buildCombinedFromSources(sources) {
@@ -2595,20 +2298,12 @@
       // см. комментарий у buildReverseIndex
       hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
       verbsReverse = buildReverseIndex(verbsDict, 'translation');
-      // карты "запись -> скелет" — нужны для редактирования базы: когда
-      // нашли запись через ОБРАТНЫЙ индекс (по переводу), нужно знать, в
-      // каком именно ключе прямого словаря она лежит, чтобы её изменить
-      hebrewDictEntrySkeleton = buildEntrySkeletonMap(hebrewDictSkeleton);
-      verbsEntrySkeleton = buildEntrySkeletonMap(verbsDict);
-      hebrewDictKeyCountAtLoad = Object.keys(hebrewDictSkeleton).length;
-      verbsDictKeyCountAtLoad = Object.keys(verbsDict).length;
       console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length);
     }).catch(e => {
       console.log('[DICT] словари не загрузились, работаем только через DeepL:', e);
       hebrewDictSkeleton = {}; hebrewDictReverse = {}; hebrewVerbForms = {};
       verbsDict = {}; verbsReverse = {}; translitIndex = {}; nounFormsIndex = {};
       generatedVerbForms = {};
-      hebrewDictEntrySkeleton = new WeakMap(); verbsEntrySkeleton = new WeakMap();
     });
     return hebrewDictLoadPromise;
   }
@@ -2802,7 +2497,6 @@
       grammarLabel: grammarLabelForEntry(entry),
       translation: entry.gloss_ru,
       root: entry.root || null,
-      register: entry.register || null,
       source: 'dict'
     };
   }
@@ -2819,7 +2513,6 @@
       grammarLabel: binyan ? `глагол, ${binyan}` : 'глагол',
       translation: entry.translation,
       root: entry.root || null,
-      register: entry.register || null,
       source: 'dict'
     };
   }
@@ -3573,7 +3266,6 @@
         <div class="candidate-word">${m.text}</div>
         <div class="candidate-translit">/${m.translit}/</div>
         ${m.grammarLabel ? `<div class="candidate-grammar">${m.grammarLabel}</div>` : ''}
-        ${registerBadgeHtml(m.register)}
         ${m.translation ? `<div class="candidate-translation">${m.translation}</div>` : ''}
         ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
       </button>
@@ -3652,15 +3344,6 @@
   // со значением <select id="inputPos"> — форматы слегка расходятся
   // ("глагол, пааль" vs просто "пааль"), поэтому не полагаемся на точное
   // совпадение строки целиком
-  // Небольшая пометка на карточке — уст./библ., та же метка, что можно
-  // проставить через "Редактировать базу". Помогает понять, почему это
-  // слово оказалось внизу списка (см. пессимизацию в mergeCandidatesBySense)
-  function registerBadgeHtml(register) {
-    if (!register) return '';
-    const label = register === 'biblical' ? 'библ.' : 'уст.';
-    return `<div class="register-badge">${label}</div>`;
-  }
-
   function grammarLabelToPosValue(label) {
     if (!label) return null;
     if (label.startsWith('глагол, ')) {
@@ -3711,7 +3394,6 @@
           <div class="candidate-word">${c.text}</div>
           <div class="candidate-translit">/${c.translit}/</div>
           ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
-          ${registerBadgeHtml(c.register)}
           ${c.translation ? `<div class="candidate-translation">${c.translation}</div>` : ''}
           ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
         </button>
@@ -3756,7 +3438,7 @@
   // же формат, что и у кандидата из поиска: используется, когда входим в
   // режим добавления кликом по ещё не сохранённому слову в результатах поиска
   function enterAddMode(prefill) {
-    if (selectionMode || editDbMode) return; // не пересекаемся с другими режимами
+    if (selectionMode) return; // не пересекаемся с режимом выделения
     addMode = true;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = 'none';
@@ -3807,260 +3489,6 @@
     renderFilterBar();
     renderList();
   }
-
-  // ===== Редактирование базы (пишет прямо на GitHub) =====
-  const editDbPanel = document.getElementById('editDbPanel');
-  const editDbResultsEl = document.getElementById('editDbResults');
-  const editDbStatusEl = document.getElementById('editDbStatus');
-  const editDbSaveGithubBtn = document.getElementById('editDbSaveGithubBtn');
-  const editDbAddNewToggle = document.getElementById('editDbAddNewToggle');
-  const editDbAddNewForm = document.getElementById('editDbAddNewForm');
-  const editDbNewWord = document.getElementById('editDbNewWord');
-  const editDbNewPos = document.getElementById('editDbNewPos');
-  const editDbNewGloss = document.getElementById('editDbNewGloss');
-  const editDbNewRegister = document.getElementById('editDbNewRegister');
-  const editDbAddNewCancel = document.getElementById('editDbAddNewCancel');
-  const editDbAddNewSubmit = document.getElementById('editDbAddNewSubmit');
-
-  let editDbDirtyFiles = new Set(); // 'hebrewDict' | 'verbsDict' — какие файлы нужно будет закоммитить
-  let editDbCurrentSkeleton = null; // скелет для "добавить новое значение" — только при точном поиске по ивриту в обычном словаре
-
-  function markEditDbDirty(source) {
-    editDbDirtyFiles.add(source);
-    editDbSaveGithubBtn.disabled = false;
-  }
-
-  function enterEditDbMode() {
-    if (selectionMode || addMode) return; // не пересекаемся с другими режимами
-    editDbMode = true;
-    updateHeaderForSelectionMode();
-    selectModeBtn.style.display = 'none';
-    filterBarEl.style.display = 'none';
-    wordListEl.style.display = 'none';
-    editDbPanel.style.display = '';
-    inputHebrew.placeholder = 'Найдите слово, которое хотите отредактировать';
-    inputHebrew.removeAttribute('dir'); // ищем и по-русски, и по ивриту — направление лучше оставить нейтральным
-    inputHebrew.value = '';
-    editDbResultsEl.innerHTML = '';
-    editDbStatusEl.textContent = '';
-    editDbDirtyFiles = new Set();
-    editDbSaveGithubBtn.disabled = true;
-    editDbCurrentSkeleton = null;
-    editDbAddNewToggle.style.display = 'none';
-    editDbAddNewForm.style.display = 'none';
-    setTimeout(() => inputHebrew.focus(), 50);
-  }
-
-  function exitEditDbMode() {
-    if (editDbDirtyFiles.size) {
-      showActionModal({
-        title: 'Есть несохранённые правки',
-        message: 'Правки применены только в этой вкладке и пропадут при перезагрузке страницы, если не сохранить их в GitHub. Выйти без сохранения?',
-        buttons: [
-          { label: 'Остаться', variant: 'cancel' },
-          { label: 'Выйти без сохранения', variant: 'danger', action: () => actuallyExitEditDbMode() },
-        ]
-      });
-      return;
-    }
-    actuallyExitEditDbMode();
-  }
-
-  function actuallyExitEditDbMode() {
-    editDbMode = false;
-    updateHeaderForSelectionMode();
-    selectModeBtn.style.display = '';
-    filterBarEl.style.display = '';
-    wordListEl.style.display = '';
-    editDbPanel.style.display = 'none';
-    inputHebrew.placeholder = 'Слово, перевод или транскрипция';
-    inputHebrew.value = '';
-    searchQuery = '';
-    renderFilterBar();
-    renderList();
-  }
-
-  // Ищет РЕДАКТИРУЕМЫЕ записи — напрямую в hebrewDictSkeleton/verbsDict (не
-  // через весь конвейер resolveCandidates с его сетевыми фоллбэками): тут
-  // нужны именно сырые записи для правки, а не "лучший кандидат"
-  function findEditableEntries(raw) {
-    const results = [];
-    if (!raw) { editDbCurrentSkeleton = null; return results; }
-    if (containsHebrew(raw)) {
-      const skeleton = stripNiqqud(raw).normalize('NFC');
-      (hebrewDictSkeleton[skeleton] || []).forEach(entry => results.push({ entry, source: 'hebrewDict' }));
-      (verbsDict[skeleton] || []).forEach(entry => results.push({ entry, source: 'verbsDict' }));
-      // "добавить новое значение" — только когда искали ТОЧНО по ивриту и в
-      // обычном словаре (не в базе глаголов — там инфинитив ключевое слово,
-      // и добавление через эту форму не подойдёт по структуре данных)
-      editDbCurrentSkeleton = skeleton; // разрешаем добавить значение — и к существующему скелету, и к совсем новому
-    } else {
-      const key = raw.toLowerCase();
-      (hebrewDictReverse[key] || []).forEach(entry => {
-        results.push({ entry, source: 'hebrewDict' });
-      });
-      (verbsReverse[key] || []).forEach(entry => {
-        results.push({ entry, source: 'verbsDict' });
-      });
-      editDbCurrentSkeleton = null; // поиск по переводу может найти несколько разных слов — нет однозначного адресата для нового значения
-    }
-    return results;
-  }
-
-  function renderEditDbResults(raw) {
-    const results = findEditableEntries(raw);
-    if (!raw) {
-      editDbResultsEl.innerHTML = '';
-      editDbAddNewToggle.style.display = 'none';
-      editDbAddNewForm.style.display = 'none';
-      return;
-    }
-    if (!results.length) {
-      editDbResultsEl.innerHTML = '<div class="sugg-note">Ничего не найдено в редактируемых базах. Если слова совсем нет — можно завести первое значение для него кнопкой ниже.</div>';
-    } else {
-      editDbResultsEl.innerHTML = results.map((r, i) => {
-        const entry = r.entry;
-        const textField = r.source === 'hebrewDict' ? 'gloss_ru' : 'translation';
-        const posLabel = r.source === 'hebrewDict' ? grammarLabelForEntry(entry) : (BINYAN_LABELS[entry.binyan] || entry.binyan || 'глагол');
-        return `
-        <div class="edit-db-entry" data-index="${i}">
-          <div class="edit-db-entry-head">
-            <span class="edit-db-word">${entry.word}</span>
-            <span class="edit-db-pos">${posLabel}</span>
-          </div>
-          <textarea class="edit-db-gloss" data-index="${i}">${entry[textField] || ''}</textarea>
-          <select class="edit-db-register" data-index="${i}">
-            <option value="" ${!entry.register ? 'selected' : ''}>обычное</option>
-            <option value="archaic" ${entry.register === 'archaic' ? 'selected' : ''}>устаревшее</option>
-            <option value="biblical" ${entry.register === 'biblical' ? 'selected' : ''}>библейское</option>
-          </select>
-        </div>
-      `;
-      }).join('');
-
-      const applyEdit = (i) => {
-        const r = results[i];
-        const entry = r.entry;
-        const textField = r.source === 'hebrewDict' ? 'gloss_ru' : 'translation';
-        const row = editDbResultsEl.querySelector(`.edit-db-entry[data-index="${i}"]`);
-        const textarea = row.querySelector('.edit-db-gloss');
-        const select = row.querySelector('.edit-db-register');
-        const newGloss = textarea.value.trim();
-        const newRegister = select.value || null;
-        if (entry[textField] === newGloss && (entry.register || null) === newRegister) return; // ничего не поменялось
-        entry[textField] = newGloss;
-        entry.register = newRegister;
-        row.classList.add('edit-db-dirty');
-        markEditDbDirty(r.source);
-        // обратный индекс мог "протухнуть" (изменился перевод) — перестраиваем
-        if (r.source === 'hebrewDict') hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
-        else verbsReverse = buildReverseIndex(verbsDict, 'translation');
-      };
-
-      editDbResultsEl.querySelectorAll('.edit-db-gloss').forEach(ta => {
-        ta.addEventListener('blur', () => applyEdit(parseInt(ta.dataset.index)));
-      });
-      editDbResultsEl.querySelectorAll('.edit-db-register').forEach(sel => {
-        sel.addEventListener('change', () => applyEdit(parseInt(sel.dataset.index)));
-      });
-    }
-
-    if (editDbCurrentSkeleton) {
-      editDbAddNewToggle.style.display = '';
-    } else {
-      editDbAddNewToggle.style.display = 'none';
-      editDbAddNewForm.style.display = 'none';
-    }
-  }
-
-  editDbAddNewToggle.addEventListener('click', () => {
-    const showing = editDbAddNewForm.style.display !== 'none';
-    editDbAddNewForm.style.display = showing ? 'none' : '';
-    if (!showing) {
-      editDbNewWord.value = '';
-      editDbNewGloss.value = '';
-      editDbNewPos.selectedIndex = 0;
-      editDbNewRegister.selectedIndex = 0;
-      setTimeout(() => editDbNewWord.focus(), 50);
-    }
-  });
-  editDbAddNewCancel.addEventListener('click', () => {
-    editDbAddNewForm.style.display = 'none';
-  });
-  editDbAddNewSubmit.addEventListener('click', () => {
-    const word = editDbNewWord.value.trim();
-    const gloss = editDbNewGloss.value.trim();
-    if (!word || !gloss || !editDbCurrentSkeleton) return;
-    const posVal = editDbNewPos.value;
-    let pos = 'other', gender = null;
-    if (posVal === 'noun-m') { pos = 'noun'; gender = 'm'; }
-    else if (posVal === 'noun-f') { pos = 'noun'; gender = 'f'; }
-    else if (posVal === 'adj') { pos = 'adj'; }
-    const register = editDbNewRegister.value || null;
-
-    const newEntry = { word, pos, tr: '', gloss: '', gloss_ru: gloss, register };
-    if (gender) newEntry.gender = gender;
-
-    if (!hebrewDictSkeleton[editDbCurrentSkeleton]) hebrewDictSkeleton[editDbCurrentSkeleton] = [];
-    hebrewDictSkeleton[editDbCurrentSkeleton].push(newEntry);
-    hebrewDictEntrySkeleton.set(newEntry, editDbCurrentSkeleton);
-    hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
-    markEditDbDirty('hebrewDict');
-
-    editDbAddNewForm.style.display = 'none';
-    showToast('Значение добавлено — не забудьте «Сохранить в GitHub»');
-    renderEditDbResults(inputHebrew.value.trim());
-  });
-
-  editDbSaveGithubBtn.addEventListener('click', async () => {
-    if (!editDbDirtyFiles.size) return;
-    const token = await ensureGithubToken();
-    if (!token) return;
-
-    editDbSaveGithubBtn.disabled = true;
-    editDbStatusEl.textContent = 'Проверяю, не изменился ли файл на GitHub тем временем…';
-
-    const filesToPush = [];
-    if (editDbDirtyFiles.has('hebrewDict')) filesToPush.push({ key: 'hebrewDict', path: 'hebrew_dict_v3.json', data: hebrewDictSkeleton });
-    if (editDbDirtyFiles.has('verbsDict')) filesToPush.push({ key: 'verbsDict', path: 'verbs_dict.json', data: verbsDict });
-
-    try {
-      // Грубая проверка конфликта: сравниваем число ключей в файле НА GITHUB
-      // прямо сейчас с тем, что было при открытии страницы. Не ловит правку
-      // уже существующего значения без изменения числа ключей — но при
-      // сценарии "мы вдвоём" этого достаточно, чтобы поймать самый частый
-      // случай (кто-то параллельно что-то добавил/удалил), не усложняя код
-      // построчным сравнением всего файла.
-      const fileMap = {};
-      for (const f of filesToPush) {
-        const current = await fetchCurrentFileFromGithub(f.path);
-        const currentKeyCount = Object.keys(current).length;
-        const knownKeyCount = f.key === 'hebrewDict' ? hebrewDictKeyCountAtLoad : verbsDictKeyCountAtLoad;
-        if (knownKeyCount !== null && currentKeyCount !== knownKeyCount) {
-          editDbStatusEl.textContent = '';
-          editDbSaveGithubBtn.disabled = false;
-          showActionModal({
-            title: 'Файл изменился на GitHub',
-            message: `${f.path} на GitHub сейчас отличается от того, что было при открытии страницы — похоже, кто-то ещё внёс правку. Перезагрузите страницу и повторите правки заново поверх актуальной версии, чтобы не затереть чужие изменения.`,
-            buttons: [{ label: 'Понятно', variant: 'primary' }]
-          });
-          return;
-        }
-        fileMap[f.path] = f.data;
-      }
-
-      editDbStatusEl.textContent = 'Сохраняю в GitHub…';
-      await commitFilesToGithub(fileMap, `Правки базы через редактор (${filesToPush.map(f => f.path).join(', ')})`);
-      editDbDirtyFiles = new Set();
-      editDbResultsEl.querySelectorAll('.edit-db-entry.edit-db-dirty').forEach(el => el.classList.remove('edit-db-dirty'));
-      editDbStatusEl.textContent = 'Сохранено ✓';
-      showToast('Правки сохранены в GitHub');
-    } catch (err) {
-      editDbStatusEl.textContent = 'Не удалось сохранить: ' + err.message;
-    } finally {
-      editDbSaveGithubBtn.disabled = editDbDirtyFiles.size === 0;
-    }
-  });
 
   function updateSaveState() {
     const ready = inputHebrew.value.trim() && inputTranslation.value.trim();
