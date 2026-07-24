@@ -784,135 +784,6 @@
     white-space: pre-line;
   }
 
-  /* ===== Тренировка ===== */
-  .train-panel {
-    padding-top: 4px;
-    padding-bottom: 40px;
-  }
-
-  .train-manual-list-scroll {
-    max-height: 320px;
-    overflow-y: auto;
-    border: 1px solid var(--border-purple);
-    border-radius: 12px;
-    padding: 4px;
-  }
-  .train-manual-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .train-manual-row:active { background: rgba(155,93,229,0.1); }
-  .train-manual-hebrew {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 17px;
-    color: var(--gold);
-    direction: rtl;
-    flex-shrink: 0;
-    min-width: 70px;
-  }
-  .train-manual-translation {
-    font-family: 'Noto Serif', serif;
-    font-size: 14px;
-    color: var(--text-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .train-progress {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: var(--muted);
-    text-align: center;
-    margin-bottom: 16px;
-  }
-
-  .train-card {
-    min-height: 220px;
-    border: 1px solid var(--border-purple);
-    border-radius: 16px;
-    background: var(--card-bg);
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-  .train-card-face {
-    font-family: 'Frank Ruhl Libre', serif;
-    font-size: 40px;
-    color: var(--gold);
-    direction: rtl;
-  }
-  .train-card-face.train-card-face-ru {
-    font-family: 'Noto Serif', serif;
-    font-size: 26px;
-    color: #e8ddf5;
-    direction: ltr;
-  }
-  .train-card-back {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(123,53,212,0.25);
-    width: 100%;
-  }
-  .train-card-back .translit {
-    font-size: 17px;
-  }
-  .train-card-back .pos {
-    font-size: 13px;
-  }
-  .train-card-back .translation {
-    font-family: 'Noto Serif', serif;
-    font-size: 20px;
-    color: #e8ddf5;
-    white-space: normal;
-    text-align: center;
-  }
-  .train-card-back .hebrew-word {
-    font-size: 30px;
-  }
-
-  .train-rate-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  .train-rate-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 10px 4px;
-    border-radius: 12px;
-    border: 1px solid var(--border-purple);
-    background: transparent;
-    color: #e8ddf5;
-    font-family: 'Noto Serif', serif;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .train-rate-btn span {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .train-rate-again { border-color: #a8455a; color: #e08a9a; }
-  .train-rate-hard { border-color: var(--gold-soft); color: var(--gold-soft); }
-  .train-rate-good { border-color: var(--purple); color: #d6c8ff; }
-  .train-rate-easy { border-color: #4ec98a; color: #4ec98a; }
-  .train-rate-btn:active { transform: scale(0.97); }
-
   .btn-stop {
     background: transparent;
     color: var(--muted);
@@ -1083,11 +954,8 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.3.0</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.2.2</span></div>
       <div class="header-actions">
-        <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
-        </button>
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
         </button>
@@ -1226,75 +1094,6 @@
     </div>
   </div>
 
-  <div class="train-panel" id="trainPanel" style="display:none;">
-    <div id="trainSetup">
-      <div class="field">
-        <label>Что тренируем</label>
-        <div class="filter-row" id="trainScopeChips">
-          <button type="button" class="chip active" data-scope="all">Все слова</button>
-          <button type="button" class="chip" data-scope="collection">Подборка</button>
-          <button type="button" class="chip" data-scope="manual">Выбрать вручную</button>
-        </div>
-      </div>
-
-      <div class="field" id="trainCollectionPickerWrap" style="display:none;">
-        <label>Какая подборка</label>
-        <div class="filter-row" id="trainCollectionChips"></div>
-      </div>
-
-      <div class="field" id="trainManualPickerWrap" style="display:none;">
-        <label>Отметьте слова (найдено: <span id="trainManualCount">0</span>)</label>
-        <div id="trainManualList" class="train-manual-list-scroll"></div>
-      </div>
-
-      <div class="field">
-        <label>Направление</label>
-        <div class="filter-row" id="trainDirectionChips">
-          <button type="button" class="chip active" data-direction="he-ru">Иврит → перевод</button>
-          <button type="button" class="chip" data-direction="ru-he">Перевод → иврит</button>
-        </div>
-      </div>
-
-      <div class="field" id="trainNiqqudFieldWrap">
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <input type="checkbox" id="trainShowNiqqud" checked /> Показывать огласовки
-        </label>
-      </div>
-
-      <div class="field">
-        <label>Новых слов за раз (карт уже введённых в повтор это не касается)</label>
-        <input type="number" id="trainNewLimit" min="0" value="20" style="width:100px; padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-purple); border-radius:10px; color:#e8ddf5; font-family:'Noto Serif', serif; font-size:15px;" />
-      </div>
-
-      <div class="edit-db-status" id="trainSetupStatus"></div>
-      <div class="modal-actions" style="margin-top:20px;">
-        <button class="btn-save" id="trainStartBtn">Начать</button>
-      </div>
-    </div>
-
-    <div id="trainSession" style="display:none;">
-      <div class="train-progress" id="trainProgress"></div>
-      <div class="train-card" id="trainCard">
-        <div class="train-card-face" id="trainCardFace"></div>
-        <div class="train-card-back" id="trainCardBack" style="display:none;"></div>
-      </div>
-      <button class="btn-save" id="trainShowAnswerBtn" style="width:100%;">Показать ответ</button>
-      <div class="train-rate-buttons" id="trainRateButtons" style="display:none;">
-        <button type="button" class="train-rate-btn train-rate-again" data-rating="again">Не помню<span></span></button>
-        <button type="button" class="train-rate-btn train-rate-hard" data-rating="hard">Трудно<span></span></button>
-        <button type="button" class="train-rate-btn train-rate-good" data-rating="good">Хорошо<span></span></button>
-        <button type="button" class="train-rate-btn train-rate-easy" data-rating="easy">Легко<span></span></button>
-      </div>
-    </div>
-
-    <div id="trainSummary" style="display:none;">
-      <div id="trainSummaryText" class="edit-db-status" style="font-size:16px;"></div>
-      <div class="modal-actions" style="margin-top:20px;">
-        <button class="btn-save" id="trainFinishBtn">Готово</button>
-      </div>
-    </div>
-  </div>
-
   <div class="list" id="wordList"></div>
 </div>
 
@@ -1400,7 +1199,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.3.0';
+  const APP_VERSION = '0.2.2';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1616,18 +1415,6 @@
   let selectionMode = false;
   let addMode = false; // встроенный (не модальный) режим добавления слова
   let editDbMode = false; // режим редактирования базы (пишет прямо на GitHub)
-  let trainMode = false;
-  let trainSessionActive = false; // true, когда уже идёт сама сессия (не экран настройки) — нужно для подтверждения при выходе
-  let trainScope = 'all';        // 'all' | 'collection' | 'manual'
-  let trainCollectionId = null;
-  let trainManualSelectedIds = new Set();
-  let trainDirection = 'he-ru';  // 'he-ru' | 'ru-he'
-  let trainShowNiqqud = true;
-  let trainQueue = [];
-  let trainQueueIndex = 0;
-  let trainCurrentWord = null;
-  let trainAnswerShown = false;
-  let trainSessionStats = { studied: 0, again: 0, hard: 0, good: 0, easy: 0 };
   let selectedIds = new Set();
   let selectedCollectionIds = new Set(); // подборки, выделенные кликом в том же режиме выделения
   let sortMode = 'added';        // 'added' | 'alpha' | 'status'
@@ -2258,13 +2045,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = 'Выйти из редактирования';
       primaryActionBtn.removeAttribute('data-drop-delete');
-    } else if (trainMode) {
-      headerTitleEl.textContent = 'Тренировка';
-      primaryActionBtn.innerHTML = EXIT_ICON;
-      primaryActionBtn.classList.remove('header-icon-btn-danger');
-      primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = 'Выйти из тренировки';
-      primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
       headerTitleEl.innerHTML = `Справочник <span class="app-version">v${APP_VERSION}</span>`;
       primaryActionBtn.innerHTML = PLUS_ICON;
@@ -2276,7 +2056,7 @@
   }
 
   selectModeBtn.addEventListener('click', () => {
-    if (addMode || editDbMode || trainMode) return; // нельзя одновременно выделять и добавлять/редактировать базу/тренироваться
+    if (addMode || editDbMode) return; // нельзя одновременно выделять и добавлять/редактировать базу
     selectionMode = !selectionMode;
     selectedIds = new Set();
     selectedCollectionIds = new Set();
@@ -2304,8 +2084,6 @@
       exitAddMode();
     } else if (editDbMode) {
       exitEditDbMode();
-    } else if (trainMode) {
-      exitTrainMode();
     } else if (selectionMode) {
       exitSelectionMode();
       renderFilterBar();
@@ -2333,18 +2111,17 @@
 
   // кнопка в шапке работает по-разному в зависимости от режима: обычно —
   // включает встроенное добавление слова, в режиме выделения — удаляет
-  // выбранное, в режиме добавления/редактирования базы/тренировки — сама же
-  // из него выходит (см. updateHeaderForSelectionMode)
+  // выбранное, в режиме добавления/редактирования базы — сама же из него
+  // выходит (см. updateHeaderForSelectionMode)
   primaryActionBtn.addEventListener('click', () => {
     if (selectionMode) { performBulkDelete(); return; }
     if (addMode) { exitAddMode(); return; }
     if (editDbMode) { exitEditDbMode(); return; }
-    if (trainMode) { exitTrainMode(); return; }
     enterAddMode();
   });
 
   document.getElementById('editDbBtn').addEventListener('click', () => {
-    if (selectionMode || addMode || trainMode) return; // не пересекаемся с другими режимами
+    if (selectionMode || addMode) return; // не пересекаемся с другими режимами
     if (editDbMode) { exitEditDbMode(); return; }
     enterEditDbMode();
   });
@@ -4325,11 +4102,10 @@
   // же формат, что и у кандидата из поиска: используется, когда входим в
   // режим добавления кликом по ещё не сохранённому слову в результатах поиска
   function enterAddMode(prefill) {
-    if (selectionMode || editDbMode || trainMode) return; // не пересекаемся с другими режимами
+    if (selectionMode || editDbMode) return; // не пересекаемся с другими режимами
     addMode = true;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = 'none';
-    document.getElementById('trainModeBtn').style.display = 'none';
     filterBarEl.style.display = 'none';
     wordListEl.style.display = 'none';
     addWordPanel.style.display = '';
@@ -4365,7 +4141,6 @@
     addMode = false;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = '';
-    document.getElementById('trainModeBtn').style.display = '';
     filterBarEl.style.display = '';
     wordListEl.style.display = '';
     addWordPanel.style.display = 'none';
@@ -4402,11 +4177,10 @@
   }
 
   function enterEditDbMode() {
-    if (selectionMode || addMode || trainMode) return; // не пересекаемся с другими режимами
+    if (selectionMode || addMode) return; // не пересекаемся с другими режимами
     editDbMode = true;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = 'none';
-    document.getElementById('trainModeBtn').style.display = 'none';
     filterBarEl.style.display = 'none';
     wordListEl.style.display = 'none';
     editDbPanel.style.display = '';
@@ -4442,7 +4216,6 @@
     editDbMode = false;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = '';
-    document.getElementById('trainModeBtn').style.display = '';
     filterBarEl.style.display = '';
     wordListEl.style.display = '';
     editDbPanel.style.display = 'none';
@@ -4784,369 +4557,6 @@
       showToast(`Применено: ${applied}. Не забудьте «Сохранить в GitHub».`);
     }
     document.getElementById('missingNiqqudPanel').style.display = 'none';
-  });
-
-  // ===== Тренировка (интервальные повторения, SM-2-подобный алгоритм) =====
-  // Данные SRS хранятся прямо в объекте слова (localStorage), в поле srs —
-  // никак не связаны с общей базой на GitHub. Одно состояние SRS на слово
-  // (не отдельно по направлениям иврит→рус / рус→иврит) — сознательное
-  // упрощение для первой версии.
-  const SRS_DAY_MS = 24 * 60 * 60 * 1000;
-  const SRS_NEW_LIMIT_KEY = 'tedabru_srs_new_today';
-
-  function initSrs() {
-    return { interval: 0, ease: 2.5, reps: 0, dueDate: null, learning: true };
-  }
-
-  function isWordNew(word) {
-    return !word.srs || word.srs.dueDate == null;
-  }
-  function isWordDue(word, now) {
-    return word.srs && word.srs.dueDate != null && word.srs.dueDate <= now;
-  }
-
-  function getTodayNewCount() {
-    const raw = localStorage.getItem(SRS_NEW_LIMIT_KEY);
-    if (!raw) return 0;
-    try {
-      const data = JSON.parse(raw);
-      const today = new Date().toISOString().slice(0, 10);
-      return data.date === today ? (data.count || 0) : 0;
-    } catch (e) { return 0; }
-  }
-  function addTodayNewCount(n) {
-    const today = new Date().toISOString().slice(0, 10);
-    const cur = getTodayNewCount();
-    localStorage.setItem(SRS_NEW_LIMIT_KEY, JSON.stringify({ date: today, count: cur + n }));
-  }
-
-  function formatIntervalDays(days) {
-    if (days < 1) return 'сегодня';
-    if (days === 1) return '1 день';
-    if (days < 7) return days + ' дн.';
-    if (days < 30) return Math.round(days / 7) + ' нед.';
-    return Math.round(days / 30) + ' мес.';
-  }
-
-  // Показывает, что БУДЕТ, если нажать эту кнопку — не меняя реального
-  // состояния слова (нужно только для подписи на кнопках оценки)
-  function previewRatingLabel(word, rating) {
-    const srs = word.srs || initSrs();
-    if (srs.learning) {
-      if (rating === 'again' || rating === 'hard') return 'скоро';
-      if (rating === 'good') return '1 день';
-      return '4 дня'; // easy
-    }
-    if (rating === 'again') return 'скоро';
-    if (rating === 'hard') return formatIntervalDays(Math.max(1, Math.round(srs.interval * 1.2)));
-    if (rating === 'good') return formatIntervalDays(Math.max(1, Math.round(srs.interval * srs.ease)));
-    return formatIntervalDays(Math.max(1, Math.round(srs.interval * srs.ease * 1.3))); // easy
-  }
-
-  // Собственно алгоритм — SM-2-подобный, как в Anki. "Не помню"/"Трудно" у
-  // совсем новой карточки держат её в "обучении" (снова покажется в этой же
-  // сессии, а не через дни) — упрощённая версия учебных шагов Anki без
-  // привязки к реальным минутам, раз это веб-сессия, а не постоянно
-  // открытое приложение с фоновым таймером.
-  function rateWord(word, rating) {
-    const srs = word.srs || (word.srs = initSrs());
-    const now = Date.now();
-
-    if (srs.learning) {
-      if (rating === 'again' || rating === 'hard') {
-        return { requeue: true };
-      }
-      srs.learning = false;
-      srs.reps = 1;
-      srs.interval = rating === 'easy' ? 4 : 1;
-      srs.dueDate = now + srs.interval * SRS_DAY_MS;
-      return { requeue: false };
-    }
-
-    if (rating === 'again') {
-      srs.reps = 0;
-      srs.ease = Math.max(1.3, srs.ease - 0.2);
-      srs.interval = 0;
-      srs.learning = true;
-      return { requeue: true };
-    }
-    if (rating === 'hard') {
-      srs.ease = Math.max(1.3, srs.ease - 0.15);
-      srs.interval = Math.max(1, Math.round(srs.interval * 1.2));
-    } else if (rating === 'good') {
-      srs.interval = Math.max(1, Math.round(srs.interval * srs.ease));
-    } else {
-      srs.ease = srs.ease + 0.15;
-      srs.interval = Math.max(1, Math.round(srs.interval * srs.ease * 1.3));
-    }
-    srs.reps++;
-    srs.dueDate = now + srs.interval * SRS_DAY_MS;
-    return { requeue: false };
-  }
-
-  // ===== Вход/выход из режима =====
-  const trainPanelEl = document.getElementById('trainPanel');
-  const trainSetupEl = document.getElementById('trainSetup');
-  const trainSessionEl = document.getElementById('trainSession');
-  const trainSummaryEl = document.getElementById('trainSummary');
-
-  document.getElementById('trainModeBtn').addEventListener('click', () => {
-    if (selectionMode || addMode || editDbMode) return;
-    if (trainMode) { exitTrainMode(); return; }
-    enterTrainMode();
-  });
-
-  function enterTrainMode() {
-    if (selectionMode || addMode || editDbMode) return;
-    trainMode = true;
-    trainSessionActive = false;
-    updateHeaderForSelectionMode();
-    selectModeBtn.style.display = 'none';
-    document.getElementById('editDbBtn').style.display = 'none';
-    filterBarEl.style.display = 'none';
-    wordListEl.style.display = 'none';
-    trainPanelEl.style.display = '';
-    showTrainSetup();
-  }
-
-  function exitTrainMode() {
-    if (trainSessionActive) {
-      showActionModal({
-        title: 'Прервать тренировку?',
-        message: 'Прогресс по уже отвеченным карточкам уже сохранён — но текущая сессия закроется, и оставшиеся карточки сейчас показаны не будут.',
-        buttons: [
-          { label: 'Остаться', variant: 'cancel' },
-          { label: 'Прервать', variant: 'danger', action: () => actuallyExitTrainMode() },
-        ]
-      });
-      return;
-    }
-    actuallyExitTrainMode();
-  }
-
-  function actuallyExitTrainMode() {
-    trainMode = false;
-    trainSessionActive = false;
-    updateHeaderForSelectionMode();
-    selectModeBtn.style.display = '';
-    document.getElementById('editDbBtn').style.display = '';
-    filterBarEl.style.display = '';
-    wordListEl.style.display = '';
-    trainPanelEl.style.display = 'none';
-    renderFilterBar();
-    renderList();
-  }
-
-  // ===== Экран настройки =====
-  function showTrainSetup() {
-    trainSetupEl.style.display = '';
-    trainSessionEl.style.display = 'none';
-    trainSummaryEl.style.display = 'none';
-    document.getElementById('trainSetupStatus').textContent = '';
-    renderTrainCollectionChips();
-    if (trainScope === 'manual') renderTrainManualList();
-  }
-
-  document.querySelectorAll('#trainScopeChips [data-scope]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      trainScope = btn.dataset.scope;
-      document.querySelectorAll('#trainScopeChips [data-scope]').forEach(b => b.classList.toggle('active', b.dataset.scope === trainScope));
-      document.getElementById('trainCollectionPickerWrap').style.display = trainScope === 'collection' ? '' : 'none';
-      document.getElementById('trainManualPickerWrap').style.display = trainScope === 'manual' ? '' : 'none';
-      if (trainScope === 'manual') renderTrainManualList();
-    });
-  });
-
-  function renderTrainCollectionChips() {
-    const el = document.getElementById('trainCollectionChips');
-    if (!collections.length) {
-      el.innerHTML = '<span style="font-family:\'Inter\',sans-serif; font-size:13px; color:var(--muted);">Подборок пока нет</span>';
-      return;
-    }
-    el.innerHTML = collections.map(c =>
-      `<button type="button" class="chip ${trainCollectionId === c.id ? 'active' : ''}" data-train-coll="${c.id}">${c.name}</button>`
-    ).join('');
-    el.querySelectorAll('[data-train-coll]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        trainCollectionId = btn.dataset.trainColl;
-        renderTrainCollectionChips();
-      });
-    });
-  }
-
-  function renderTrainManualList() {
-    const el = document.getElementById('trainManualList');
-    if (!words.length) {
-      el.innerHTML = '<div style="padding:12px; font-family:\'Inter\',sans-serif; font-size:13px; color:var(--muted);">В словаре пока нет слов</div>';
-    } else {
-      el.innerHTML = words.map(w => `
-        <label class="train-manual-row">
-          <input type="checkbox" data-train-manual="${w.id}" ${trainManualSelectedIds.has(w.id) ? 'checked' : ''} />
-          <span class="train-manual-hebrew">${w.hebrew}</span>
-          <span class="train-manual-translation">${w.translation}</span>
-        </label>
-      `).join('');
-      el.querySelectorAll('[data-train-manual]').forEach(cb => {
-        cb.addEventListener('change', () => {
-          const id = parseInt(cb.dataset.trainManual);
-          if (cb.checked) trainManualSelectedIds.add(id); else trainManualSelectedIds.delete(id);
-          document.getElementById('trainManualCount').textContent = trainManualSelectedIds.size;
-        });
-      });
-    }
-    document.getElementById('trainManualCount').textContent = trainManualSelectedIds.size;
-  }
-
-  document.querySelectorAll('#trainDirectionChips [data-direction]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      trainDirection = btn.dataset.direction;
-      document.querySelectorAll('#trainDirectionChips [data-direction]').forEach(b => b.classList.toggle('active', b.dataset.direction === trainDirection));
-      document.getElementById('trainNiqqudFieldWrap').style.display = trainDirection === 'he-ru' ? '' : 'none';
-    });
-  });
-
-  document.getElementById('trainShowNiqqud').addEventListener('change', (e) => {
-    trainShowNiqqud = e.target.checked;
-  });
-
-  function getTrainCandidateWords() {
-    if (trainScope === 'all') return words.slice();
-    if (trainScope === 'collection') {
-      if (!trainCollectionId) return [];
-      return words.filter(w => (w.collectionIds || []).includes(trainCollectionId));
-    }
-    return words.filter(w => trainManualSelectedIds.has(w.id)); // manual
-  }
-
-  document.getElementById('trainStartBtn').addEventListener('click', () => {
-    const candidates = getTrainCandidateWords();
-    const statusEl = document.getElementById('trainSetupStatus');
-    if (!candidates.length) {
-      statusEl.textContent = 'Нечего тренировать — сначала выберите слова.';
-      return;
-    }
-
-    const now = Date.now();
-    const due = candidates.filter(w => isWordDue(w, now));
-    const brandNew = candidates.filter(w => isWordNew(w));
-
-    const newLimitRaw = parseInt(document.getElementById('trainNewLimit').value, 10);
-    const newLimit = isNaN(newLimitRaw) || newLimitRaw < 0 ? Infinity : newLimitRaw;
-    const alreadyToday = getTodayNewCount();
-    const remainingNewSlots = newLimit === Infinity ? Infinity : Math.max(0, newLimit - alreadyToday);
-    const newToInclude = remainingNewSlots === Infinity ? brandNew : brandNew.slice(0, remainingNewSlots);
-
-    let queue = due.concat(newToInclude);
-    queue = Array.from(new Set(queue)); // на случай пересечения — не должно, но на всякий случай
-
-    if (!queue.length) {
-      statusEl.textContent = 'На сейчас повторять нечего — все выбранные слова либо уже отвечены сегодня, либо ждут своей даты. Загляните позже.';
-      return;
-    }
-
-    for (let i = queue.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [queue[i], queue[j]] = [queue[j], queue[i]];
-    }
-
-    if (newToInclude.length) addTodayNewCount(newToInclude.length);
-
-    trainQueue = queue;
-    trainQueueIndex = 0;
-    trainSessionStats = { studied: 0, again: 0, hard: 0, good: 0, easy: 0 };
-    trainSessionActive = true;
-    startTrainSession();
-  });
-
-  // ===== Сама сессия =====
-  function startTrainSession() {
-    trainSetupEl.style.display = 'none';
-    trainSummaryEl.style.display = 'none';
-    trainSessionEl.style.display = '';
-    showNextTrainCard();
-  }
-
-  function showNextTrainCard() {
-    if (trainQueueIndex >= trainQueue.length) {
-      finishTrainSession();
-      return;
-    }
-    trainCurrentWord = trainQueue[trainQueueIndex];
-    trainAnswerShown = false;
-    renderTrainCard();
-  }
-
-  function renderTrainCard() {
-    const word = trainCurrentWord;
-    document.getElementById('trainProgress').textContent = `${trainQueueIndex + 1} из ${trainQueue.length}`;
-
-    const faceEl = document.getElementById('trainCardFace');
-    const backEl = document.getElementById('trainCardBack');
-    backEl.style.display = 'none';
-    document.getElementById('trainShowAnswerBtn').style.display = '';
-    document.getElementById('trainRateButtons').style.display = 'none';
-
-    if (trainDirection === 'he-ru') {
-      faceEl.className = 'train-card-face';
-      faceEl.textContent = trainShowNiqqud ? word.hebrew : stripNiqqud(word.hebrew);
-      backEl.innerHTML = `
-        <div class="translit">${word.translit}</div>
-        <div class="pos">${word.pos}</div>
-        <div class="translation">${word.translation}</div>
-      `;
-    } else {
-      faceEl.className = 'train-card-face train-card-face-ru';
-      faceEl.textContent = word.translation;
-      backEl.innerHTML = `
-        <div class="hebrew-word" style="direction:rtl;">${word.hebrew}</div>
-        <div class="translit">${word.translit}</div>
-        <div class="pos">${word.pos}</div>
-      `;
-    }
-  }
-
-  document.getElementById('trainShowAnswerBtn').addEventListener('click', () => {
-    trainAnswerShown = true;
-    document.getElementById('trainCardBack').style.display = '';
-    document.getElementById('trainShowAnswerBtn').style.display = 'none';
-    const rateButtonsEl = document.getElementById('trainRateButtons');
-    rateButtonsEl.style.display = '';
-    rateButtonsEl.querySelectorAll('.train-rate-btn').forEach(btn => {
-      btn.querySelector('span').textContent = previewRatingLabel(trainCurrentWord, btn.dataset.rating);
-    });
-  });
-
-  document.getElementById('trainRateButtons').addEventListener('click', (e) => {
-    const btn = e.target.closest('.train-rate-btn');
-    if (!btn || !trainAnswerShown) return;
-    const rating = btn.dataset.rating;
-    const result = rateWord(trainCurrentWord, rating);
-    saveWords();
-    trainSessionStats.studied++;
-    trainSessionStats[rating]++;
-
-    if (result.requeue) {
-      // возвращаем карточку в очередь чуть попозже (не сразу следующей) —
-      // чтобы не превращалось в "жми, пока не запомнишь" подряд без пауз
-      const insertAt = Math.min(trainQueue.length, trainQueueIndex + 1 + Math.floor(Math.random() * 3) + 3);
-      trainQueue.splice(insertAt, 0, trainCurrentWord);
-    }
-
-    trainQueueIndex++;
-    showNextTrainCard();
-  });
-
-  function finishTrainSession() {
-    trainSessionActive = false;
-    trainSessionEl.style.display = 'none';
-    trainSummaryEl.style.display = '';
-    const s = trainSessionStats;
-    document.getElementById('trainSummaryText').textContent =
-      `Сессия завершена. Отвечено карточек: ${s.studied}.\nНе помню: ${s.again} · Трудно: ${s.hard} · Хорошо: ${s.good} · Легко: ${s.easy}`;
-  }
-
-  document.getElementById('trainFinishBtn').addEventListener('click', () => {
-    showTrainSetup();
   });
 
   function updateSaveState() {
