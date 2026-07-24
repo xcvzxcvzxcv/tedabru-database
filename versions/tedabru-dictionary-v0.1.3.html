@@ -30,7 +30,7 @@
   }
 
   .app {
-    max-width: 720px;
+    max-width: 560px;
     margin: 0 auto;
     min-height: 100vh;
     display: flex;
@@ -193,6 +193,8 @@
     gap: 6px;
     overflow-x: auto;
     scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
   }
   .filter-row::-webkit-scrollbar { display: none; }
   .chip {
@@ -855,7 +857,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.4</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.3</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1085,7 +1087,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.4';
+  const APP_VERSION = '0.1.3';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1432,7 +1434,7 @@
           const count = c.key === null ? words.length : (countByStatus[c.key] || 0);
           return `<button type="button" class="chip ${isActive ? 'active' : ''}" data-status="${c.key ?? ''}">${c.label} · ${count}</button>`;
         }).join('')}
-        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="Избранное">★ ${favoriteCount}</button>` : ''}
+        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip">★ Избранное · ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
           : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
@@ -1531,30 +1533,6 @@
       sortMode = e.target.value;
       renderList();
     });
-
-    // затухание слева/справа — только там, где реально есть что докрутить;
-    // в естественном (нескролленном) положении левый край всегда чёткий
-    el.querySelectorAll('.filter-row').forEach(row => {
-      updateFadeMask(row);
-      row.addEventListener('scroll', () => updateFadeMask(row));
-    });
-  }
-
-  function updateFadeMask(row) {
-    const atStart = row.scrollLeft <= 2;
-    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
-    let gradient;
-    if (atStart && atEnd) {
-      gradient = 'none'; // всё помещается целиком — скрывать нечего вовсе
-    } else if (atStart) {
-      gradient = 'linear-gradient(to right, black calc(100% - 28px), transparent 100%)';
-    } else if (atEnd) {
-      gradient = 'linear-gradient(to right, transparent 0, black 28px, black 100%)';
-    } else {
-      gradient = 'linear-gradient(to right, transparent 0, black 28px, black calc(100% - 28px), transparent 100%)';
-    }
-    row.style.maskImage = gradient;
-    row.style.webkitMaskImage = gradient;
   }
 
   function renderList() {
@@ -2151,10 +2129,14 @@
     const hasAnyWords = words.some(w => (w.collectionIds || []).some(cid => idSet.has(cid)));
 
     if (!hasAnyWords) {
-      // подборка(и) пустая — спрашивать нечего (нет слов, значит нет и
-      // выбора "и слова тоже"), удаляем сразу
-      deleteCollections(collectionIds, false);
-      showToast(many ? 'Пустые подборки удалены' : 'Пустая подборка удалена');
+      // подборка(и) пустая — выбирать "и слова тоже" не из чего, простое подтверждение
+      showActionModal({
+        title: many ? `Удалить ${names.length} подборки (${names.join(', ')})?` : `Удалить подборку «${names[0]}»?`,
+        buttons: [
+          { label: 'Отмена', variant: 'cancel' },
+          { label: 'Удалить', variant: 'danger', action: () => deleteCollections(collectionIds, false) },
+        ]
+      });
       return;
     }
 
@@ -2323,13 +2305,6 @@
       ? Array.from(selectedCollectionIds)
       : [chip.dataset.coll];
     startCollectionDrag(ids, chip, e.pointerId, collectionDragArmedStartX, collectionDragArmedStartY);
-    // слушатель pointermove внутри startCollectionDrag подключается уже ПОСЛЕ
-    // того, как текущее событие начало обрабатываться — на само это событие
-    // он не сработает (слушатели, добавленные во время диспетчеризации, не
-    // применяются к событию, которое сейчас обрабатывается). Поэтому сразу
-    // же обрабатываем текущую позицию вручную, иначе первая же точка, где
-    // превышен порог движения, "теряется" для определения цели сброса.
-    handleCollectionDragMove(e);
   });
   filterBarEl.addEventListener('pointerup', cancelCollectionDragArm);
   filterBarEl.addEventListener('pointercancel', cancelCollectionDragArm);
