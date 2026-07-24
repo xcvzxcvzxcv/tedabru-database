@@ -159,21 +159,12 @@
   }
 
   .word-row {
-    position: relative;
     display: grid;
     grid-template-columns: 32px 108px 120px 1fr 26px 26px 22px;
     align-items: center;
     gap: 8px;
     padding: 14px 4px;
-  }
-  .word-row::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
+    border-bottom: 1px solid rgba(123,53,212,0.15);
   }
 
   .icon-btn {
@@ -189,7 +180,6 @@
   }
   .icon-btn svg { width: 18px; height: 18px; }
   .icon-btn.favorite-on { color: var(--gold); }
-  .favorite-btn { margin-left: 4px; }
   .icon-btn.delete-btn:active { color: #e05a5a; }
 
   .filter-bar {
@@ -270,40 +260,6 @@
     border-color: var(--gold);
     color: var(--gold);
   }
-
-  .chip.chip-with-pencil {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 4px 4px 16px;
-  }
-  .chip-with-pencil .chip-body {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .chip-with-pencil .chip-pencil-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    flex-shrink: 0;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    color: inherit;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .chip-with-pencil .chip-pencil-btn svg { width: 13px; height: 13px; }
-  .chip-with-pencil .chip-pencil-btn:active { background: rgba(255,255,255,0.2); }
 
   /* Подборка-цель слияния — визуально "раздвигается" под наведённым чипом */
   .chip.coll-drop-widen {
@@ -441,7 +397,7 @@
 
   .hebrew-word {
     font-family: 'Frank Ruhl Libre', serif;
-    font-size: 30px;
+    font-size: 26px;
     direction: rtl;
     text-align: right;
     color: var(--gold);
@@ -927,7 +883,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.6</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.5</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1157,7 +1113,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.6';
+  const APP_VERSION = '0.1.5';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1472,7 +1428,6 @@
   const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   const EXIT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
-  const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
   const FOLDER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>';
 
   function renderFilterBar() {
@@ -1525,19 +1480,7 @@
           if (renamingCollectionId === c.id) {
             return `<input type="text" class="chip chip-input chip-rename-input" data-rename-coll="${c.id}" value="${c.name.replace(/"/g, '&quot;')}" />`;
           }
-          if (isSelected) {
-            // выделенная подборка "раздвигается" — тело чипа переключает
-            // выделение, отдельная кнопка-карандаш рядом отвечает за
-            // переименование; так клик по чипу больше не конфликтует между
-            // "снять выделение" и "переименовать"
-            return `
-              <div class="chip chip-selected chip-with-pencil">
-                <button type="button" class="chip-body" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>
-                <button type="button" class="chip-pencil-btn" data-coll-rename="${c.id}" title="Переименовать">${PENCIL_ICON}</button>
-              </div>
-            `;
-          }
-          return `<button type="button" class="chip ${isFilterActive ? 'active' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
+          return `<button type="button" class="chip ${isFilterActive ? 'active' : ''} ${isSelected ? 'chip-selected' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
         <select class="sort-select" id="sortSelect" style="display:none;">
           <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
@@ -1614,22 +1557,21 @@
       btn.addEventListener('click', () => {
         const val = btn.dataset.coll;
         if (selectionMode) {
-          // в режиме выделения клик по телу чипа — чистое выделение/снятие
-          // выделения, без побочных эффектов; переименование теперь отдельно
-          // через кнопку-карандаш, которая появляется у выделенного чипа
-          if (selectedCollectionIds.has(val)) selectedCollectionIds.delete(val); else selectedCollectionIds.add(val);
-          headerTitleEl.textContent = selectionHeaderText();
-          renderFilterBar();
+          // в режиме выделения: первый клик по НЕвыделенной подборке — просто
+          // выделяет её (как и клик по слову). Клик по УЖЕ выделенной — не
+          // снимает выделение, а включает переименование прямо в чипе.
+          if (selectedCollectionIds.has(val)) {
+            renamingCollectionId = val;
+            renderFilterBar();
+          } else {
+            selectedCollectionIds.add(val);
+            headerTitleEl.textContent = selectionHeaderText();
+            renderFilterBar();
+          }
           return;
         }
         filterCollectionId = (filterCollectionId === val) ? null : val; // повторный клик снимает фильтр
         renderFilterBar(); renderList();
-      });
-    });
-    el.querySelectorAll('[data-coll-rename]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        renamingCollectionId = btn.dataset.collRename;
-        renderFilterBar();
       });
     });
     if (creatingCollectionInline) {
