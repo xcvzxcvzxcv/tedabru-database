@@ -1123,7 +1123,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.3</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.2</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1467,7 +1467,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.4.3';
+  const APP_VERSION = '0.4.2';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3402,41 +3402,8 @@
     return translit.slice(0, idx + 1) + '\u0301' + translit.slice(idx + 1);
   }
 
-  function countVowelsIn(str, vowelSet) {
-    let count = 0;
-    for (const ch of (str || '').toLowerCase()) {
-      if (vowelSet.includes(ch)) count++;
-    }
-    return count;
-  }
-
   function translitWithStress(word, trField) {
-    let base = niqqudToTranslit(word);
-
-    // Иногда наш алгоритм озвучивает начальную шва там, где по авторитетным
-    // данным (поле tr) её на самом деле нет — "петсаца" вместо "птсаца"
-    // (פְּצָצָה, tr: "ptsatsá"), "сефат" вместо "сфат" (שְׂפַת, tr: "sfat").
-    // Проверяем это не разбором tr посимвольно (слишком хрупко — апострофы/
-    // огласовки записаны непоследовательно), а тем же трюком, что уже
-    // используется для расстановки ударения: считаем гласные. Если "тихий"
-    // вариант (без озвученной начальной шва) даёт ровно столько же гласных,
-    // сколько в tr — а обычный "громкий" вариант на одну больше — берём тихий.
-    if (trField) {
-      const trFirst = trField.split(',')[0].trim();
-      if (trFirst) {
-        const LATIN_VOWELS = 'aeiouɛɔəáéíóú';
-        const RU_VOWELS = 'аеиоуяюёэ';
-        const trVowelCount = countVowelsIn(trFirst, LATIN_VOWELS);
-        const voicedVowelCount = countVowelsIn(base, RU_VOWELS);
-        if (voicedVowelCount === trVowelCount + 1) {
-          const silent = niqqudToTranslit(word, { silentInitialShva: true });
-          if (countVowelsIn(silent, RU_VOWELS) === trVowelCount) {
-            base = silent;
-          }
-        }
-      }
-    }
-
+    const base = niqqudToTranslit(word);
     const stressIdx = findStressIndexFromEnd(trField);
     return applyStressFromEnd(base, stressIdx);
   }
@@ -3852,16 +3819,15 @@
   // ивритские слова по пробелу, конвертирует каждое отдельно и склеивает
   // обратно с пробелом. Без этого пробел между словами "терялся" при
   // токенизации (он не согласная и не огласовка, просто пропускался).
-  function niqqudToTranslit(text, opts) {
+  function niqqudToTranslit(text) {
     return text
       .split(/\s+/)
       .filter(Boolean)
-      .map(w => convertSingleWord(w, opts))
+      .map(convertSingleWord)
       .join(' ');
   }
 
-  function convertSingleWord(word, opts) {
-    opts = opts || {};
+  function convertSingleWord(word) {
     const groups = tokenizeNiqqud(word);
 
     let result = '';
@@ -3961,30 +3927,19 @@
       if (vowelMark) {
         vowel = VOWEL_MAP[vowelMark];
       } else if (idx === 0 && marks.includes(NIQQUD.SHVA)) {
+        // ШВА под самой первой буквой слова обычно озвучивается кратким "е"
+        // (לְ- → "ле-", בְּ- → "бе-"), НО перед сонорными согласными (מ, נ, ר)
+        // в разговорном иврите он почти всегда "проглатывается": שלושה →
+        // "шлоша", не "шелоша"; שני → "шней", не "шеней". Это относится
+        // только к случаям, когда САМА шва-носитель — НЕ сонорная согласная
+        // (ש, כ и т.п.), а следующая — сонорная. Если же сама первая буква
+        // тоже сонорная (מ, נ, ר, ל), проглатывание не происходит: מְנוֹרָה =
+        // "менора", а не "мнора" — согласная+шва+согласная тут звучат как
+        // отдельный слог, а не сливаются.
         const SONORANTS = ['ל', 'מ', 'נ', 'ר'];
-        // подсказку от tr-поля (силентная начальная шва) применяем ТОЛЬКО
-        // когда сама шва-носитель — не сонорная согласная: для сонорных
-        // (מ, נ, ר, ל) уже есть отдельное, осознанно принятое правило ниже
-        // (מְנוֹרָה = "менора", а не "мнора"), и его лучше не трогать —
-        // among сонорных первых букв реальное произношение расходится по
-        // конкретным словам гораздо сильнее, чем формат tr-поля способен
-        // надёжно передать
-        if (opts.silentInitialShva && !SONORANTS.includes(letter)) {
-          vowel = '';
-        } else {
-          // ШВА под самой первой буквой слова обычно озвучивается кратким "е"
-          // (לְ- → "ле-", בְּ- → "бе-"), НО перед сонорными согласными (מ, נ, ר)
-          // в разговорном иврите он почти всегда "проглатывается": שלושה →
-          // "шлоша", не "шелоша"; שני → "шней", не "шеней". Это относится
-          // только к случаям, когда САМА шва-носитель — НЕ сонорная согласная
-          // (ש, כ и т.п.), а следующая — сонорная. Если же сама первая буква
-          // тоже сонорная (מ, נ, ר, ל), проглатывание не происходит: מְנוֹרָה =
-          // "менора", а не "мнора" — согласная+шва+согласная тут звучат как
-          // отдельный слог, а не сливаются.
-          const nextGroup = groups[1];
-          const nextIsSonorant = !SONORANTS.includes(letter) && nextGroup && SONORANTS.includes(nextGroup.letter);
-          vowel = nextIsSonorant ? '' : 'е';
-        }
+        const nextGroup = groups[1];
+        const nextIsSonorant = !SONORANTS.includes(letter) && nextGroup && SONORANTS.includes(nextGroup.letter);
+        vowel = nextIsSonorant ? '' : 'е';
       } else if (letter !== 'ל' && marks.includes(NIQQUD.SHVA)) {
         // шва посреди слова перед йудом, у которого есть СВОЯ гласная
         // (типичный паттерн заимствований на -ция/-сия: סִימוּלַצְיָה, где
