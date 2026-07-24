@@ -160,7 +160,7 @@
 
   .word-row {
     display: grid;
-    grid-template-columns: 32px 108px 120px 1fr 26px 26px 22px;
+    grid-template-columns: 32px 108px 120px 1fr 26px 26px 30px;
     align-items: center;
     gap: 8px;
     padding: 14px 4px;
@@ -216,20 +216,6 @@
   .chip.chip-add-collection {
     border-color: var(--gold-soft);
     color: var(--gold-soft);
-  }
-  .chip.chip-text-only {
-    border-style: dashed;
-    color: var(--muted);
-  }
-  .filters-collapse {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: max-height 0.28s ease-out, opacity 0.22s ease-out;
-  }
-  .filters-collapse.expanded {
-    max-height: 200px;
-    opacity: 1;
   }
   .chip.chip-icon-only {
     display: flex;
@@ -397,7 +383,7 @@
 
   .hebrew-word {
     font-family: 'Frank Ruhl Libre', serif;
-    font-size: 26px;
+    font-size: 20px;
     direction: rtl;
     text-align: right;
     color: var(--gold);
@@ -436,7 +422,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: var(--muted);
-    text-align: left;
+    text-align: right;
   }
 
   .word-row.row-deleting {
@@ -481,20 +467,6 @@
   .row-dimmed .hebrew-word,
   .row-dimmed .translation { color: #8b7fa8; }
   .row-dimmed .translit { color: #6a5f85; }
-
-  @media (hover: hover) {
-    .word-row:hover .hebrew-word,
-    .word-row:hover .translit,
-    .word-row:hover .pos,
-    .word-row:hover .translation {
-      filter: brightness(1.2);
-    }
-    .word-row:hover .status-btn,
-    .word-row:hover .favorite-btn,
-    .word-row:hover .delete-btn {
-      filter: brightness(1.3);
-    }
-  }
 
   .empty-state {
     text-align: center;
@@ -883,7 +855,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.5</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.4</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1113,7 +1085,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.5';
+  const APP_VERSION = '0.1.4';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -1322,8 +1294,6 @@
   let filterPos = null;          // null | конкретное значение w.pos
   let filterCollectionId = null; // null | id подборки
   let creatingCollectionInline = false; // чип "+" превращён в текстовый инпут для ввода имени
-  let filtersExpanded = false; // строка "часть речи" скрыта по умолчанию, раскрывается по клику на "Фильтры"
-  let renamingCollectionId = null; // id подборки, чей чип сейчас превращён в поле переименования
 
   // ===== Режим выбора (для массового добавления в подборку) =====
   let selectionMode = false;
@@ -1466,20 +1436,15 @@
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
           : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
-        <button type="button" class="chip chip-text-only" id="filtersToggleChip">Фильтры</button>
       </div>
-      <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
-        <div class="filter-row">
-          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
-        </div>
-      </div>
+      ${posValues.length ? `
+      <div class="filter-row">
+        ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
+      </div>` : ''}
       <div class="filter-row">
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
-          if (renamingCollectionId === c.id) {
-            return `<input type="text" class="chip chip-input chip-rename-input" data-rename-coll="${c.id}" value="${c.name.replace(/"/g, '&quot;')}" />`;
-          }
           return `<button type="button" class="chip ${isFilterActive ? 'active' : ''} ${isSelected ? 'chip-selected' : ''}" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
         <select class="sort-select" id="sortSelect" style="display:none;">
@@ -1489,42 +1454,6 @@
         </select>
       </div>
     `;
-
-    document.getElementById('filtersToggleChip').addEventListener('click', () => {
-      // трогаем класс НАПРЯМУЮ, а не через renderFilterBar() — иначе элемент
-      // пересоздаётся с уже применённым классом, и transition просто нечего
-      // будет анимировать (нет "до"-состояния внутри одного и того же узла)
-      filtersExpanded = !filtersExpanded;
-      const collapseEl = document.getElementById('filtersCollapse');
-      if (collapseEl) collapseEl.classList.toggle('expanded', filtersExpanded);
-    });
-
-    if (renamingCollectionId) {
-      const renameInput = el.querySelector('.chip-rename-input');
-      if (renameInput) {
-        renameInput.focus();
-        renameInput.select();
-        const finishRename = (commit) => {
-          if (renamingCollectionId === null) return;
-          const id = renamingCollectionId;
-          renamingCollectionId = null;
-          if (commit) {
-            const name = renameInput.value.trim();
-            const collection = collections.find(c => c.id === id);
-            if (collection && name && name !== collection.name) {
-              collection.name = uniqueCollectionName(name);
-              saveCollections();
-            }
-          }
-          renderFilterBar();
-        };
-        renameInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') finishRename(true);
-          else if (e.key === 'Escape') { e.stopPropagation(); finishRename(false); }
-        });
-        renameInput.addEventListener('blur', () => finishRename(true));
-      }
-    }
 
     el.querySelectorAll('[data-status]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1557,17 +1486,11 @@
       btn.addEventListener('click', () => {
         const val = btn.dataset.coll;
         if (selectionMode) {
-          // в режиме выделения: первый клик по НЕвыделенной подборке — просто
-          // выделяет её (как и клик по слову). Клик по УЖЕ выделенной — не
-          // снимает выделение, а включает переименование прямо в чипе.
-          if (selectedCollectionIds.has(val)) {
-            renamingCollectionId = val;
-            renderFilterBar();
-          } else {
-            selectedCollectionIds.add(val);
-            headerTitleEl.textContent = selectionHeaderText();
-            renderFilterBar();
-          }
+          // в режиме выделения клик по подборке добавляет/убирает её из
+          // мультивыделения (как и клик по слову), а не фильтрует список
+          if (selectedCollectionIds.has(val)) selectedCollectionIds.delete(val); else selectedCollectionIds.add(val);
+          headerTitleEl.textContent = selectionHeaderText();
+          renderFilterBar();
           return;
         }
         filterCollectionId = (filterCollectionId === val) ? null : val; // повторный клик снимает фильтр
@@ -3883,7 +3806,7 @@
     wordListEl.style.display = 'none';
     addWordPanel.style.display = '';
     setBulkMode(false); // всегда открываемся в одиночном режиме
-    bulkTargetCollectionIds = new Set();
+    bulkTargetCollectionId = null;
     bulkCreatingCollectionInline = false;
     renderBulkCollectionChips();
     inputHebrew.placeholder = 'Впишите слово, транскрипцию или перевод';
@@ -4219,16 +4142,14 @@
     if (existing) {
       // слово с таким написанием уже есть в справочнике — обновляем его
       // на месте вместо того, чтобы завести дубликат; статус/избранное/
-      // подборки уже существующего слова не трогаем (кроме явно выбранных
-      // подборок в пикере ниже — их всё же добавляем)
+      // подборки уже существующего слова не трогаем (кроме явно выбранной
+      // подборки в пикере ниже — её всё же добавляем)
       existing.translit = inputTranslit.value.trim();
       existing.pos = inputPos.value;
       existing.translation = inputTranslation.value.trim();
-      if (bulkTargetCollectionIds.size) {
+      if (bulkTargetCollectionId) {
         existing.collectionIds = existing.collectionIds || [];
-        bulkTargetCollectionIds.forEach(cid => {
-          if (!existing.collectionIds.includes(cid)) existing.collectionIds.push(cid);
-        });
+        if (!existing.collectionIds.includes(bulkTargetCollectionId)) existing.collectionIds.push(bulkTargetCollectionId);
       }
     } else {
       const newWord = {
@@ -4239,7 +4160,7 @@
         translation: inputTranslation.value.trim(),
         status: 'active',
         favorite: false,
-        collectionIds: Array.from(bulkTargetCollectionIds),
+        collectionIds: bulkTargetCollectionId ? [bulkTargetCollectionId] : [],
         addedAt: Date.now()
       };
       words.unshift(newWord);
@@ -4262,12 +4183,12 @@
   let bulkMode = false;
   let bulkAddRunning = false;
   let bulkAddAborted = false;
-  let bulkTargetCollectionIds = new Set(); // в какие подборки класть добавляемые слова (можно несколько сразу)
+  let bulkTargetCollectionId = null;      // в какую подборку класть добавляемые слова (необязательно)
   let bulkCreatingCollectionInline = false;
 
   function renderBulkCollectionChips() {
     bulkCollectionChipsEl.innerHTML = collections.map(c =>
-      `<button type="button" class="chip ${bulkTargetCollectionIds.has(c.id) ? 'chip-selected' : ''}" data-bulk-coll="${c.id}">${c.name}</button>`
+      `<button type="button" class="chip ${bulkTargetCollectionId === c.id ? 'chip-selected' : ''}" data-bulk-coll="${c.id}">${c.name}</button>`
     ).join('') + (
       bulkCreatingCollectionInline
         ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="Название подборки" />`
@@ -4277,7 +4198,7 @@
     bulkCollectionChipsEl.querySelectorAll('[data-bulk-coll]').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.bulkColl;
-        if (bulkTargetCollectionIds.has(id)) bulkTargetCollectionIds.delete(id); else bulkTargetCollectionIds.add(id); // повторный клик снимает выбор — остальные не трогает
+        bulkTargetCollectionId = (bulkTargetCollectionId === id) ? null : id; // повторный клик снимает выбор
         renderBulkCollectionChips();
       });
     });
@@ -4294,7 +4215,7 @@
             const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
             collections.push(nc);
             saveCollections();
-            bulkTargetCollectionIds.add(nc.id); // сразу добавляем только что созданную к выбору
+            bulkTargetCollectionId = nc.id; // сразу выбираем только что созданную
           }
         }
         renderBulkCollectionChips();
@@ -4380,11 +4301,9 @@
         existing.translit = best.translit || existing.translit;
         existing.pos = grammarLabelToPosValue(best.grammarLabel) || existing.pos;
         existing.translation = best.translation;
-        if (bulkTargetCollectionIds.size) {
+        if (bulkTargetCollectionId) {
           existing.collectionIds = existing.collectionIds || [];
-          bulkTargetCollectionIds.forEach(cid => {
-            if (!existing.collectionIds.includes(cid)) existing.collectionIds.push(cid);
-          });
+          if (!existing.collectionIds.includes(bulkTargetCollectionId)) existing.collectionIds.push(bulkTargetCollectionId);
         }
         updated++;
       } else {
@@ -4396,7 +4315,7 @@
           translation: best.translation,
           status: 'active',
           favorite: false,
-          collectionIds: Array.from(bulkTargetCollectionIds),
+          collectionIds: bulkTargetCollectionId ? [bulkTargetCollectionId] : [],
           addedAt: Date.now()
         });
         added++;
