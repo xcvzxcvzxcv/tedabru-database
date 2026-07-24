@@ -853,7 +853,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.2</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.1.1</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="selectModeBtn" title="Режим выбора">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -1083,7 +1083,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.1.2';
+  const APP_VERSION = '0.1.1';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2492,11 +2492,10 @@
     const verbHit = (verbsDict && verbsDict[skeleton]) || [];
     // старый Wiktionary-индекс форм подключаем ТОЛЬКО если у этого скелета нет
     // ничего авторитетного вообще — ни в новой базе сгенерированных форм, ни
-    // среди самих инфинитивов, ни в основном словаре (сущ/прил и т.п.). Если
-    // скелет уже есть где-то из этого — запись "формы" для того же скелета
-    // почти наверняка мусор из старой базы (пустой hint, "форма от" со
-    // сбитым значением), а не отдельное самостоятельное слово
-    const formHit = (genFormHit.length || verbHit.length || dictHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
+    // среди самих инфинитивов. Если скелет уже есть как инфинитив в verbsDict,
+    // запись "формы" для того же скелета почти наверняка мусор из старой базы
+    // (пустой hint, "форма от" со сбитым значением) — а не отдельное слово
+    const formHit = (genFormHit.length || verbHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
     const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
     return { dictHit, formHit, verbHit, nounFormHit, genFormHit };
   }
@@ -3046,8 +3045,8 @@
       const verbHit = (verbsDict && verbsDict[skeleton]) || [];
       const genFormHit = (generatedVerbForms && generatedVerbForms[skeleton]) || [];
       // см. комментарий в lookupSkeletonSources — старые формы только если у
-      // скелета нет ничего авторитетного вообще (ни новых форм, ни инфинитива, ни основного словаря)
-      const formHit = (genFormHit.length || verbHit.length || dictHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
+      // скелета нет ничего авторитетного вообще (ни новых форм, ни инфинитива)
+      const formHit = (genFormHit.length || verbHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
       const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
       const candidates = [
         ...dictHit.map(buildDictCandidate),
