@@ -1123,7 +1123,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.2</span></div>
+      <div class="title" id="headerTitle">Справочник <span class="app-version">v0.4.1</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1467,7 +1467,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.4.2';
+  const APP_VERSION = '0.4.1';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2990,19 +2990,7 @@
       let plain = seg.replace(/[.,:;!?]+$/, '').trim();
       if (plain.length >= 2) keys.push(plain.toLowerCase());
     }
-    // плюс отдельные слова из МНОГОСЛОВНЫХ ключей — чтобы запрос "шум" нашёл
-    // и статью с переводом "шум давар", а не только точное совпадение целиком.
-    // Слова короче 3 букв пропускаем — иначе предлоги/союзы вроде "и"/"в"/"не"
-    // заполонили бы индекс случайными совпадениями
-    const wordKeys = [];
-    for (const key of keys) {
-      if (!key.includes(' ')) continue;
-      for (const word of key.split(/\s+/)) {
-        const w = word.replace(/[.,:;!?]+$/, '');
-        if (w.length >= 3 && !keys.includes(w) && !wordKeys.includes(w)) wordKeys.push(w);
-      }
-    }
-    return keys.concat(wordKeys);
+    return keys;
   }
 
   function buildReverseIndex(forwardDict, textField) {
@@ -3575,37 +3563,20 @@
     const ruKey = raw.trim().toLowerCase();
     const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const translationMatches = (dictHit.length || verbRuHit.length)
-      ? mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)])
-      : [];
+    if (dictHit.length || verbRuHit.length) {
+      console.log('[RC] найдено в обратном индексе:', ruKey, '—', dictHit.length, 'словарных значений +', verbRuHit.length, 'глаголов');
+      return mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)]);
+    }
 
-    // раз это не обязательно перевод — возможно, это ТРАНСКРИПЦИЯ ивритского
-    // слова ("махшев" вместо перевода "компьютер"). Пробуем ВСЕГДА, а не
-    // только если перевод не нашёлся — иначе случайное совпадение с реальным
-    // русским словом ("рак" = "краб") тихо перекрывает транскрипцию, которую
-    // человек реально имел в виду ("рак" = רַק, "только")
-    const transcriptionMatches = fuzzyMatchTranslitIndex(raw);
-
-    if (translationMatches.length || transcriptionMatches.length) {
-      console.log('[RC] локально нашлось:', ruKey, '—', translationMatches.length, 'по переводу +', transcriptionMatches.length, 'по транскрипции');
-      if (!translationMatches.length) return transcriptionMatches;
-      if (!transcriptionMatches.length) return translationMatches;
-      // приоритет: точное совпадение транскрипции → перевод → остальная
-      // (нечёткая) транскрипция
-      const queryNorm = normalizeForCompare(raw);
-      const exactTranslit = [];
-      const restTranslit = [];
-      transcriptionMatches.forEach(c => {
-        (normalizeForCompare(c.translit) === queryNorm ? exactTranslit : restTranslit).push(c);
-      });
-      const combined = [...exactTranslit, ...translationMatches, ...restTranslit];
-      const seen = new Set();
-      return combined.filter(c => {
-        const key = c.text + '|' + c.translation;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
+    // раз это не перевод — возможно, это ТРАНСКРИПЦИЯ ивритского слова
+    // ("махшев" вместо перевода "компьютер"). Пробуем нечёткое совпадение по
+    // собственному индексу транскрипции (посчитан заранее по всей базе,
+    // локально, без сети) — и только если совсем ничего не нашлось, идём
+    // к Джемини гадать написание по звучанию.
+    const transcriptionHit = fuzzyMatchTranslitIndex(raw);
+    if (transcriptionHit.length) {
+      console.log('[RC] найдено по индексу транскрипции (локально, без Джемини):', ruKey, '—', transcriptionHit.length, 'кандидатов');
+      return transcriptionHit;
     }
 
     console.log('[RC] в индексе транскрипции нет — иду к Джемини гадать написание:', raw);
@@ -3653,17 +3624,10 @@
       const dist = levenshtein(key, query); // ключи индекса уже нормализованы при сборке
       const maxLen = Math.max(key.length, query.length);
       const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
-      // отдельное правило для многословных ключей: если запрос ТОЧНО совпал
-      // с первым словом фразы ("шум" для "шум давар") — обычное расстояние
-      // Левенштейна тут ни при чём не поможет (разница в длине из-за
-      // "хвоста" фразы почти всегда превысит допуск), а по факту это
-      // абсолютно естественное совпадение, которое должно находиться
-      const isPrefixWordMatch = key.startsWith(query + ' ');
-      if (dist > allowedDistance && !isPrefixWordMatch) continue;
-      const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
+      if (dist > allowedDistance) continue;
       for (const entry of translitIndex[key]) {
         const cur = skeletonDistance.get(entry.skeleton);
-        if (cur === undefined || effectiveDist < cur) skeletonDistance.set(entry.skeleton, effectiveDist);
+        if (cur === undefined || dist < cur) skeletonDistance.set(entry.skeleton, dist);
       }
     }
     if (!skeletonDistance.size) return [];
@@ -3690,12 +3654,7 @@
         // "лифнот" и לְפַנוֹת "лефанот") получают одну и ту же "лучшую" дистанцию
         // скелета и сортируются между собой произвольно, даже если запрос
         // буква-в-букву совпадает с транскрипцией только ОДНОГО из них
-        const cTranslit = normalizeForCompare(c.translit);
-        const rawDist = levenshtein(cTranslit, query);
-        // то же исключение для многословных фраз, что и при отборе скелетов
-        // выше — иначе "шум давар" при сортировке всё равно проваливается
-        // вниз списка, даже пройдя порог отбора
-        const ownDist = cTranslit.startsWith(query + ' ') ? Math.min(rawDist, 1) : rawDist;
+        const ownDist = levenshtein(normalizeForCompare(c.translit), query);
         results.push({ c, dist: ownDist });
       }
     }
@@ -3725,35 +3684,12 @@
     const ruKey = raw.trim().toLowerCase();
     const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const translationMatches = (dictHit.length || verbRuHit.length)
-      ? mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)])
-      : [];
-
-    // транскрипцию пробуем ВСЕГДА, а не только если перевод не нашёлся —
-    // иначе случайное совпадение с реальным русским словом ("рак" = "краб",
-    // хотя искали רַק "только") тихо перекрывает то, что человек реально искал
-    const transcriptionMatches = fuzzyMatchTranslitIndex(raw);
-    if (!translationMatches.length) return transcriptionMatches;
-    if (!transcriptionMatches.length) return translationMatches;
-
-    // приоритет: сначала ТОЧНОЕ совпадение транскрипции (человек буквально
-    // напечатал именно то, как слово звучит), затем перевод, затем остальные
-    // (нечёткие) варианты транскрипции
-    const queryNorm = normalizeForCompare(raw);
-    const exactTranslit = [];
-    const restTranslit = [];
-    transcriptionMatches.forEach(c => {
-      (normalizeForCompare(c.translit) === queryNorm ? exactTranslit : restTranslit).push(c);
-    });
-
-    const combined = [...exactTranslit, ...translationMatches, ...restTranslit];
-    const seen = new Set();
-    return combined.filter(c => {
-      const key = c.text + '|' + c.translation;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    if (dictHit.length || verbRuHit.length) {
+      return mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)]);
+    }
+    // ни перевод, ни точное совпадение — пробуем как транскрипцию ("махшев")
+    // по собственному индексу, тоже мгновенно и локально
+    return fuzzyMatchTranslitIndex(raw);
   }
 
 
@@ -4225,14 +4161,7 @@
       return levenshtein(a, b) <= 1;
     };
     const containsLatinScript = (m) => /[a-zA-Z]/.test(m.translation || '');
-    // ОБЕ эвристики годятся только для распознавания мусора из API-фоллбэка
-    // (DeepL иногда просто эхом возвращает нераспознанное слово или транскрипцию
-    // как "перевод"). У настоящих словарных статей (source: 'dict') такого не
-    // бывает — а вот латиница у них встречается совершенно законно (например,
-    // биологическое название вида в скобках: "лиса (Vulpes vulpes)"), поэтому
-    // раньше эти статьи ошибочно прятались в "скрытые результаты"
-    const isApiFallback = (m) => m.source === 'hebrew-api' || m.source === 'translation-api';
-    const isJunk = (m) => isApiFallback(m) && (looksLikeFallbackTransliteration(m) || containsLatinScript(m));
+    const isJunk = (m) => looksLikeFallbackTransliteration(m) || containsLatinScript(m);
 
     const hasGenuineTranslation = uniqueMatches.some(m => !isJunk(m));
     const visibleMatches = hasGenuineTranslation ? uniqueMatches.filter(m => !isJunk(m)) : uniqueMatches;
