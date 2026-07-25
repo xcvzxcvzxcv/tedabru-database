@@ -1174,7 +1174,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.3</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1518,7 +1518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.6.3';
+  const APP_VERSION = '0.7.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3168,6 +3168,8 @@
   let translitIndex = null;
   let nounFormsIndex = null;
   let generatedVerbForms = null;
+  let functionWordForms = null;
+  let functionWordFormsReverse = null;
   let hebrewDictLoadPromise = null;
   let hebrewDictEntrySkeleton = null; // WeakMap: запись -> её скелет-ключ (для редактора базы)
   let verbsEntrySkeleton = null;
@@ -3302,12 +3304,13 @@
     // сбитым значением), а не отдельное самостоятельное слово
     const formHit = (genFormHit.length || verbHit.length || dictHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
     const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
-    return { dictHit, formHit, verbHit, nounFormHit, genFormHit };
+    const functionFormHit = (functionWordForms && functionWordForms[skeleton]) || [];
+    return { dictHit, formHit, verbHit, nounFormHit, genFormHit, functionFormHit };
   }
 
   function hasAnyHit(sources) {
     return sources.dictHit.length || sources.formHit.length || sources.verbHit.length ||
-      sources.nounFormHit.length || sources.genFormHit.length;
+      sources.nounFormHit.length || sources.genFormHit.length || sources.functionFormHit.length;
   }
 
   // Объединяет кандидатов, которые на самом деле являются РАЗНЫМИ ЗНАЧЕНИЯМИ
@@ -3359,7 +3362,8 @@
       ...sources.formHit.map(buildVerbFormCandidate),
       ...sources.verbHit.map(buildVerbDictCandidate),
       ...sources.nounFormHit.map(buildNounFormCandidate),
-      ...sources.genFormHit.map(buildGeneratedVerbFormCandidate)
+      ...sources.genFormHit.map(buildGeneratedVerbFormCandidate),
+      ...sources.functionFormHit.map(buildFunctionWordFormCandidate)
     ];
     return mergeCandidatesBySense(combined);
   }
@@ -3392,8 +3396,9 @@
       fetchFresh('verbs_dict.json').then(r => { if (!r.ok) throw new Error('verbs_dict.json: ' + r.status); return r.json(); }),
       fetchFresh('translit_index.json').then(r => { if (!r.ok) throw new Error('translit_index.json: ' + r.status); return r.json(); }),
       fetchFresh('noun_forms_index.json').then(r => { if (!r.ok) throw new Error('noun_forms_index.json: ' + r.status); return r.json(); }),
-      fetchFresh('generated_verb_forms.json').then(r => { if (!r.ok) throw new Error('generated_verb_forms.json: ' + r.status); return r.json(); })
-    ]).then(([skeleton, verbForms, vDict, tIndex, nFormsIndex, gVerbForms]) => {
+      fetchFresh('generated_verb_forms.json').then(r => { if (!r.ok) throw new Error('generated_verb_forms.json: ' + r.status); return r.json(); }),
+      fetchFresh('function_word_forms_index.json').then(r => { if (!r.ok) throw new Error('function_word_forms_index.json: ' + r.status); return r.json(); })
+    ]).then(([skeleton, verbForms, vDict, tIndex, nFormsIndex, gVerbForms, fwForms]) => {
       // ключи-скелеты нормализуем по NFC на всякий случай (хотя без огласовок
       // риск расхождения диакритики уже почти нулевой)
       const normSkeleton = {};
@@ -3406,16 +3411,20 @@
       for (const key in nFormsIndex) normNounForms[key.normalize('NFC')] = nFormsIndex[key];
       const normGenVerbForms = {};
       for (const key in gVerbForms) normGenVerbForms[key.normalize('NFC')] = gVerbForms[key];
+      const normFunctionWordForms = {};
+      for (const key in fwForms) normFunctionWordForms[key.normalize('NFC')] = fwForms[key];
       hebrewDictSkeleton = normSkeleton;
       hebrewVerbForms = normVerbForms;
       verbsDict = normVerbsDict;
       translitIndex = tIndex;
       nounFormsIndex = normNounForms;
       generatedVerbForms = normGenVerbForms;
+      functionWordForms = normFunctionWordForms;
       // обратные индексы строим на лету из уже загруженных прямых —
       // см. комментарий у buildReverseIndex
       hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
       verbsReverse = buildReverseIndex(verbsDict, 'translation');
+      functionWordFormsReverse = buildReverseIndex(functionWordForms, 'gloss_ru');
       // карты "запись -> скелет" — нужны для редактирования базы: когда
       // нашли запись через ОБРАТНЫЙ индекс (по переводу), нужно знать, в
       // каком именно ключе прямого словаря она лежит, чтобы её изменить
@@ -3423,12 +3432,12 @@
       verbsEntrySkeleton = buildEntrySkeletonMap(verbsDict);
       hebrewDictKeyCountAtLoad = Object.keys(hebrewDictSkeleton).length;
       verbsDictKeyCountAtLoad = Object.keys(verbsDict).length;
-      console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length);
+      console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length, ', формы служебных слов —', Object.keys(functionWordForms).length);
     }).catch(e => {
       console.log('[DICT] словари не загрузились, работаем только через DeepL:', e);
       hebrewDictSkeleton = {}; hebrewDictReverse = {}; hebrewVerbForms = {};
       verbsDict = {}; verbsReverse = {}; translitIndex = {}; nounFormsIndex = {};
-      generatedVerbForms = {};
+      generatedVerbForms = {}; functionWordForms = {}; functionWordFormsReverse = {};
       hebrewDictEntrySkeleton = new WeakMap(); verbsEntrySkeleton = new WeakMap();
     });
     return hebrewDictLoadPromise;
@@ -3705,6 +3714,26 @@
   // вшиты прямо в саму запись формы (lemma_word/lemma_gloss_ru/lemma_binyan/
   // lemma_root/lemma_inf) — раньше их приходилось подтягивать отдельным
   // файлом wiktionary_verb_lemmas.json во время поиска.
+  function buildFunctionWordFormCandidate(formEntry) {
+    // В отличие от глагольных форм, здесь перевод самой формы (gloss_ru)
+    // ДЕЙСТВИТЕЛЬНО известен и точен (שֶׁלִּי — это именно "мой/моя", а не
+    // общий смысл леммы שֶׁל) — поэтому лемма тут не подстраховка на случай
+    // отсутствия перевода формы, а просто сноска о происхождении, как в
+    // словарях иностранных языков ("mine — форма от my").
+    const lemmaLine = formEntry.lemma_word
+      ? ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`
+      : '';
+    const posLabel = formEntry.lemma_pos_label || 'служебное слово';
+    return {
+      text: formEntry.form_word,
+      translit: formEntry.tr ? translitWithStress(formEntry.form_word, formEntry.tr) : niqqudToTranslit(formEntry.form_word),
+      grammarLabel: formEntry.hint ? `${posLabel}, ${formEntry.hint}` : posLabel,
+      translation: `${formEntry.gloss_ru}${lemmaLine}`,
+      source: 'dict'
+    };
+  }
+
+
   function buildVerbFormCandidate(formEntry) {
     const lemmaGloss = formEntry.lemma_gloss_ru || null;
     const binyan = formEntry.lemma_binyan ? (BINYAN_LABELS[formEntry.lemma_binyan] || formEntry.lemma_binyan) : null;
@@ -3843,8 +3872,13 @@
     const ruKey = raw.trim().toLowerCase();
     const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const translationMatches = (dictHit.length || verbRuHit.length)
-      ? mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)])
+    const functionFormRuHit = (functionWordFormsReverse && functionWordFormsReverse[ruKey]) || [];
+    const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
+      ? mergeCandidatesBySense([
+          ...dictHit.map(buildDictCandidate),
+          ...verbRuHit.map(buildVerbDictCandidate),
+          ...functionFormRuHit.map(buildFunctionWordFormCandidate)
+        ])
       : [];
 
     // раз это не обязательно перевод — возможно, это ТРАНСКРИПЦИЯ ивритского
@@ -3946,12 +3980,14 @@
       // скелета нет ничего авторитетного вообще (ни новых форм, ни инфинитива, ни основного словаря)
       const formHit = (genFormHit.length || verbHit.length || dictHit.length) ? [] : ((hebrewVerbForms && hebrewVerbForms[skeleton]) || []);
       const nounFormHit = (nounFormsIndex && nounFormsIndex[skeleton]) || [];
+      const functionFormHit = (functionWordForms && functionWordForms[skeleton]) || [];
       const candidates = [
         ...dictHit.map(buildDictCandidate),
         ...verbHit.map(buildVerbDictCandidate),
         ...formHit.map(buildVerbFormCandidate),
         ...nounFormHit.map(buildNounFormCandidate),
-        ...genFormHit.map(buildGeneratedVerbFormCandidate)
+        ...genFormHit.map(buildGeneratedVerbFormCandidate),
+        ...functionFormHit.map(buildFunctionWordFormCandidate)
       ];
       for (const c of candidates) {
         // дистанцию для сортировки считаем по СОБСТВЕННОЙ транскрипции этого
@@ -3995,8 +4031,13 @@
     const ruKey = raw.trim().toLowerCase();
     const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const translationMatches = (dictHit.length || verbRuHit.length)
-      ? mergeCandidatesBySense([...dictHit.map(buildDictCandidate), ...verbRuHit.map(buildVerbDictCandidate)])
+    const functionFormRuHit = (functionWordFormsReverse && functionWordFormsReverse[ruKey]) || [];
+    const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
+      ? mergeCandidatesBySense([
+          ...dictHit.map(buildDictCandidate),
+          ...verbRuHit.map(buildVerbDictCandidate),
+          ...functionFormRuHit.map(buildFunctionWordFormCandidate)
+        ])
       : [];
 
     // транскрипцию пробуем ВСЕГДА, а не только если перевод не нашёлся —

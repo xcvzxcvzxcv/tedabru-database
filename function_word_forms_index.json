@@ -1,0 +1,1538 @@
+{
+  "שלי": [
+    {
+      "form_word": "שֶׁלִּי",
+      "tr": "shelí",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "я",
+      "gloss_ru": "мой, моя"
+    }
+  ],
+  "שלך": [
+    {
+      "form_word": "שֶׁלְּךָ",
+      "tr": "shelxá",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "ты (м.)",
+      "gloss_ru": "твой (обращение к м.)"
+    },
+    {
+      "form_word": "שֶׁלָּךְ",
+      "tr": "shelax",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "ты (ж.)",
+      "gloss_ru": "твоя (обращение к ж.)"
+    }
+  ],
+  "שלו": [
+    {
+      "form_word": "שֶׁלּוֹ",
+      "tr": "sheló",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "он",
+      "gloss_ru": "его"
+    }
+  ],
+  "שלה": [
+    {
+      "form_word": "שֶׁלָּה",
+      "tr": "shelá",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "она",
+      "gloss_ru": "её"
+    }
+  ],
+  "שלנו": [
+    {
+      "form_word": "שֶׁלָּנוּ",
+      "tr": "shelánu",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "мы",
+      "gloss_ru": "наш, наша"
+    }
+  ],
+  "שלכם": [
+    {
+      "form_word": "שֶׁלָּכֶם",
+      "tr": "shelaxém",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "вы (м.)",
+      "gloss_ru": "ваш (обращение к м.мн.)"
+    }
+  ],
+  "שלכן": [
+    {
+      "form_word": "שֶׁלָּכֶן",
+      "tr": "shelaxén",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "вы (ж.)",
+      "gloss_ru": "ваша (обращение к ж.мн.)"
+    }
+  ],
+  "שלהם": [
+    {
+      "form_word": "שֶׁלָּהֶם",
+      "tr": "shelahém",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "они (м.)",
+      "gloss_ru": "их (м.)"
+    }
+  ],
+  "שלהן": [
+    {
+      "form_word": "שֶׁלָּהֶן",
+      "tr": "shelahén",
+      "lemma_skeleton": "של",
+      "lemma_word": "שֶׁל",
+      "lemma_pos_label": "частица принадлежности",
+      "hint": "они (ж.)",
+      "gloss_ru": "их (ж.)"
+    }
+  ],
+  "לי": [
+    {
+      "form_word": "לִי",
+      "tr": "li",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "я",
+      "gloss_ru": "мне"
+    }
+  ],
+  "לך": [
+    {
+      "form_word": "לְךָ",
+      "tr": "lexá",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "ты (м.)",
+      "gloss_ru": "тебе (м.)"
+    },
+    {
+      "form_word": "לָךְ",
+      "tr": "lax",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "ты (ж.)",
+      "gloss_ru": "тебе (ж.)"
+    }
+  ],
+  "לו": [
+    {
+      "form_word": "לוֹ",
+      "tr": "lo",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "он",
+      "gloss_ru": "ему"
+    }
+  ],
+  "לה": [
+    {
+      "form_word": "לָהּ",
+      "tr": "la",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "она",
+      "gloss_ru": "ей"
+    }
+  ],
+  "לנו": [
+    {
+      "form_word": "לָנוּ",
+      "tr": "lánu",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "мы",
+      "gloss_ru": "нам"
+    }
+  ],
+  "לכם": [
+    {
+      "form_word": "לָכֶם",
+      "tr": "laxém",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "вы (м.)",
+      "gloss_ru": "вам (м.)"
+    }
+  ],
+  "לכן": [
+    {
+      "form_word": "לָכֶן",
+      "tr": "laxén",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "вы (ж.)",
+      "gloss_ru": "вам (ж.)"
+    }
+  ],
+  "להם": [
+    {
+      "form_word": "לָהֶם",
+      "tr": "lahém",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "они (м.)",
+      "gloss_ru": "им (м.)"
+    }
+  ],
+  "להן": [
+    {
+      "form_word": "לָהֶן",
+      "tr": "lahén",
+      "lemma_skeleton": "ל",
+      "lemma_word": "לְ",
+      "lemma_pos_label": "предлог (дательный падеж)",
+      "hint": "они (ж.)",
+      "gloss_ru": "им (ж.)"
+    }
+  ],
+  "אותי": [
+    {
+      "form_word": "אוֹתִי",
+      "tr": "otí",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "я",
+      "gloss_ru": "меня"
+    }
+  ],
+  "אותך": [
+    {
+      "form_word": "אוֹתְךָ",
+      "tr": "otxá",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "ты (м.)",
+      "gloss_ru": "тебя (м.)"
+    },
+    {
+      "form_word": "אוֹתָךְ",
+      "tr": "otáx",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "ты (ж.)",
+      "gloss_ru": "тебя (ж.)"
+    }
+  ],
+  "אותו": [
+    {
+      "form_word": "אוֹתוֹ",
+      "tr": "otó",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "он",
+      "gloss_ru": "его"
+    }
+  ],
+  "אותה": [
+    {
+      "form_word": "אוֹתָהּ",
+      "tr": "otá",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "она",
+      "gloss_ru": "её"
+    }
+  ],
+  "אותנו": [
+    {
+      "form_word": "אוֹתָנוּ",
+      "tr": "otánu",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "мы",
+      "gloss_ru": "нас"
+    }
+  ],
+  "אתכם": [
+    {
+      "form_word": "אֶתְכֶם",
+      "tr": "etxém",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "вы (м.)",
+      "gloss_ru": "вас (м.)"
+    },
+    {
+      "form_word": "אִתְּכֶם",
+      "tr": "itxém",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "с вами (м.)"
+    }
+  ],
+  "אתכן": [
+    {
+      "form_word": "אֶתְכֶן",
+      "tr": "etxén",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "вы (ж.)",
+      "gloss_ru": "вас (ж.)"
+    },
+    {
+      "form_word": "אִתְּכֶן",
+      "tr": "itxén",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "с вами (ж.)"
+    }
+  ],
+  "אותם": [
+    {
+      "form_word": "אוֹתָם",
+      "tr": "otám",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "они (м.)",
+      "gloss_ru": "их (м.)"
+    }
+  ],
+  "אותן": [
+    {
+      "form_word": "אוֹתָן",
+      "tr": "otán",
+      "lemma_skeleton": "את",
+      "lemma_word": "אֶת",
+      "lemma_pos_label": "частица прямого дополнения",
+      "hint": "они (ж.)",
+      "gloss_ru": "их (ж.)"
+    }
+  ],
+  "אתי": [
+    {
+      "form_word": "אִתִּי",
+      "tr": "ití",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "со мной"
+    }
+  ],
+  "אתך": [
+    {
+      "form_word": "אִתְּךָ",
+      "tr": "itxá",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "с тобой (м.)"
+    },
+    {
+      "form_word": "אִתָּךְ",
+      "tr": "itáx",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "с тобой (ж.)"
+    }
+  ],
+  "אתו": [
+    {
+      "form_word": "אִתּוֹ",
+      "tr": "itó",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "с ним"
+    }
+  ],
+  "אתה": [
+    {
+      "form_word": "אִתָּהּ",
+      "tr": "itá",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "с ней"
+    }
+  ],
+  "אתנו": [
+    {
+      "form_word": "אִתָּנוּ",
+      "tr": "itánu",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "с нами"
+    }
+  ],
+  "אתם": [
+    {
+      "form_word": "אִתָּם",
+      "tr": "itám",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "с ними (м.)"
+    }
+  ],
+  "אתן": [
+    {
+      "form_word": "אִתָּן",
+      "tr": "itán",
+      "lemma_skeleton": "עם",
+      "lemma_word": "עִם",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "с ними (ж.)"
+    }
+  ],
+  "עלי": [
+    {
+      "form_word": "עָלַי",
+      "tr": "alái",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "на мне, обо мне"
+    }
+  ],
+  "עליך": [
+    {
+      "form_word": "עָלֶיךָ",
+      "tr": "aléixa",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "на тебе, о тебе (м.)"
+    },
+    {
+      "form_word": "עָלַיִךְ",
+      "tr": "aláix",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "на тебе, о тебе (ж.)"
+    }
+  ],
+  "עליו": [
+    {
+      "form_word": "עָלָיו",
+      "tr": "aláv",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "на нём, о нём"
+    }
+  ],
+  "עליה": [
+    {
+      "form_word": "עָלֶיהָ",
+      "tr": "aléiha",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "на ней, о ней"
+    }
+  ],
+  "עלינו": [
+    {
+      "form_word": "עָלֵינוּ",
+      "tr": "aléinu",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "на нас, о нас"
+    }
+  ],
+  "עליכם": [
+    {
+      "form_word": "עֲלֵיכֶם",
+      "tr": "aleixém",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "на вас, о вас (м.)"
+    }
+  ],
+  "עליכן": [
+    {
+      "form_word": "עֲלֵיכֶן",
+      "tr": "aleixén",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "на вас, о вас (ж.)"
+    }
+  ],
+  "עליהם": [
+    {
+      "form_word": "עֲלֵיהֶם",
+      "tr": "aleihém",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "на них, о них (м.)"
+    }
+  ],
+  "עליהן": [
+    {
+      "form_word": "עֲלֵיהֶן",
+      "tr": "aleihén",
+      "lemma_skeleton": "על",
+      "lemma_word": "עַל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "на них, о них (ж.)"
+    }
+  ],
+  "בשבילי": [
+    {
+      "form_word": "בִּשְׁבִילִי",
+      "tr": "bishvilí",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "для меня, ради меня"
+    }
+  ],
+  "בשבילך": [
+    {
+      "form_word": "בִּשְׁבִילְךָ",
+      "tr": "bishvilxá",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "для тебя, ради тебя (м.)"
+    },
+    {
+      "form_word": "בִּשְׁבִילֵךְ",
+      "tr": "bishvilex",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "для тебя, ради тебя (ж.)"
+    }
+  ],
+  "בשבילו": [
+    {
+      "form_word": "בִּשְׁבִילוֹ",
+      "tr": "bishviló",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "для него, ради него"
+    }
+  ],
+  "בשבילה": [
+    {
+      "form_word": "בִּשְׁבִילָהּ",
+      "tr": "bishvilá",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "для неё, ради неё"
+    }
+  ],
+  "בשבילנו": [
+    {
+      "form_word": "בִּשְׁבִילֵנוּ",
+      "tr": "bishvilénu",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "для нас, ради нас"
+    }
+  ],
+  "בשבילכם": [
+    {
+      "form_word": "בִּשְׁבִילְכֶם",
+      "tr": "bishvilxém",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "для вас, ради вас (м.)"
+    }
+  ],
+  "בשבילכן": [
+    {
+      "form_word": "בִּשְׁבִילְכֶן",
+      "tr": "bishvilxén",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "для вас, ради вас (ж.)"
+    }
+  ],
+  "בשבילם": [
+    {
+      "form_word": "בִּשְׁבִילָם",
+      "tr": "bishvilám",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "для них, ради них (м.)"
+    }
+  ],
+  "בשבילן": [
+    {
+      "form_word": "בִּשְׁבִילָן",
+      "tr": "bishvilán",
+      "lemma_skeleton": "בשביל",
+      "lemma_word": "בִּשְׁבִיל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "для них, ради них (ж.)"
+    }
+  ],
+  "בי": [
+    {
+      "form_word": "בִּי",
+      "tr": "bi",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "я",
+      "gloss_ru": "во мне"
+    }
+  ],
+  "בך": [
+    {
+      "form_word": "בְּךָ",
+      "tr": "bexá",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "ты (м.)",
+      "gloss_ru": "в тебе (м.)"
+    },
+    {
+      "form_word": "בָּךְ",
+      "tr": "bax",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "ты (ж.)",
+      "gloss_ru": "в тебе (ж.)"
+    }
+  ],
+  "בו": [
+    {
+      "form_word": "בּוֹ",
+      "tr": "bo",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "он",
+      "gloss_ru": "в нём"
+    }
+  ],
+  "בה": [
+    {
+      "form_word": "בָּהּ",
+      "tr": "ba",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "она",
+      "gloss_ru": "в ней"
+    }
+  ],
+  "בנו": [
+    {
+      "form_word": "בָּנוּ",
+      "tr": "bánu",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "мы",
+      "gloss_ru": "в нас"
+    }
+  ],
+  "בכם": [
+    {
+      "form_word": "בָּכֶם",
+      "tr": "baxém",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "вы (м.)",
+      "gloss_ru": "в вас (м.)"
+    }
+  ],
+  "בכן": [
+    {
+      "form_word": "בָּכֶן",
+      "tr": "baxén",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "вы (ж.)",
+      "gloss_ru": "в вас (ж.)"
+    }
+  ],
+  "בהם": [
+    {
+      "form_word": "בָּהֶם",
+      "tr": "bahém",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "они (м.)",
+      "gloss_ru": "в них (м.)"
+    }
+  ],
+  "בהן": [
+    {
+      "form_word": "בָּהֶן",
+      "tr": "bahén",
+      "lemma_skeleton": "ב",
+      "lemma_word": "בְּ",
+      "lemma_pos_label": "предлог (наличие/местонахождение)",
+      "hint": "они (ж.)",
+      "gloss_ru": "в них (ж.)"
+    }
+  ],
+  "לפני": [
+    {
+      "form_word": "לְפָנַי",
+      "tr": "lefanái",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "передо мной"
+    }
+  ],
+  "לפניך": [
+    {
+      "form_word": "לְפָנֶיךָ",
+      "tr": "lefanéixa",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "перед тобой (м.)"
+    },
+    {
+      "form_word": "לְפָנַיִךְ",
+      "tr": "lefanáix",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "перед тобой (ж.)"
+    }
+  ],
+  "לפניו": [
+    {
+      "form_word": "לְפָנָיו",
+      "tr": "lefanáv",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "перед ним"
+    }
+  ],
+  "לפניה": [
+    {
+      "form_word": "לְפָנֶיהָ",
+      "tr": "lefanéiha",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "перед ней"
+    }
+  ],
+  "לפנינו": [
+    {
+      "form_word": "לְפָנֵינוּ",
+      "tr": "lefanéinu",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "перед нами"
+    }
+  ],
+  "לפניכם": [
+    {
+      "form_word": "לִפְנֵיכֶם",
+      "tr": "lifneixém",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "перед вами (м.)"
+    }
+  ],
+  "לפניכן": [
+    {
+      "form_word": "לִפְנֵיכֶן",
+      "tr": "lifneixén",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "перед вами (ж.)"
+    }
+  ],
+  "לפניהם": [
+    {
+      "form_word": "לִפְנֵיהֶם",
+      "tr": "lifneihém",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "перед ними (м.)"
+    }
+  ],
+  "לפניהן": [
+    {
+      "form_word": "לִפְנֵיהֶן",
+      "tr": "lifneihén",
+      "lemma_skeleton": "לפני",
+      "lemma_word": "לִפְנֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "перед ними (ж.)"
+    }
+  ],
+  "אחרי": [
+    {
+      "form_word": "אַחֲרַי",
+      "tr": "axarái",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "за мной, после меня"
+    }
+  ],
+  "אחריך": [
+    {
+      "form_word": "אַחֲרֶיךָ",
+      "tr": "axaréixa",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "за тобой, после тебя (м.)"
+    },
+    {
+      "form_word": "אַחֲרַיִךְ",
+      "tr": "axaráix",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "за тобой, после тебя (ж.)"
+    }
+  ],
+  "אחריו": [
+    {
+      "form_word": "אַחֲרָיו",
+      "tr": "axaráv",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "за ним, после него"
+    }
+  ],
+  "אחריה": [
+    {
+      "form_word": "אַחֲרֶיהָ",
+      "tr": "axaréiha",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "за ней, после неё"
+    }
+  ],
+  "אחרינו": [
+    {
+      "form_word": "אַחֲרֵינוּ",
+      "tr": "axaréinu",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "за нами, после нас"
+    }
+  ],
+  "אחריכם": [
+    {
+      "form_word": "אַחֲרֵיכֶם",
+      "tr": "axareixém",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "за вами, после вас (м.)"
+    }
+  ],
+  "אחריכן": [
+    {
+      "form_word": "אַחֲרֵיכֶן",
+      "tr": "axareixén",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "за вами, после вас (ж.)"
+    }
+  ],
+  "אחריהם": [
+    {
+      "form_word": "אַחֲרֵיהֶם",
+      "tr": "axareihém",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "за ними, после них (м.)"
+    }
+  ],
+  "אחריהן": [
+    {
+      "form_word": "אַחֲרֵיהֶן",
+      "tr": "axareihén",
+      "lemma_skeleton": "אחרי",
+      "lemma_word": "אַחֲרֵי",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "за ними, после них (ж.)"
+    }
+  ],
+  "אצלי": [
+    {
+      "form_word": "אֶצְלִי",
+      "tr": "etslí",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "я",
+      "gloss_ru": "у меня"
+    }
+  ],
+  "אצלך": [
+    {
+      "form_word": "אֶצְלְךָ",
+      "tr": "etslexá",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (м.)",
+      "gloss_ru": "у тебя (м.)"
+    },
+    {
+      "form_word": "אֶצְלֵךְ",
+      "tr": "etslex",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "ты (ж.)",
+      "gloss_ru": "у тебя (ж.)"
+    }
+  ],
+  "אצלו": [
+    {
+      "form_word": "אֶצְלוֹ",
+      "tr": "etsló",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "он",
+      "gloss_ru": "у него"
+    }
+  ],
+  "אצלה": [
+    {
+      "form_word": "אֶצְלָהּ",
+      "tr": "etslá",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "она",
+      "gloss_ru": "у неё"
+    }
+  ],
+  "אצלנו": [
+    {
+      "form_word": "אֶצְלֵנוּ",
+      "tr": "etslénu",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "мы",
+      "gloss_ru": "у нас"
+    }
+  ],
+  "אצלכם": [
+    {
+      "form_word": "אֶצְלְכֶם",
+      "tr": "etslexém",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (м.)",
+      "gloss_ru": "у вас (м.)"
+    }
+  ],
+  "אצלכן": [
+    {
+      "form_word": "אֶצְלְכֶן",
+      "tr": "etslexén",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "вы (ж.)",
+      "gloss_ru": "у вас (ж.)"
+    }
+  ],
+  "אצלם": [
+    {
+      "form_word": "אֶצְלָם",
+      "tr": "etslám",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (м.)",
+      "gloss_ru": "у них (м.)"
+    }
+  ],
+  "אצלן": [
+    {
+      "form_word": "אֶצְלָן",
+      "tr": "etslán",
+      "lemma_skeleton": "אצל",
+      "lemma_word": "אֵצֶל",
+      "lemma_pos_label": "предлог",
+      "hint": "они (ж.)",
+      "gloss_ru": "у них (ж.)"
+    }
+  ],
+  "ממני": [
+    {
+      "form_word": "מִמֶּנִּי",
+      "tr": "miméni",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "я",
+      "gloss_ru": "от меня, из меня"
+    }
+  ],
+  "ממך": [
+    {
+      "form_word": "מִמְּךָ",
+      "tr": "mimxá",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "ты (м.)",
+      "gloss_ru": "от тебя, из тебя (м.)"
+    },
+    {
+      "form_word": "מִמֵּךְ",
+      "tr": "miméx",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "ты (ж.)",
+      "gloss_ru": "от тебя, из тебя (ж.)"
+    }
+  ],
+  "ממנו": [
+    {
+      "form_word": "מִמֶּנּוּ",
+      "tr": "miménu",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "он",
+      "gloss_ru": "от него, из него"
+    }
+  ],
+  "ממנה": [
+    {
+      "form_word": "מִמֶּנָּה",
+      "tr": "miména",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "она",
+      "gloss_ru": "от неё, из неё"
+    }
+  ],
+  "מאתנו": [
+    {
+      "form_word": "מֵאִתָּנוּ",
+      "tr": "meitánu",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "мы",
+      "gloss_ru": "от нас, из нас"
+    }
+  ],
+  "מכם": [
+    {
+      "form_word": "מִכֶּם",
+      "tr": "mikém",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "вы (м.)",
+      "gloss_ru": "от вас, из вас (м.)"
+    }
+  ],
+  "מכן": [
+    {
+      "form_word": "מִכֶּן",
+      "tr": "mikén",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "вы (ж.)",
+      "gloss_ru": "от вас, из вас (ж.)"
+    }
+  ],
+  "מהם": [
+    {
+      "form_word": "מֵהֶם",
+      "tr": "meihém",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "они (м.)",
+      "gloss_ru": "от них, из них (м.)"
+    }
+  ],
+  "מהן": [
+    {
+      "form_word": "מֵהֶן",
+      "tr": "meihén",
+      "lemma_skeleton": "מ",
+      "lemma_word": "מִ",
+      "lemma_pos_label": "предлог (из, от)",
+      "hint": "они (ж.)",
+      "gloss_ru": "от них, из них (ж.)"
+    }
+  ],
+  "מישהו": [
+    {
+      "form_word": "מִישֶׁהוּ",
+      "tr": "míshehu",
+      "lemma_skeleton": "מי",
+      "lemma_word": "מִי",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "кто-то, кто-нибудь"
+    }
+  ],
+  "משהו": [
+    {
+      "form_word": "מַשֶׁהוּ",
+      "tr": "máshehu",
+      "lemma_skeleton": "מה",
+      "lemma_word": "מָה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "что-то, что-нибудь"
+    }
+  ],
+  "איפשהו": [
+    {
+      "form_word": "אֵיפֹשֶׁהוּ",
+      "tr": "éifoshehu",
+      "lemma_skeleton": "איפה",
+      "lemma_word": "אֵיפֹה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "где-то"
+    }
+  ],
+  "לאנשהו": [
+    {
+      "form_word": "לְאָנָשֶׁהוּ",
+      "tr": "le'anáshehu",
+      "lemma_skeleton": "לאן",
+      "lemma_word": "לְאָן",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "куда-то"
+    }
+  ],
+  "מאיפשהו": [
+    {
+      "form_word": "מֵאֵיפֹשֶׁהוּ",
+      "tr": "mee'ifoshehu",
+      "lemma_skeleton": "מאיפה",
+      "lemma_word": "מֵאֵיפֹה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "откуда-то"
+    }
+  ],
+  "מתישהו": [
+    {
+      "form_word": "מְתִישֶׁהוּ",
+      "tr": "metíshehu",
+      "lemma_skeleton": "מתי",
+      "lemma_word": "מָתַי",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "когда-то"
+    }
+  ],
+  "משום מה": [
+    {
+      "form_word": "מִשּׁוּם מָה",
+      "tr": "mishúm ma",
+      "lemma_skeleton": "למה",
+      "lemma_word": "לָמָה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "почему-то"
+    }
+  ],
+  "לשם מה": [
+    {
+      "form_word": "לְשֵׁם מָה",
+      "tr": "leshém ma",
+      "lemma_skeleton": "למה",
+      "lemma_word": "לָמָה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "зачем-то"
+    }
+  ],
+  "איכשהו": [
+    {
+      "form_word": "אֵיכְשֶׁהוּ",
+      "tr": "eixshehu",
+      "lemma_skeleton": "איך",
+      "lemma_word": "אֵיךְ",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "как-то"
+    }
+  ],
+  "איזה שהוא": [
+    {
+      "form_word": "אֵיזֶה שֶׁהוּא",
+      "tr": "éize shehú",
+      "lemma_skeleton": "איזה",
+      "lemma_word": "אֵיזֶה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "какой-то"
+    }
+  ],
+  "איזשהו": [
+    {
+      "form_word": "אֵיזְשֶׁהוּ",
+      "tr": "eizshehú",
+      "lemma_skeleton": "איזה",
+      "lemma_word": "אֵיזֶה",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "какой-то (слитно)"
+    }
+  ],
+  "של מישהו": [
+    {
+      "form_word": "שֶׁל מִישֶׁהוּ",
+      "tr": "shel míshehu",
+      "lemma_skeleton": "מי",
+      "lemma_word": "מִי",
+      "lemma_pos_label": "местоимение",
+      "hint": "неопределённое",
+      "gloss_ru": "чей-то"
+    }
+  ],
+  "כלם": [
+    {
+      "form_word": "כֻּלָּם",
+      "tr": "kulám",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "все (м.р.)"
+    }
+  ],
+  "כלן": [
+    {
+      "form_word": "כֻּלָּן",
+      "tr": "kulán",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "все (ж.р.)"
+    }
+  ],
+  "הכל": [
+    {
+      "form_word": "הַכֹּל",
+      "tr": "hakól",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "всё"
+    }
+  ],
+  "כל אחד": [
+    {
+      "form_word": "כָּל אֶחָד",
+      "tr": "kol exád",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждый"
+    }
+  ],
+  "כל אחת": [
+    {
+      "form_word": "כָּל אַחַת",
+      "tr": "kol axát",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждая"
+    }
+  ],
+  "בכל מקום": [
+    {
+      "form_word": "בְּכָל מָקוֹם",
+      "tr": "bexól makóm",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "везде"
+    }
+  ],
+  "מכל מקום": [
+    {
+      "form_word": "מִכָּל מָקוֹם",
+      "tr": "mikól makóm",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "отовсюду"
+    }
+  ],
+  "לכל מקום": [
+    {
+      "form_word": "לְכָל מָקוֹם",
+      "tr": "lexól makóm",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "повсюду, в любое место"
+    }
+  ],
+  "בכל זמן": [
+    {
+      "form_word": "בְּכָל זְמַן",
+      "tr": "bexól zman",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "всегда, в любое время"
+    }
+  ],
+  "כל הזמן": [
+    {
+      "form_word": "כָּל הַזְּמַן",
+      "tr": "kol hazmán",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "всё время"
+    }
+  ],
+  "בכל אפן": [
+    {
+      "form_word": "בְּכָל אֹפֶן",
+      "tr": "bexól ófen",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "в любом случае"
+    }
+  ],
+  "בכל זאת": [
+    {
+      "form_word": "בְּכָל זֹאת",
+      "tr": "bexól zot",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "всё же, тем не менее"
+    }
+  ],
+  "כל כך": [
+    {
+      "form_word": "כָּל כָּךְ",
+      "tr": "kol kax",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "так, настолько"
+    }
+  ],
+  "כלום": [
+    {
+      "form_word": "כְּלוּם",
+      "tr": "klum",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "ничего (обычно в отрицательных предложениях)"
+    }
+  ],
+  "כלשהו": [
+    {
+      "form_word": "כָּלְשֶׁהוּ",
+      "tr": "kalshehú",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "какой-либо, какой-то"
+    }
+  ],
+  "כלשהי": [
+    {
+      "form_word": "כָּלְשֶׁהִי",
+      "tr": "kalshehí",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "какая-либо, какая-то"
+    }
+  ],
+  "כל אחד מהם": [
+    {
+      "form_word": "כָּל אֶחָד מֵהֶם",
+      "tr": "kol exád mehém",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждый из них"
+    }
+  ],
+  "כל אחד מאתנו": [
+    {
+      "form_word": "כָּל אֶחָד מֵאִתָּנוּ",
+      "tr": "kol exád meitánu",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждый из нас"
+    }
+  ],
+  "כל פעם": [
+    {
+      "form_word": "כָּל פַּעַם",
+      "tr": "kol páam",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждый раз"
+    }
+  ],
+  "כל יום": [
+    {
+      "form_word": "כָּל יוֹם",
+      "tr": "kol yom",
+      "lemma_skeleton": "כל",
+      "lemma_word": "כֹּל",
+      "lemma_pos_label": "местоимение",
+      "hint": "производное",
+      "gloss_ru": "каждый день"
+    }
+  ]
+}
