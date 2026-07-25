@@ -2314,7 +2314,6 @@
 
     const cachedBlob = await getCachedAudioBlob(hebrewText).catch(() => null);
     if (cachedBlob) {
-      console.log('[TTS DEBUG] слово:', hebrewText, '— взято из кэша');
       const audio = new Audio(URL.createObjectURL(cachedBlob));
       currentAudioEl = audio;
       audio.addEventListener('ended', clearPlaying);
@@ -2323,39 +2322,26 @@
       return;
     }
 
-    // Перебираем несколько известных вариантов эндпоинта по очереди — домен
-    // и параметр client отличаются у разных инструментов/версий, и, похоже,
-    // Google сейчас проверяет заголовок Referer (браузер всегда шлёт наш
-    // собственный адрес, подделать это из JS невозможно) — так что не факт,
-    // что ХОТЬ ОДИН вариант реально сработает, но стоит проверить все.
+    // Перебираем несколько известных вариантов эндпоинта — если сработает
+    // хоть один, используем его. Похоже, Google сейчас проверяет Referer
+    // (подделать из JS невозможно), так что скорее всего НИ ОДИН не
+    // сработает — тогда просто аккуратно сообщаем об этом один раз, без
+    // спама в консоль на каждый клик.
     const candidates = ttsUrlCandidates(hebrewText);
-    console.log('[TTS DEBUG] слово:', hebrewText, '— пробуем', candidates.length, 'вариант(а/ов) URL');
-
     let index = 0;
     const tryNext = () => {
       if (index >= candidates.length) {
-        console.log('[TTS DEBUG] ни один вариант не сработал');
         clearPlaying();
+        showToast('Не удалось воспроизвести слово');
         return;
       }
       const url = candidates[index];
-      console.log(`[TTS DEBUG] вариант ${index + 1}/${candidates.length}:`, url);
       index++;
-
       const audio = new Audio(url);
       currentAudioEl = audio;
-      audio.addEventListener('canplay', () => console.log('[TTS DEBUG] canplay — этот вариант рабочий'));
-      audio.addEventListener('playing', () => console.log('[TTS DEBUG] playing — реально звучит'));
-      audio.addEventListener('error', () => {
-        const err = audio.error;
-        console.log('[TTS DEBUG] вариант не подошёл, code:', err && err.code,
-          '(1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED)');
-        tryNext();
-      });
+      audio.addEventListener('error', tryNext);
       audio.addEventListener('ended', clearPlaying);
-      audio.play().catch((e) => {
-        console.log('[TTS DEBUG] play() отклонён для этого варианта:', e && e.name);
-      });
+      audio.play().catch(() => {}); // событие 'error' само переключит на следующий вариант
     };
     tryNext();
   }
