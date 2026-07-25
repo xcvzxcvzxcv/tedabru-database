@@ -7,7 +7,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "я",
-      "gloss_ru": "мой, моя"
+      "gloss_ru": "мой, моя",
+      "gloss_en": "my, mine",
+      "hint_en": "I",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלך": [
@@ -18,7 +22,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "ты (м.)",
-      "gloss_ru": "твой (обращение к м.)"
+      "gloss_ru": "твой (обращение к м.)",
+      "gloss_en": "your (addressing m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     },
     {
       "form_word": "שֶׁלָּךְ",
@@ -27,7 +35,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "ты (ж.)",
-      "gloss_ru": "твоя (обращение к ж.)"
+      "gloss_ru": "твоя (обращение к ж.)",
+      "gloss_en": "your (addressing f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלו": [
@@ -38,7 +50,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "он",
-      "gloss_ru": "его"
+      "gloss_ru": "его",
+      "gloss_en": "his",
+      "hint_en": "he",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלה": [
@@ -49,7 +65,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "она",
-      "gloss_ru": "её"
+      "gloss_ru": "её",
+      "gloss_en": "her, hers",
+      "hint_en": "she",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלנו": [
@@ -60,7 +80,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "мы",
-      "gloss_ru": "наш, наша"
+      "gloss_ru": "наш, наша",
+      "gloss_en": "our, ours",
+      "hint_en": "we",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלכם": [
@@ -71,7 +95,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "вы (м.)",
-      "gloss_ru": "ваш (обращение к м.мн.)"
+      "gloss_ru": "ваш (обращение к м.мн.)",
+      "gloss_en": "your (addressing pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלכן": [
@@ -82,7 +110,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "вы (ж.)",
-      "gloss_ru": "ваша (обращение к ж.мн.)"
+      "gloss_ru": "ваша (обращение к ж.мн.)",
+      "gloss_en": "your (addressing pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלהם": [
@@ -93,7 +125,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "они (м.)",
-      "gloss_ru": "их (м.)"
+      "gloss_ru": "их (м.)",
+      "gloss_en": "their (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "שלהן": [
@@ -104,7 +140,11 @@
       "lemma_word": "שֶׁל",
       "lemma_pos_label": "частица принадлежности",
       "hint": "они (ж.)",
-      "gloss_ru": "их (ж.)"
+      "gloss_ru": "их (ж.)",
+      "gloss_en": "their (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "possessive particle",
+      "lemma_word_en": "of / belonging to"
     }
   ],
   "לי": [
@@ -115,7 +155,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "я",
-      "gloss_ru": "мне"
+      "gloss_ru": "мне",
+      "gloss_en": "to me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לך": [
@@ -126,7 +170,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "ты (м.)",
-      "gloss_ru": "тебе (м.)"
+      "gloss_ru": "тебе (м.)",
+      "gloss_en": "to you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     },
     {
       "form_word": "לָךְ",
@@ -135,7 +183,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "ты (ж.)",
-      "gloss_ru": "тебе (ж.)"
+      "gloss_ru": "тебе (ж.)",
+      "gloss_en": "to you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לו": [
@@ -146,7 +198,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "он",
-      "gloss_ru": "ему"
+      "gloss_ru": "ему",
+      "gloss_en": "to him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לה": [
@@ -157,7 +213,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "она",
-      "gloss_ru": "ей"
+      "gloss_ru": "ей",
+      "gloss_en": "to her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לנו": [
@@ -168,7 +228,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "мы",
-      "gloss_ru": "нам"
+      "gloss_ru": "нам",
+      "gloss_en": "to us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לכם": [
@@ -179,7 +243,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "вы (м.)",
-      "gloss_ru": "вам (м.)"
+      "gloss_ru": "вам (м.)",
+      "gloss_en": "to you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "לכן": [
@@ -190,7 +258,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "вы (ж.)",
-      "gloss_ru": "вам (ж.)"
+      "gloss_ru": "вам (ж.)",
+      "gloss_en": "to you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "להם": [
@@ -201,7 +273,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "они (м.)",
-      "gloss_ru": "им (м.)"
+      "gloss_ru": "им (м.)",
+      "gloss_en": "to them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "להן": [
@@ -212,7 +288,11 @@
       "lemma_word": "לְ",
       "lemma_pos_label": "предлог (дательный падеж)",
       "hint": "они (ж.)",
-      "gloss_ru": "им (ж.)"
+      "gloss_ru": "им (ж.)",
+      "gloss_en": "to them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition (dative)",
+      "lemma_word_en": "to / for"
     }
   ],
   "אותי": [
@@ -223,7 +303,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "я",
-      "gloss_ru": "меня"
+      "gloss_ru": "меня",
+      "gloss_en": "me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אותך": [
@@ -234,7 +318,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "ты (м.)",
-      "gloss_ru": "тебя (м.)"
+      "gloss_ru": "тебя (м.)",
+      "gloss_en": "you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     },
     {
       "form_word": "אוֹתָךְ",
@@ -243,7 +331,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "ты (ж.)",
-      "gloss_ru": "тебя (ж.)"
+      "gloss_ru": "тебя (ж.)",
+      "gloss_en": "you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אותו": [
@@ -254,7 +346,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "он",
-      "gloss_ru": "его"
+      "gloss_ru": "его",
+      "gloss_en": "him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אותה": [
@@ -265,7 +361,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "она",
-      "gloss_ru": "её"
+      "gloss_ru": "её",
+      "gloss_en": "her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אותנו": [
@@ -276,7 +376,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "мы",
-      "gloss_ru": "нас"
+      "gloss_ru": "нас",
+      "gloss_en": "us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אתכם": [
@@ -287,7 +391,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "вы (м.)",
-      "gloss_ru": "вас (м.)"
+      "gloss_ru": "вас (м.)",
+      "gloss_en": "you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     },
     {
       "form_word": "אִתְּכֶם",
@@ -296,7 +404,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "с вами (м.)"
+      "gloss_ru": "с вами (м.)",
+      "gloss_en": "with you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתכן": [
@@ -307,7 +419,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "вы (ж.)",
-      "gloss_ru": "вас (ж.)"
+      "gloss_ru": "вас (ж.)",
+      "gloss_en": "you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     },
     {
       "form_word": "אִתְּכֶן",
@@ -316,7 +432,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "с вами (ж.)"
+      "gloss_ru": "с вами (ж.)",
+      "gloss_en": "with you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אותם": [
@@ -327,7 +447,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "они (м.)",
-      "gloss_ru": "их (м.)"
+      "gloss_ru": "их (м.)",
+      "gloss_en": "them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אותן": [
@@ -338,7 +462,11 @@
       "lemma_word": "אֶת",
       "lemma_pos_label": "частица прямого дополнения",
       "hint": "они (ж.)",
-      "gloss_ru": "их (ж.)"
+      "gloss_ru": "их (ж.)",
+      "gloss_en": "them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "direct object particle",
+      "lemma_word_en": "(direct object marker)"
     }
   ],
   "אתי": [
@@ -349,7 +477,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "со мной"
+      "gloss_ru": "со мной",
+      "gloss_en": "with me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתך": [
@@ -360,7 +492,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "с тобой (м.)"
+      "gloss_ru": "с тобой (м.)",
+      "gloss_en": "with you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     },
     {
       "form_word": "אִתָּךְ",
@@ -369,7 +505,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "с тобой (ж.)"
+      "gloss_ru": "с тобой (ж.)",
+      "gloss_en": "with you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתו": [
@@ -380,7 +520,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "с ним"
+      "gloss_ru": "с ним",
+      "gloss_en": "with him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתה": [
@@ -391,7 +535,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "с ней"
+      "gloss_ru": "с ней",
+      "gloss_en": "with her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתנו": [
@@ -402,7 +550,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "с нами"
+      "gloss_ru": "с нами",
+      "gloss_en": "with us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתם": [
@@ -413,7 +565,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "с ними (м.)"
+      "gloss_ru": "с ними (м.)",
+      "gloss_en": "with them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "אתן": [
@@ -424,7 +580,11 @@
       "lemma_word": "עִם",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "с ними (ж.)"
+      "gloss_ru": "с ними (ж.)",
+      "gloss_en": "with them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "with"
     }
   ],
   "עלי": [
@@ -435,7 +595,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "на мне, обо мне"
+      "gloss_ru": "на мне, обо мне",
+      "gloss_en": "on me, about me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליך": [
@@ -446,7 +610,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "на тебе, о тебе (м.)"
+      "gloss_ru": "на тебе, о тебе (м.)",
+      "gloss_en": "on you, about you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     },
     {
       "form_word": "עָלַיִךְ",
@@ -455,7 +623,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "на тебе, о тебе (ж.)"
+      "gloss_ru": "на тебе, о тебе (ж.)",
+      "gloss_en": "on you, about you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליו": [
@@ -466,7 +638,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "на нём, о нём"
+      "gloss_ru": "на нём, о нём",
+      "gloss_en": "on him, about him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליה": [
@@ -477,7 +653,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "на ней, о ней"
+      "gloss_ru": "на ней, о ней",
+      "gloss_en": "on her, about her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עלינו": [
@@ -488,7 +668,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "на нас, о нас"
+      "gloss_ru": "на нас, о нас",
+      "gloss_en": "on us, about us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליכם": [
@@ -499,7 +683,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "на вас, о вас (м.)"
+      "gloss_ru": "на вас, о вас (м.)",
+      "gloss_en": "on you, about you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליכן": [
@@ -510,7 +698,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "на вас, о вас (ж.)"
+      "gloss_ru": "на вас, о вас (ж.)",
+      "gloss_en": "on you, about you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליהם": [
@@ -521,7 +713,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "на них, о них (м.)"
+      "gloss_ru": "на них, о них (м.)",
+      "gloss_en": "on them, about them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "עליהן": [
@@ -532,7 +728,11 @@
       "lemma_word": "עַל",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "на них, о них (ж.)"
+      "gloss_ru": "на них, о них (ж.)",
+      "gloss_en": "on them, about them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "on / about"
     }
   ],
   "בשבילי": [
@@ -543,7 +743,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "для меня, ради меня"
+      "gloss_ru": "для меня, ради меня",
+      "gloss_en": "for me, for my sake",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילך": [
@@ -554,7 +758,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "для тебя, ради тебя (м.)"
+      "gloss_ru": "для тебя, ради тебя (м.)",
+      "gloss_en": "for you, for your sake (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     },
     {
       "form_word": "בִּשְׁבִילֵךְ",
@@ -563,7 +771,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "для тебя, ради тебя (ж.)"
+      "gloss_ru": "для тебя, ради тебя (ж.)",
+      "gloss_en": "for you, for your sake (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילו": [
@@ -574,7 +786,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "для него, ради него"
+      "gloss_ru": "для него, ради него",
+      "gloss_en": "for him, for his sake",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילה": [
@@ -585,7 +801,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "для неё, ради неё"
+      "gloss_ru": "для неё, ради неё",
+      "gloss_en": "for her, for her sake",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילנו": [
@@ -596,7 +816,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "для нас, ради нас"
+      "gloss_ru": "для нас, ради нас",
+      "gloss_en": "for us, for our sake",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילכם": [
@@ -607,7 +831,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "для вас, ради вас (м.)"
+      "gloss_ru": "для вас, ради вас (м.)",
+      "gloss_en": "for you, for your sake (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילכן": [
@@ -618,7 +846,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "для вас, ради вас (ж.)"
+      "gloss_ru": "для вас, ради вас (ж.)",
+      "gloss_en": "for you, for your sake (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילם": [
@@ -629,7 +861,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "для них, ради них (м.)"
+      "gloss_ru": "для них, ради них (м.)",
+      "gloss_en": "for them, for their sake (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בשבילן": [
@@ -640,7 +876,11 @@
       "lemma_word": "בִּשְׁבִיל",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "для них, ради них (ж.)"
+      "gloss_ru": "для них, ради них (ж.)",
+      "gloss_en": "for them, for their sake (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "for the sake of"
     }
   ],
   "בי": [
@@ -651,7 +891,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "я",
-      "gloss_ru": "во мне"
+      "gloss_ru": "во мне",
+      "gloss_en": "in me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בך": [
@@ -662,7 +906,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "ты (м.)",
-      "gloss_ru": "в тебе (м.)"
+      "gloss_ru": "в тебе (м.)",
+      "gloss_en": "in you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     },
     {
       "form_word": "בָּךְ",
@@ -671,7 +919,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "ты (ж.)",
-      "gloss_ru": "в тебе (ж.)"
+      "gloss_ru": "в тебе (ж.)",
+      "gloss_en": "in you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בו": [
@@ -682,7 +934,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "он",
-      "gloss_ru": "в нём"
+      "gloss_ru": "в нём",
+      "gloss_en": "in him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בה": [
@@ -693,7 +949,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "она",
-      "gloss_ru": "в ней"
+      "gloss_ru": "в ней",
+      "gloss_en": "in her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בנו": [
@@ -704,7 +964,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "мы",
-      "gloss_ru": "в нас"
+      "gloss_ru": "в нас",
+      "gloss_en": "in us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בכם": [
@@ -715,7 +979,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "вы (м.)",
-      "gloss_ru": "в вас (м.)"
+      "gloss_ru": "в вас (м.)",
+      "gloss_en": "in you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בכן": [
@@ -726,7 +994,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "вы (ж.)",
-      "gloss_ru": "в вас (ж.)"
+      "gloss_ru": "в вас (ж.)",
+      "gloss_en": "in you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בהם": [
@@ -737,7 +1009,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "они (м.)",
-      "gloss_ru": "в них (м.)"
+      "gloss_ru": "в них (м.)",
+      "gloss_en": "in them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "בהן": [
@@ -748,7 +1024,11 @@
       "lemma_word": "בְּ",
       "lemma_pos_label": "предлог (наличие/местонахождение)",
       "hint": "они (ж.)",
-      "gloss_ru": "в них (ж.)"
+      "gloss_ru": "в них (ж.)",
+      "gloss_en": "in them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition (locative)",
+      "lemma_word_en": "in"
     }
   ],
   "לפני": [
@@ -759,7 +1039,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "передо мной"
+      "gloss_ru": "передо мной",
+      "gloss_en": "before me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניך": [
@@ -770,7 +1054,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "перед тобой (м.)"
+      "gloss_ru": "перед тобой (м.)",
+      "gloss_en": "before you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     },
     {
       "form_word": "לְפָנַיִךְ",
@@ -779,7 +1067,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "перед тобой (ж.)"
+      "gloss_ru": "перед тобой (ж.)",
+      "gloss_en": "before you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניו": [
@@ -790,7 +1082,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "перед ним"
+      "gloss_ru": "перед ним",
+      "gloss_en": "before him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניה": [
@@ -801,7 +1097,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "перед ней"
+      "gloss_ru": "перед ней",
+      "gloss_en": "before her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפנינו": [
@@ -812,7 +1112,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "перед нами"
+      "gloss_ru": "перед нами",
+      "gloss_en": "before us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניכם": [
@@ -823,7 +1127,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "перед вами (м.)"
+      "gloss_ru": "перед вами (м.)",
+      "gloss_en": "before you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניכן": [
@@ -834,7 +1142,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "перед вами (ж.)"
+      "gloss_ru": "перед вами (ж.)",
+      "gloss_en": "before you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניהם": [
@@ -845,7 +1157,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "перед ними (м.)"
+      "gloss_ru": "перед ними (м.)",
+      "gloss_en": "before them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "לפניהן": [
@@ -856,7 +1172,11 @@
       "lemma_word": "לִפְנֵי",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "перед ними (ж.)"
+      "gloss_ru": "перед ними (ж.)",
+      "gloss_en": "before them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "before"
     }
   ],
   "אחרי": [
@@ -867,7 +1187,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "за мной, после меня"
+      "gloss_ru": "за мной, после меня",
+      "gloss_en": "behind me, after me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריך": [
@@ -878,7 +1202,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "за тобой, после тебя (м.)"
+      "gloss_ru": "за тобой, после тебя (м.)",
+      "gloss_en": "behind you, after you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     },
     {
       "form_word": "אַחֲרַיִךְ",
@@ -887,7 +1215,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "за тобой, после тебя (ж.)"
+      "gloss_ru": "за тобой, после тебя (ж.)",
+      "gloss_en": "behind you, after you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריו": [
@@ -898,7 +1230,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "за ним, после него"
+      "gloss_ru": "за ним, после него",
+      "gloss_en": "behind him, after him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריה": [
@@ -909,7 +1245,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "за ней, после неё"
+      "gloss_ru": "за ней, после неё",
+      "gloss_en": "behind her, after her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחרינו": [
@@ -920,7 +1260,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "за нами, после нас"
+      "gloss_ru": "за нами, после нас",
+      "gloss_en": "behind us, after us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריכם": [
@@ -931,7 +1275,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "за вами, после вас (м.)"
+      "gloss_ru": "за вами, после вас (м.)",
+      "gloss_en": "behind you, after you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריכן": [
@@ -942,7 +1290,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "за вами, после вас (ж.)"
+      "gloss_ru": "за вами, после вас (ж.)",
+      "gloss_en": "behind you, after you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריהם": [
@@ -953,7 +1305,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "за ними, после них (м.)"
+      "gloss_ru": "за ними, после них (м.)",
+      "gloss_en": "behind them, after them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אחריהן": [
@@ -964,7 +1320,11 @@
       "lemma_word": "אַחֲרֵי",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "за ними, после них (ж.)"
+      "gloss_ru": "за ними, после них (ж.)",
+      "gloss_en": "behind them, after them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "after"
     }
   ],
   "אצלי": [
@@ -975,7 +1335,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "я",
-      "gloss_ru": "у меня"
+      "gloss_ru": "у меня",
+      "gloss_en": "at my place, with me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלך": [
@@ -986,7 +1350,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "ты (м.)",
-      "gloss_ru": "у тебя (м.)"
+      "gloss_ru": "у тебя (м.)",
+      "gloss_en": "at your place, with you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     },
     {
       "form_word": "אֶצְלֵךְ",
@@ -995,7 +1363,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "ты (ж.)",
-      "gloss_ru": "у тебя (ж.)"
+      "gloss_ru": "у тебя (ж.)",
+      "gloss_en": "at your place, with you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלו": [
@@ -1006,7 +1378,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "он",
-      "gloss_ru": "у него"
+      "gloss_ru": "у него",
+      "gloss_en": "at his place, with him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלה": [
@@ -1017,7 +1393,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "она",
-      "gloss_ru": "у неё"
+      "gloss_ru": "у неё",
+      "gloss_en": "at her place, with her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלנו": [
@@ -1028,7 +1408,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "мы",
-      "gloss_ru": "у нас"
+      "gloss_ru": "у нас",
+      "gloss_en": "at our place, with us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלכם": [
@@ -1039,7 +1423,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "вы (м.)",
-      "gloss_ru": "у вас (м.)"
+      "gloss_ru": "у вас (м.)",
+      "gloss_en": "at your place, with you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלכן": [
@@ -1050,7 +1438,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "вы (ж.)",
-      "gloss_ru": "у вас (ж.)"
+      "gloss_ru": "у вас (ж.)",
+      "gloss_en": "at your place, with you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלם": [
@@ -1061,7 +1453,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "они (м.)",
-      "gloss_ru": "у них (м.)"
+      "gloss_ru": "у них (м.)",
+      "gloss_en": "at their place, with them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "אצלן": [
@@ -1072,7 +1468,11 @@
       "lemma_word": "אֵצֶל",
       "lemma_pos_label": "предлог",
       "hint": "они (ж.)",
-      "gloss_ru": "у них (ж.)"
+      "gloss_ru": "у них (ж.)",
+      "gloss_en": "at their place, with them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition",
+      "lemma_word_en": "at (someone's place)"
     }
   ],
   "ממני": [
@@ -1083,7 +1483,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "я",
-      "gloss_ru": "от меня, из меня"
+      "gloss_ru": "от меня, из меня",
+      "gloss_en": "from me",
+      "hint_en": "I",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "ממך": [
@@ -1094,7 +1498,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "ты (м.)",
-      "gloss_ru": "от тебя, из тебя (м.)"
+      "gloss_ru": "от тебя, из тебя (м.)",
+      "gloss_en": "from you (m.)",
+      "hint_en": "you (m.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     },
     {
       "form_word": "מִמֵּךְ",
@@ -1103,7 +1511,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "ты (ж.)",
-      "gloss_ru": "от тебя, из тебя (ж.)"
+      "gloss_ru": "от тебя, из тебя (ж.)",
+      "gloss_en": "from you (f.)",
+      "hint_en": "you (f.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "ממנו": [
@@ -1114,7 +1526,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "он",
-      "gloss_ru": "от него, из него"
+      "gloss_ru": "от него, из него",
+      "gloss_en": "from him",
+      "hint_en": "he",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "ממנה": [
@@ -1125,7 +1541,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "она",
-      "gloss_ru": "от неё, из неё"
+      "gloss_ru": "от неё, из неё",
+      "gloss_en": "from her",
+      "hint_en": "she",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "מאתנו": [
@@ -1136,7 +1556,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "мы",
-      "gloss_ru": "от нас, из нас"
+      "gloss_ru": "от нас, из нас",
+      "gloss_en": "from us",
+      "hint_en": "we",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "מכם": [
@@ -1147,7 +1571,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "вы (м.)",
-      "gloss_ru": "от вас, из вас (м.)"
+      "gloss_ru": "от вас, из вас (м.)",
+      "gloss_en": "from you (pl.m.)",
+      "hint_en": "you (pl.m.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "מכן": [
@@ -1158,7 +1586,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "вы (ж.)",
-      "gloss_ru": "от вас, из вас (ж.)"
+      "gloss_ru": "от вас, из вас (ж.)",
+      "gloss_en": "from you (pl.f.)",
+      "hint_en": "you (pl.f.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "מהם": [
@@ -1169,7 +1601,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "они (м.)",
-      "gloss_ru": "от них, из них (м.)"
+      "gloss_ru": "от них, из них (м.)",
+      "gloss_en": "from them (m.)",
+      "hint_en": "they (m.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "מהן": [
@@ -1180,7 +1616,11 @@
       "lemma_word": "מִ",
       "lemma_pos_label": "предлог (из, от)",
       "hint": "они (ж.)",
-      "gloss_ru": "от них, из них (ж.)"
+      "gloss_ru": "от них, из них (ж.)",
+      "gloss_en": "from them (f.)",
+      "hint_en": "they (f.)",
+      "lemma_pos_label_en": "preposition (from)",
+      "lemma_word_en": "from"
     }
   ],
   "לאנשהו": [
@@ -1191,7 +1631,11 @@
       "lemma_word": "לְאָן",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "куда-то"
+      "gloss_ru": "куда-то",
+      "gloss_en": "somewhere (to)",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "where to"
     }
   ],
   "מאיפשהו": [
@@ -1202,7 +1646,11 @@
       "lemma_word": "מֵאֵיפֹה",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "откуда-то"
+      "gloss_ru": "откуда-то",
+      "gloss_en": "from somewhere",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "from where"
     }
   ],
   "מתישהו": [
@@ -1213,7 +1661,11 @@
       "lemma_word": "מָתַי",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "когда-то"
+      "gloss_ru": "когда-то",
+      "gloss_en": "sometime",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "when"
     }
   ],
   "לשם מה": [
@@ -1224,7 +1676,11 @@
       "lemma_word": "לָמָה",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "зачем-то"
+      "gloss_ru": "зачем-то",
+      "gloss_en": "for some reason",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "why"
     }
   ],
   "איזה שהוא": [
@@ -1235,7 +1691,11 @@
       "lemma_word": "אֵיזֶה",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "какой-то"
+      "gloss_ru": "какой-то",
+      "gloss_en": "some (kind of)",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "which, what kind of"
     }
   ],
   "איזשהו": [
@@ -1246,7 +1706,11 @@
       "lemma_word": "אֵיזֶה",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "какой-то (слитно)"
+      "gloss_ru": "какой-то (слитно)",
+      "gloss_en": "some (kind of), any",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "which, what kind of"
     }
   ],
   "של מישהו": [
@@ -1257,7 +1721,11 @@
       "lemma_word": "מִי",
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
-      "gloss_ru": "чей-то"
+      "gloss_ru": "чей-то",
+      "gloss_en": "someone's",
+      "hint_en": "indefinite",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "who"
     }
   ],
   "כלן": [
@@ -1268,7 +1736,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "все (ж.р.)"
+      "gloss_ru": "все (ж.р.)",
+      "gloss_en": "all of them (f.)",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "הכל": [
@@ -1279,7 +1751,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "всё"
+      "gloss_ru": "всё",
+      "gloss_en": "everything",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל אחד": [
@@ -1290,7 +1766,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждый"
+      "gloss_ru": "каждый",
+      "gloss_en": "everyone, each one",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל אחת": [
@@ -1301,7 +1781,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждая"
+      "gloss_ru": "каждая",
+      "gloss_en": "everyone, each one (f.)",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "בכל מקום": [
@@ -1312,7 +1796,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "везде"
+      "gloss_ru": "везде",
+      "gloss_en": "everywhere",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "מכל מקום": [
@@ -1323,7 +1811,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "отовсюду"
+      "gloss_ru": "отовсюду",
+      "gloss_en": "from everywhere",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "לכל מקום": [
@@ -1334,7 +1826,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "повсюду, в любое место"
+      "gloss_ru": "повсюду, в любое место",
+      "gloss_en": "to everywhere, anywhere",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "בכל זמן": [
@@ -1345,7 +1841,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "всегда, в любое время"
+      "gloss_ru": "всегда, в любое время",
+      "gloss_en": "always, at any time",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל הזמן": [
@@ -1356,7 +1856,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "всё время"
+      "gloss_ru": "всё время",
+      "gloss_en": "all the time",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כלום": [
@@ -1367,7 +1871,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "ничего (обычно в отрицательных предложениях)"
+      "gloss_ru": "ничего (обычно в отрицательных предложениях)",
+      "gloss_en": "nothing (usually in negative sentences)",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כלשהי": [
@@ -1378,7 +1886,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "какая-либо, какая-то"
+      "gloss_ru": "какая-либо, какая-то",
+      "gloss_en": "some, any (f.)",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל אחד מהם": [
@@ -1389,7 +1901,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждый из них"
+      "gloss_ru": "каждый из них",
+      "gloss_en": "each of them",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל אחד מאתנו": [
@@ -1400,7 +1916,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждый из нас"
+      "gloss_ru": "каждый из нас",
+      "gloss_en": "each of us",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל פעם": [
@@ -1411,7 +1931,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждый раз"
+      "gloss_ru": "каждый раз",
+      "gloss_en": "every time",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ],
   "כל יום": [
@@ -1422,7 +1946,11 @@
       "lemma_word": "כֹּל",
       "lemma_pos_label": "местоимение",
       "hint": "производное",
-      "gloss_ru": "каждый день"
+      "gloss_ru": "каждый день",
+      "gloss_en": "every day",
+      "hint_en": "derived",
+      "lemma_pos_label_en": "pronoun",
+      "lemma_word_en": "all, every"
     }
   ]
 }
