@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.9 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.8 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2247,7 +2247,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.9';
+  const APP_VERSION = '0.9.8';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3957,7 +3957,6 @@
   // lemma_gloss_ru, lemma_binyan, lemma_root, lemma_inf), отдельный файл не нужен.
   let hebrewDictSkeleton = null;
   let hebrewDictReverse = null;
-  let hebrewDictReverseEn = null;
   let hebrewVerbForms = null;
   let verbsDict = null;
   let verbsReverse = null;
@@ -3966,7 +3965,6 @@
   let generatedVerbForms = null;
   let functionWordForms = null;
   let functionWordFormsReverse = null;
-  let functionWordFormsReverseEn = null;
   let hebrewDictLoadPromise = null;
   let hebrewDictEntrySkeleton = null; // WeakMap: запись -> её скелет-ключ (для редактора базы)
   let verbsEntrySkeleton = null;
@@ -4220,10 +4218,8 @@
       // обратные индексы строим на лету из уже загруженных прямых —
       // см. комментарий у buildReverseIndex
       hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
-      hebrewDictReverseEn = buildReverseIndex(hebrewDictSkeleton, 'gloss');
       verbsReverse = buildReverseIndex(verbsDict, 'translation');
       functionWordFormsReverse = buildReverseIndex(functionWordForms, 'gloss_ru');
-      functionWordFormsReverseEn = buildReverseIndex(functionWordForms, 'gloss_en');
       // карты "запись -> скелет" — нужны для редактирования базы: когда
       // нашли запись через ОБРАТНЫЙ индекс (по переводу), нужно знать, в
       // каком именно ключе прямого словаря она лежит, чтобы её изменить
@@ -4726,11 +4722,9 @@
     }
 
     const ruKey = raw.trim().toLowerCase();
-    const activeDictReverse = currentLang === 'en' ? hebrewDictReverseEn : hebrewDictReverse;
-    const activeFunctionReverse = currentLang === 'en' ? functionWordFormsReverseEn : functionWordFormsReverse;
-    const dictHit = (activeDictReverse && activeDictReverse[ruKey]) || [];
+    const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const functionFormRuHit = (activeFunctionReverse && activeFunctionReverse[ruKey]) || [];
+    const functionFormRuHit = (functionWordFormsReverse && functionWordFormsReverse[ruKey]) || [];
     const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
       ? mergeCandidatesBySense([
           ...dictHit.map(buildDictCandidate),
@@ -4887,11 +4881,9 @@
     }
 
     const ruKey = raw.trim().toLowerCase();
-    const activeDictReverse = currentLang === 'en' ? hebrewDictReverseEn : hebrewDictReverse;
-    const activeFunctionReverse = currentLang === 'en' ? functionWordFormsReverseEn : functionWordFormsReverse;
-    const dictHit = (activeDictReverse && activeDictReverse[ruKey]) || [];
+    const dictHit = (hebrewDictReverse && hebrewDictReverse[ruKey]) || [];
     const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
-    const functionFormRuHit = (activeFunctionReverse && activeFunctionReverse[ruKey]) || [];
+    const functionFormRuHit = (functionWordFormsReverse && functionWordFormsReverse[ruKey]) || [];
     const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
       ? mergeCandidatesBySense([
           ...dictHit.map(buildDictCandidate),
