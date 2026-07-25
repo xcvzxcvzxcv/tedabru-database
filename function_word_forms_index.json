@@ -1183,39 +1183,6 @@
       "gloss_ru": "от них, из них (ж.)"
     }
   ],
-  "מישהו": [
-    {
-      "form_word": "מִישֶׁהוּ",
-      "tr": "míshehu",
-      "lemma_skeleton": "מי",
-      "lemma_word": "מִי",
-      "lemma_pos_label": "местоимение",
-      "hint": "неопределённое",
-      "gloss_ru": "кто-то, кто-нибудь"
-    }
-  ],
-  "משהו": [
-    {
-      "form_word": "מַשֶׁהוּ",
-      "tr": "máshehu",
-      "lemma_skeleton": "מה",
-      "lemma_word": "מָה",
-      "lemma_pos_label": "местоимение",
-      "hint": "неопределённое",
-      "gloss_ru": "что-то, что-нибудь"
-    }
-  ],
-  "איפשהו": [
-    {
-      "form_word": "אֵיפֹשֶׁהוּ",
-      "tr": "éifoshehu",
-      "lemma_skeleton": "איפה",
-      "lemma_word": "אֵיפֹה",
-      "lemma_pos_label": "местоимение",
-      "hint": "неопределённое",
-      "gloss_ru": "где-то"
-    }
-  ],
   "לאנשהו": [
     {
       "form_word": "לְאָנָשֶׁהוּ",
@@ -1249,17 +1216,6 @@
       "gloss_ru": "когда-то"
     }
   ],
-  "משום מה": [
-    {
-      "form_word": "מִשּׁוּם מָה",
-      "tr": "mishúm ma",
-      "lemma_skeleton": "למה",
-      "lemma_word": "לָמָה",
-      "lemma_pos_label": "местоимение",
-      "hint": "неопределённое",
-      "gloss_ru": "почему-то"
-    }
-  ],
   "לשם מה": [
     {
       "form_word": "לְשֵׁם מָה",
@@ -1269,17 +1225,6 @@
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
       "gloss_ru": "зачем-то"
-    }
-  ],
-  "איכשהו": [
-    {
-      "form_word": "אֵיכְשֶׁהוּ",
-      "tr": "eixshehu",
-      "lemma_skeleton": "איך",
-      "lemma_word": "אֵיךְ",
-      "lemma_pos_label": "местоимение",
-      "hint": "неопределённое",
-      "gloss_ru": "как-то"
     }
   ],
   "איזה שהוא": [
@@ -1313,17 +1258,6 @@
       "lemma_pos_label": "местоимение",
       "hint": "неопределённое",
       "gloss_ru": "чей-то"
-    }
-  ],
-  "כלם": [
-    {
-      "form_word": "כֻּלָּם",
-      "tr": "kulám",
-      "lemma_skeleton": "כל",
-      "lemma_word": "כֹּל",
-      "lemma_pos_label": "местоимение",
-      "hint": "производное",
-      "gloss_ru": "все (м.р.)"
     }
   ],
   "כלן": [
@@ -1425,39 +1359,6 @@
       "gloss_ru": "всё время"
     }
   ],
-  "בכל אפן": [
-    {
-      "form_word": "בְּכָל אֹפֶן",
-      "tr": "bexól ófen",
-      "lemma_skeleton": "כל",
-      "lemma_word": "כֹּל",
-      "lemma_pos_label": "местоимение",
-      "hint": "производное",
-      "gloss_ru": "в любом случае"
-    }
-  ],
-  "בכל זאת": [
-    {
-      "form_word": "בְּכָל זֹאת",
-      "tr": "bexól zot",
-      "lemma_skeleton": "כל",
-      "lemma_word": "כֹּל",
-      "lemma_pos_label": "местоимение",
-      "hint": "производное",
-      "gloss_ru": "всё же, тем не менее"
-    }
-  ],
-  "כל כך": [
-    {
-      "form_word": "כָּל כָּךְ",
-      "tr": "kol kax",
-      "lemma_skeleton": "כל",
-      "lemma_word": "כֹּל",
-      "lemma_pos_label": "местоимение",
-      "hint": "производное",
-      "gloss_ru": "так, настолько"
-    }
-  ],
   "כלום": [
     {
       "form_word": "כְּלוּם",
@@ -1467,17 +1368,6 @@
       "lemma_pos_label": "местоимение",
       "hint": "производное",
       "gloss_ru": "ничего (обычно в отрицательных предложениях)"
-    }
-  ],
-  "כלשהו": [
-    {
-      "form_word": "כָּלְשֶׁהוּ",
-      "tr": "kalshehú",
-      "lemma_skeleton": "כל",
-      "lemma_word": "כֹּל",
-      "lemma_pos_label": "местоимение",
-      "hint": "производное",
-      "gloss_ru": "какой-либо, какой-то"
     }
   ],
   "כלשהי": [
