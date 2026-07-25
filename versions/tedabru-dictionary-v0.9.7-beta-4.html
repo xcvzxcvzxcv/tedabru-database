@@ -188,27 +188,6 @@
     justify-content: space-between;
     margin-bottom: 16px;
   }
-  .header-top-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .lang-toggle-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: 1px solid var(--border-purple);
-    border-radius: 20px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .lang-toggle-btn .lang-option { color: var(--muted); }
-  .lang-toggle-btn .lang-option.lang-active { color: var(--gold); font-weight: 600; }
-  .lang-toggle-btn .lang-divider { color: var(--border-purple); }
 
   .title {
     font-size: 21px;
@@ -1475,14 +1454,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="header-top-left">
-        <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
-          <span class="lang-option" data-lang="ru">RU</span>
-          <span class="lang-divider">|</span>
-          <span class="lang-option" data-lang="en">EN</span>
-        </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.8 Beta</span></div>
-      </div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.7 Beta</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1799,132 +1771,6 @@
   let words = loadWords();
   let collections = loadCollections(); // [{ id, name }]
   let searchQuery = '';
-
-  // ===== Интернационализация (RU/EN) =====
-  // Ключ словаря — сам русский текст (не абстрактный код вида "addWord") —
-  // это осознанный выбор: перевод существующего русского приложения задним
-  // числом сильно проще, если не нужно придумывать имя ключа для каждой из
-  // ~300 строк, и любая забытая строка просто останется на русском (t()
-  // возвращает исходный текст, если перевода нет), а не сломает вёрстку.
-  const LANG_STORAGE_KEY = 'tedabru_lang';
-  let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || 'ru';
-
-  const I18N_EN = {
-    // ===== Шапка, поиск =====
-    'Тренировка': 'Training',
-    'Режим выбора': 'Selection mode',
-    'Редактировать базу': 'Edit database',
-    'Добавить слово': 'Add word',
-    'Ищите по слову, переводу или транскрипции': 'Search by word, translation, or transcription',
-    'Фильтры по части речи': 'Filter by part of speech',
-    'Переключить тему': 'Toggle theme',
-    'Увеличить масштаб': 'Zoom in',
-    'Уменьшить масштаб': 'Zoom out',
-    // ===== Чипы фильтров =====
-    'Все': 'All',
-    'Новое': 'New',
-    'Не помню': "Don't remember",
-    'Помню плохо': 'Barely remember',
-    'Помню хорошо': 'Remember well',
-    'Выучено': 'Learned',
-    'Избранное': 'Favorites',
-    'Добавить подборку': 'Add collection',
-    'Фильтры': 'Filters',
-    'Название подборки': 'Collection name',
-    'Сбросить фильтр': 'Reset filter',
-    'Подборок пока нет': 'No collections yet',
-    // ===== Пустые состояния / сообщения =====
-    'В словаре пока нет слов': 'Your dictionary is empty yet',
-    'Ничего не найдено по этому фильтру.': 'Nothing found for this filter.',
-    'Результаты поиска': 'Search results',
-    'Скрытые результаты': 'Hidden results',
-    'Нажмите, чтобы отменить': 'Tap to undo',
-    'Слово добавлено в ваш словарь': 'Word added to your dictionary',
-    'Слово удалено из вашего словаря': 'Word removed from your dictionary',
-    'Искать среди всех слов': 'Search all words',
-    'Ищу среди вариантов написания...': 'Searching alternate spellings...',
-    'Не удалось найти это слово ни в словаре, ни через перевод.': "Couldn't find this word in the dictionary or via translation.",
-    // ===== Добавление слова =====
-    'Добавить одно слово': 'Add one word',
-    'Добавить несколько слов сразу': 'Add multiple words at once',
-    'Введите слово, которое хотите добавить': 'Enter the word you want to add',
-    'Впишите слово, транскрипцию или перевод': 'Enter a word, transcription, or translation',
-    'Слово на иврите (с огласовками)': 'Hebrew word (with niqqud)',
-    'Добавить сразу в подборку (необязательно)': 'Add directly to a collection (optional)',
-    'Добавить все': 'Add all',
-    'Слова через запятую или перенос строки': 'Words separated by comma or line break',
-    'Отменить добавление': 'Cancel adding',
-    // ===== Общие кнопки/действия =====
-    'Отмена': 'Cancel',
-    'Сохранить': 'Save',
-    'Сохранено': 'Saved',
-    'Удалить': 'Delete',
-    'Удалить выбранное': 'Delete selected',
-    'Создать': 'Create',
-    'Закрыть': 'Close',
-    'Готово': 'Done',
-    'Начать': 'Start',
-    'Прервать': 'Stop',
-    'Понятно': 'Got it',
-    'Остаться': 'Stay',
-    'Выйти без сохранения': 'Leave without saving',
-    'Выйти без сохранения?': 'Leave without saving?',
-    'Выйти из редактирования': 'Exit editing',
-    'Выйти из тренировки': 'Exit training',
-    'Есть несохранённые правки': 'You have unsaved changes',
-    'Переименовать': 'Rename',
-    'Другое': 'Other',
-    'Нет': 'No',
-    // ===== Части речи (для меток на карточке) =====
-    'Глагол': 'Verb',
-    'Существительное': 'Noun',
-    'Прилагательное': 'Adjective',
-    'Наречие': 'Adverb',
-    'Местоимение': 'Pronoun',
-    'Числительное': 'Numeral',
-    'Имя собственное': 'Proper name',
-    'Определитель': 'Determiner',
-    'Союз': 'Conjunction',
-    'Предлог': 'Preposition',
-    'Частица': 'Particle',
-    'Междометие': 'Interjection',
-    'Устойчивое выражение': 'Set phrase',
-    'Вопросительное слово': 'Question word',
-    'Часть речи': 'Part of speech',
-    // ===== Тренировка =====
-    'Что тренируем': "What we're training",
-    'Легко': 'Easy',
-    'Хорошо': 'Good',
-    'Трудно': 'Hard',
-    'Показать ответ': 'Show answer',
-    'Прервать тренировку?': 'Stop training?',
-    'Останавливаю после текущего слова': 'Stopping after the current word',
-    'Нечего тренировать — сначала выберите слова.': 'Nothing to train — select some words first.',
-    'На сейчас повторять нечего — все выбранные слова либо уже отвечены сегодня, либо ждут своей даты. Загляните позже.':
-      "There's nothing to review right now — all selected words have already been answered today or aren't due yet. Check back later.",
-    'Новых слов за раз (карт уже введённых в повтор это не касается)': "New cards per session (doesn't affect cards already in review)",
-    'Прогресс по уже отвеченным карточкам уже сохранён — но текущая сессия закроется, и оставшиеся карточки сейчас показаны не будут.':
-      "Progress on already-answered cards is saved — but the current session will close, and the remaining cards won't be shown right now.",
-    // ===== Редактор базы =====
-    'Найдите слово, которое хотите отредактировать': 'Find the word you want to edit',
-    'Добавить значение': 'Add a sense',
-    'добавить новое значение к этому слову': 'add a new sense to this word',
-    'Ничего не найдено в редактируемых базах. Если слова совсем нет — можно завести первое значение для него кнопкой ниже.':
-      "Nothing found in the editable databases. If the word doesn't exist at all, you can create its first entry with the button below.",
-  };
-
-  function t(str) {
-    if (currentLang !== 'en') return str;
-    return I18N_EN[str] !== undefined ? I18N_EN[str] : str;
-  }
-
-  // Для строк с числом/переменной внутри — тот же принцип, но с плейсхолдером
-  // %s, который подставляется уже после перевода
-  function tf(template, ...args) {
-    let result = t(template);
-    args.forEach(a => { result = result.replace('%s', a); });
-    return result;
-  }
 
   // ===== Каскадная анимация появления карточек =====
   // Личный словарь — только при самом первом открытии страницы (не при
@@ -2247,7 +2093,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.8';
+  const APP_VERSION = '0.9.7';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4489,28 +4335,12 @@
     return applyStressFromEnd(base, stressIdx);
   }
 
-  // ===== Показ транскрипции/перевода с учётом языка =====
-  // RU: кириллическая транскрипция, посчитанная нашим собственным движком
-  // (все тонкие правила шва/ударения/мягкого знака, наработанные за эту
-  // сессию) — специфично для русскоязычного читателя.
-  // EN: берём готовое поле tr ИЗ БАЗЫ НАПРЯМУЮ, без конвертации — оно уже
-  // на латинице и рассчитано на англоязычного читателя, наш кириллический
-  // конвертер тут просто не нужен (так и порешили).
-  function displayTranslit(word, trField) {
-    if (currentLang === 'en') return trField || '';
-    return translitWithStress(word, trField);
-  }
-  function displayGloss(entry) {
-    if (currentLang === 'en') return entry.gloss !== undefined ? entry.gloss : entry.gloss_ru;
-    return entry.gloss_ru;
-  }
-
   function buildDictCandidate(entry) {
     return {
       text: entry.word,
-      translit: displayTranslit(entry.word, entry.tr),
+      translit: translitWithStress(entry.word, entry.tr),
       grammarLabel: grammarLabelForEntry(entry),
-      translation: displayGloss(entry),
+      translation: entry.gloss_ru,
       root: entry.root || null,
       register: entry.register || null,
       source: 'dict'
@@ -4565,21 +4395,15 @@
     // общий смысл леммы שֶׁל) — поэтому лемма тут не подстраховка на случай
     // отсутствия перевода формы, а просто сноска о происхождении, как в
     // словарях иностранных языков ("mine — форма от my").
-    const isEn = currentLang === 'en';
-    const gloss = isEn && formEntry.gloss_en ? formEntry.gloss_en : formEntry.gloss_ru;
-    const hint = isEn && formEntry.hint_en ? formEntry.hint_en : formEntry.hint;
-    const posLabel = (isEn && formEntry.lemma_pos_label_en) ? formEntry.lemma_pos_label_en
-      : (formEntry.lemma_pos_label || (isEn ? 'function word' : 'служебное слово'));
     const lemmaLine = formEntry.lemma_word
-      ? (isEn
-        ? ` (form of ${formEntry.lemma_word}${formEntry.lemma_word_en ? ', "' + formEntry.lemma_word_en + '"' : ''})`
-        : ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`)
+      ? ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`
       : '';
+    const posLabel = formEntry.lemma_pos_label || 'служебное слово';
     return {
       text: formEntry.form_word,
-      translit: displayTranslit(formEntry.form_word, formEntry.tr),
-      grammarLabel: hint ? `${posLabel}, ${hint}` : posLabel,
-      translation: `${gloss}${lemmaLine}`,
+      translit: formEntry.tr ? translitWithStress(formEntry.form_word, formEntry.tr) : niqqudToTranslit(formEntry.form_word),
+      grammarLabel: formEntry.hint ? `${posLabel}, ${formEntry.hint}` : posLabel,
+      translation: `${formEntry.gloss_ru}${lemmaLine}`,
       source: 'dict'
     };
   }
@@ -6907,21 +6731,6 @@
     applyTheme();
   });
   applyTheme();
-
-  // ===== Язык (RU/EN) =====
-  function applyLangToggleUI() {
-    document.querySelectorAll('.lang-toggle-btn .lang-option').forEach(el => {
-      el.classList.toggle('lang-active', el.dataset.lang === currentLang);
-    });
-  }
-  document.getElementById('langToggleBtn').addEventListener('click', () => {
-    currentLang = currentLang === 'ru' ? 'en' : 'ru';
-    localStorage.setItem(LANG_STORAGE_KEY, currentLang);
-    applyLangToggleUI();
-    renderFilterBar();
-    renderList();
-  });
-  applyLangToggleUI();
 
   // ===== Первичный рендер =====
   renderFilterBar();
