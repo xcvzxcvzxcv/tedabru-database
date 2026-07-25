@@ -247,10 +247,6 @@
      Та же высота/паддинг/разделитель — чтобы ощущалось как "тот же язык
      карточек", но зеркалирование само по себе не даёт спутать поиск со
      своим словарём. */
-  .search-results-spacer {
-    /* пустая "карточка"-пробел перед заголовком "Результаты поиска" —
-       высота выставляется через JS = высоте одной настоящей карточки */
-  }
   .search-results-count {
     display: flex;
     align-items: center;
@@ -1263,7 +1259,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.4</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.3</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1896,7 +1892,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.4';
+  const APP_VERSION = '0.8.3';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2152,9 +2148,6 @@
     return (str || '')
       .toLowerCase()
       .trim()
-      // знак ударения (´ или комбинирующий акут) не должен мешать поиску —
-      // человек обычно вводит без ударения ("леистакель" вместо "леистаке́ль")
-      .replace(/´|́/g, '')
       // латинская "h" в транскрипции (леhасбир, hафтаа) часто пропускается при
       // быстром вводе без переключения раскладки — убираем её из сравнения,
       // чтобы "леасбир" находил "леhасбир"
@@ -4986,18 +4979,14 @@
   function renderCandidatesInto(resultsEl, rawCandidates, total) {
     if (!rawCandidates.length) {
       resultsEl.innerHTML = categoryFilterActive()
-        ? `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
+        ? `<div class="search-results-count" id="searchResultsCountEl">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
         : '';
       requestAnimationFrame(() => {
         const countEl = document.getElementById('searchResultsCountEl');
-        const spacerEl = document.getElementById('searchResultsSpacerEl');
         const sampleRow = document.querySelector('.word-row:not(.row-deleting)');
-        if (sampleRow) {
+        if (countEl && sampleRow) {
           const h = sampleRow.getBoundingClientRect().height;
-          if (h > 0) {
-            if (countEl) countEl.style.height = h + 'px';
-            if (spacerEl) spacerEl.style.height = h + 'px';
-          }
+          if (h > 0) countEl.style.height = h + 'px';
         }
       });
       return false;
@@ -5073,7 +5062,7 @@
     const countLabel = (total && total > visibleMatches.length)
       ? `Результаты поиска (показаны первые ${visibleMatches.length} из ${total})`
       : `Результаты поиска (${visibleMatches.length})`;
-    resultsEl.innerHTML = `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
+    resultsEl.innerHTML = `<div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
       visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
         Скрытые результаты (${hiddenMatches.length})
@@ -5081,20 +5070,16 @@
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
 
-    // Высота "разделительных карточек" (пустой и с текстом "Результаты
-    // поиска") должна равняться высоте настоящей карточки — измеряем прямо
-    // в браузере вместо того, чтобы подбирать число на глаз (шрифты/масштаб
-    // у людей разные)
+    // Высота "разделительной карточки" с текстом "Результаты поиска" должна
+    // равняться высоте настоящей карточки — измеряем прямо в браузере вместо
+    // того, чтобы подбирать число на глаз (шрифты/масштаб у людей разные)
     requestAnimationFrame(() => {
       const countEl = document.getElementById('searchResultsCountEl');
-      const spacerEl = document.getElementById('searchResultsSpacerEl');
+      if (!countEl) return;
       const sampleRow = resultsEl.querySelector('.search-result-row') || document.querySelector('.word-row:not(.row-deleting)');
       if (sampleRow) {
         const h = sampleRow.getBoundingClientRect().height;
-        if (h > 0) {
-          if (countEl) countEl.style.height = h + 'px';
-          if (spacerEl) spacerEl.style.height = h + 'px';
-        }
+        if (h > 0) countEl.style.height = h + 'px';
       }
     });
 
