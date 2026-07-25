@@ -27,46 +27,32 @@
     --dim-text-soft: #6a5f85;
     --rating-good-text: #d6c8ff;
     --danger-text: #e08a9a;
-    --chip-active-bg: rgba(155,93,229,0.25);
-    --chip-active-border: var(--purple);
-    --chip-active-text: var(--purple-dark);
-    --chip-text: var(--text-secondary);
-    --header-icon-bg: rgba(123,53,212,0.12);
-    --header-icon-color: var(--text-secondary);
   }
 
-  /* ===== Светлая тема — строгий минимализм: остаётся ровно три цвета.
-     Жёлтый акцентный (слово на иврите, кнопка добавления, активный чип),
-     серый и его оттенки (обводки, разделители, второстепенный текст),
-     чёрный текст. Фиолетовый из палитры светлой темы убран полностью —
-     переопределяем те же имена переменных, поэтому всё, что уже написано
-     через var(...), подхватывает новую палитру само собой. --ink-rgb —
-     RGB-триплет "чернил" для всех полупрозрачных подложек вида
-     rgba(var(--ink-rgb), 0.05), без отдельной переменной под каждое
-     значение прозрачности. */
+  /* ===== Светлая тема — тёплый кремовый пергамент вместо тёмного манускрипта.
+     Переопределяем те же имена переменных, поэтому всё, что уже написано
+     через var(...), подхватывает новую палитру само собой без переписывания
+     каждого правила заново. --ink-rgb — RGB-триплет "чернил" для всех
+     полупрозрачных подложек вида rgba(var(--ink-rgb), 0.05): на тёмном фоне
+     подсветка идёт белым поверх тёмного, на светлом — тёмным поверх
+     кремового, без отдельной переменной под каждое значение прозрачности. */
   html[data-theme="light"] {
-    --gold: #daa74a;
-    --gold-soft: #daa74a;
-    --purple: #b0b0b0;
-    --purple-dark: #707070;
-    --text-secondary: #6b6b6b;
-    --bg-dark: #fafafa;
-    --border-purple: #e3e3e3;
-    --card-bg: #f2f2f0;
-    --muted: #8a8a8a;
-    --text-main: #1f232d;
-    --bg-glow: #fafafa;
-    --ink-rgb: 31,35,45;
-    --dim-text: #a0a0a0;
-    --dim-text-soft: #b8b8b8;
+    --gold: #AA6A1C;
+    --gold-soft: #b8874a;
+    --purple: #7b35d4;
+    --purple-dark: #5b1fa0;
+    --text-secondary: #6b5490;
+    --bg-dark: #f7efdc;
+    --border-purple: #b79ae0;
+    --card-bg: #efe3c5;
+    --muted: #8577a0;
+    --text-main: #2d1f42;
+    --bg-glow: #fff8ec;
+    --ink-rgb: 45,31,66;
+    --dim-text: #a89880;
+    --dim-text-soft: #b8ac98;
     --rating-good-text: #4a2f7a;
     --danger-text: #8a2f42;
-    --chip-active-bg: #faf4e3;
-    --chip-active-border: #efe6d0;
-    --chip-active-text: #ba7d22;
-    --chip-text: var(--text-main);
-    --header-icon-bg: transparent;
-    --header-icon-color: var(--text-main);
   }
 
 
@@ -215,8 +201,8 @@
     height: 36px;
     border-radius: 10px;
     border: 1px solid var(--border-purple);
-    background: var(--header-icon-bg);
-    color: var(--header-icon-color);
+    background: rgba(123,53,212,0.12);
+    color: var(--text-secondary);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
@@ -507,29 +493,26 @@
   .filter-row::-webkit-scrollbar { display: none; }
   .chip {
     flex-shrink: 0;
-    padding: 10px 16px;
+    padding: 11px 16px;
     border-radius: 12px;
     border: 1px solid var(--border-purple);
     background: transparent;
-    color: var(--chip-text);
+    color: var(--text-secondary);
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     cursor: pointer;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
   }
-  html[data-theme="light"] .chip {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
   .chip.active {
-    background: var(--chip-active-bg);
-    border-color: var(--chip-active-border);
-    color: var(--chip-active-text);
+    background: rgba(155,93,229,0.25);
+    border-color: var(--purple);
+    color: var(--purple-dark);
   }
   .chip.chip-add-collection {
     border-color: var(--gold-soft);
     color: var(--gold-soft);
-    padding: 12px 20px;
+    padding: 13px 20px;
   }
   .chip.chip-text-only {
     border-style: dashed;
@@ -918,10 +901,6 @@
     .word-row:hover .row-actions-buttons .icon-btn { opacity: 1; pointer-events: auto; }
     .chip:hover {
       filter: brightness(1.25);
-    }
-    html[data-theme="light"] .chip:hover {
-      filter: none;
-      border-color: #efe6d0;
     }
   }
 
