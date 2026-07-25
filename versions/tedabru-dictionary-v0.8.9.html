@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Лексикариум · Tedabru</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Inter:wght@400;500;600&display=swap');
@@ -25,8 +25,6 @@
     background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
     background-attachment: fixed;
     min-height: 100vh;
-    min-height: 100dvh;
-    overscroll-behavior-y: none;
     font-family: 'Noto Serif', serif;
     color: #e8ddf5;
   }
@@ -73,13 +71,9 @@
     max-width: 792px;
     margin: 0 auto;
     min-height: 100vh;
-    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     padding: 0 20px;
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
-    padding-bottom: env(safe-area-inset-bottom);
   }
 
   /* ===== Header / Search ===== */
@@ -88,10 +82,10 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    padding-top: calc(32px + env(safe-area-inset-top));
+    padding-top: 32px;
     margin: 0 -20px 20px;
-    padding-left: calc(20px + env(safe-area-inset-left));
-    padding-right: calc(20px + env(safe-area-inset-right));
+    padding-left: 20px;
+    padding-right: 20px;
     background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
     background-attachment: fixed;
   }
@@ -359,33 +353,6 @@
     .search-result-row:hover .pos,
     .search-result-row:hover .search-definition {
       filter: brightness(1.2);
-    }
-  }
-
-  @media (max-width: 480px) {
-    /* На узком экране фиксированные 32+105+105+94+26=362px колонок не
-       оставляют места переводу вообще — отсюда и жалоба "перевод не виден
-       с телефона". Пока убираем прослушивание/номер/статус целиком (вернём
-       позже, если получится вписать компактнее). ВАЖНО: вместе со статусом
-       прячется и его кнопка-триггер — на мобильном пока нет доступа к
-       избранному/редактированию/удалению через карточку вообще, это
-       осознанный временный компромисс, не забыть вернуться к этому */
-    .word-row {
-      grid-template-columns: 90px 84px 1fr;
-      gap: 6px;
-    }
-    .word-row .listen-btn,
-    .word-row .row-actions-cell,
-    .word-row .row-num {
-      display: none;
-    }
-    .search-result-row {
-      grid-template-columns: 1fr 78px 90px;
-      gap: 6px;
-    }
-    .search-result-row .search-status-icon,
-    .search-result-row .row-num {
-      display: none;
     }
   }
 
@@ -1360,7 +1327,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.0</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.9</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -2010,7 +1977,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.0';
+  const APP_VERSION = '0.8.9';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
