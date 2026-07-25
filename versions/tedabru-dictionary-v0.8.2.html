@@ -248,18 +248,18 @@
      карточек", но зеркалирование само по себе не даёт спутать поиск со
      своим словарём. */
   .search-results-count {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 15px;
     color: var(--muted);
+    padding: 10px 0 4px;
+    border-bottom: 1px solid rgba(123,53,212,0.15);
+    margin-bottom: 4px;
   }
 
   .search-result-row {
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 1fr 105px 105px 26px;
+    grid-template-columns: 32px 1fr 105px 105px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -288,11 +288,6 @@
   .search-result-row .meta-col { margin: 0; }
   .search-result-row .search-definition {
     text-align: left;
-  }
-  .search-result-row .row-num {
-    text-align: right;
-    font-size: 15px;
-    color: var(--muted);
   }
   @media (hover: hover) {
     .search-result-row:hover .hebrew-word,
@@ -745,9 +740,6 @@
     padding: 60px 20px;
     color: var(--muted);
     font-size: 15px;
-  }
-  .search-results-wrapper {
-    padding: 0;
   }
   .global-search-btn {
     display: block;
@@ -1259,7 +1251,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.3</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.2</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1892,7 +1884,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.3';
+  const APP_VERSION = '0.8.2';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2489,7 +2481,7 @@
     const listEl = document.getElementById('wordList');
 
     if (categoryFilterPanelOpen || categoryFilterActive()) {
-      listEl.innerHTML = `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
+      listEl.innerHTML = `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
       attachGlobalSearchHandler();
       return;
     }
@@ -2500,8 +2492,8 @@
       listEl.innerHTML = `
         <div class="empty-state">
           Ничего не найдено в вашем словаре.
+          ${globalSearchBlockHtml()}
         </div>
-        <div class="search-results-wrapper">${globalSearchBlockHtml()}</div>
       `;
       attachGlobalSearchHandler();
       return;
@@ -2564,7 +2556,7 @@
         <div class="row-num">${i + 1}</div>
       </div>
     `;
-    }).join('') + `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
+    }).join('') + `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
     fitHebrewWordsInList(listEl);
 
     listEl.querySelectorAll('.listen-btn').forEach(btn => {
@@ -4979,16 +4971,8 @@
   function renderCandidatesInto(resultsEl, rawCandidates, total) {
     if (!rawCandidates.length) {
       resultsEl.innerHTML = categoryFilterActive()
-        ? `<div class="search-results-count" id="searchResultsCountEl">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
+        ? `<div class="search-results-count">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
         : '';
-      requestAnimationFrame(() => {
-        const countEl = document.getElementById('searchResultsCountEl');
-        const sampleRow = document.querySelector('.word-row:not(.row-deleting)');
-        if (countEl && sampleRow) {
-          const h = sampleRow.getBoundingClientRect().height;
-          if (h > 0) countEl.style.height = h + 'px';
-        }
-      });
       return false;
     }
 
@@ -5043,7 +5027,7 @@
     // ними. Зеркалирование — намеренное: человек должен на глаз отличать,
     // где он сейчас — в поиске или уже в своём словаре, даже при похожем
     // визуальном языке карточек.
-    const visibleRowHtml = (m, i) => {
+    const visibleRowHtml = (m) => {
       const existing = findExistingWordByHebrew(m.text);
       return `
       <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
@@ -5054,7 +5038,6 @@
           ${m.grammarLabel ? `<div class="pos">${m.grammarLabel}</div>` : ''}
         </div>
         <div class="hebrew-word">${m.text}</div>
-        <div class="row-num">${i + 1}</div>
       </button>
     `;
     };
@@ -5062,26 +5045,13 @@
     const countLabel = (total && total > visibleMatches.length)
       ? `Результаты поиска (показаны первые ${visibleMatches.length} из ${total})`
       : `Результаты поиска (${visibleMatches.length})`;
-    resultsEl.innerHTML = `<div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
+    resultsEl.innerHTML = `<div class="search-results-count">${countLabel}</div>` +
       visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
         Скрытые результаты (${hiddenMatches.length})
       </button>
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
-
-    // Высота "разделительной карточки" с текстом "Результаты поиска" должна
-    // равняться высоте настоящей карточки — измеряем прямо в браузере вместо
-    // того, чтобы подбирать число на глаз (шрифты/масштаб у людей разные)
-    requestAnimationFrame(() => {
-      const countEl = document.getElementById('searchResultsCountEl');
-      if (!countEl) return;
-      const sampleRow = resultsEl.querySelector('.search-result-row') || document.querySelector('.word-row:not(.row-deleting)');
-      if (sampleRow) {
-        const h = sampleRow.getBoundingClientRect().height;
-        if (h > 0) countEl.style.height = h + 'px';
-      }
-    });
 
     // Клик по всей строке — добавляет слово в личный словарь одним кликом
     // (в обход модалки добавления), либо, если оно уже там, сразу удаляет —
