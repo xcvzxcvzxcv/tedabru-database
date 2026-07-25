@@ -2282,12 +2282,21 @@
     });
   }
 
-  function ttsUrl(text) {
+  function ttsUrlCandidates(text) {
     // на всякий случай схлопываем лишние пробелы — у части слов в базе
     // остались двойные/тройные пробелы ещё с более ранних правок, и
     // отправлять их в TTS "как есть" рискованно
     const cleaned = (text || '').replace(/\s+/g, ' ').trim();
-    return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`;
+    const q = encodeURIComponent(cleaned);
+    // несколько известных вариантов этого неофициального эндпоинта — домен
+    // и параметр client отличаются у разных инструментов, и, похоже, у них
+    // разная (и нестабильная во времени) проверка на "похоже ли это на
+    // настоящий браузерный запрос с translate.google.com"
+    return [
+      `https://translate.google.com/translate_tts?ie=UTF-8&q=${q}&tl=iw&client=tw-ob`,
+      `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${q}&tl=iw&client=gtx`,
+      `https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${q}&tl=iw&client=tw-ob`,
+    ];
   }
 
   let currentAudioEl = null;
@@ -2298,49 +2307,57 @@
     document.querySelectorAll('.listen-btn.playing').forEach(b => b.classList.remove('playing'));
     if (btnEl) btnEl.classList.add('playing');
 
-    // Играем НАПРЯМУЮ через <audio src>, без fetch() — так же, как страницы
-    // алфавита когда-то. CORS ограничивает только fetch()/XHR, когда код
-    // пытается ПРОЧИТАТЬ байты ответа с чужого домена (это нужно было бы
-    // для сохранения в IndexedDB) — а не простое воспроизведение медиа
-    // (как <audio>/<img> с чужого домена). Обратная сторона: без fetch()
-    // мы не можем гарантированно закэшировать сам файл в IndexedDB — тут
-    // полагаемся только на то, что может закэшировать сам браузер по
-    // обычным HTTP-заголовкам (это не в нашем контроле). Если сначала
-    // проверить свой кэш и там что-то уже есть (например, будет заполнено
-    // другим путём в будущем) — используем его.
-    let audioSrc;
-    const cachedBlob = await getCachedAudioBlob(hebrewText).catch(() => null);
-    audioSrc = cachedBlob ? URL.createObjectURL(cachedBlob) : ttsUrl(hebrewText);
-    console.log('[TTS DEBUG] слово:', hebrewText);
-    console.log('[TTS DEBUG] взято из кэша:', !!cachedBlob);
-    console.log('[TTS DEBUG] audioSrc:', audioSrc);
-
-    const audio = new Audio(audioSrc);
-    currentAudioEl = audio;
     const clearPlaying = () => {
       if (btnEl) btnEl.classList.remove('playing');
-      if (currentAudioEl === audio) currentAudioEl = null;
+      currentAudioEl = null;
     };
-    audio.addEventListener('loadstart', () => console.log('[TTS DEBUG] loadstart'));
-    audio.addEventListener('loadedmetadata', () => console.log('[TTS DEBUG] loadedmetadata, длительность:', audio.duration));
-    audio.addEventListener('canplay', () => console.log('[TTS DEBUG] canplay'));
-    audio.addEventListener('playing', () => console.log('[TTS DEBUG] playing — реально начал звучать'));
-    audio.addEventListener('stalled', () => console.log('[TTS DEBUG] stalled — застряла загрузка'));
-    audio.addEventListener('suspend', () => console.log('[TTS DEBUG] suspend'));
-    audio.addEventListener('abort', () => console.log('[TTS DEBUG] abort'));
-    audio.addEventListener('error', () => {
-      const err = audio.error;
-      console.log('[TTS DEBUG] error! code:', err && err.code, 'message:', err && err.message,
-        '(1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED)');
-      clearPlaying();
-    });
-    audio.addEventListener('ended', () => { console.log('[TTS DEBUG] ended'); clearPlaying(); });
-    audio.play().then(() => {
-      console.log('[TTS DEBUG] play() промис зарезолвился успешно');
-    }).catch((e) => {
-      console.log('[TTS DEBUG] play() промис отклонён:', e && e.name, e && e.message);
-      clearPlaying();
-    });
+
+    const cachedBlob = await getCachedAudioBlob(hebrewText).catch(() => null);
+    if (cachedBlob) {
+      console.log('[TTS DEBUG] слово:', hebrewText, '— взято из кэша');
+      const audio = new Audio(URL.createObjectURL(cachedBlob));
+      currentAudioEl = audio;
+      audio.addEventListener('ended', clearPlaying);
+      audio.addEventListener('error', clearPlaying);
+      audio.play().catch(clearPlaying);
+      return;
+    }
+
+    // Перебираем несколько известных вариантов эндпоинта по очереди — домен
+    // и параметр client отличаются у разных инструментов/версий, и, похоже,
+    // Google сейчас проверяет заголовок Referer (браузер всегда шлёт наш
+    // собственный адрес, подделать это из JS невозможно) — так что не факт,
+    // что ХОТЬ ОДИН вариант реально сработает, но стоит проверить все.
+    const candidates = ttsUrlCandidates(hebrewText);
+    console.log('[TTS DEBUG] слово:', hebrewText, '— пробуем', candidates.length, 'вариант(а/ов) URL');
+
+    let index = 0;
+    const tryNext = () => {
+      if (index >= candidates.length) {
+        console.log('[TTS DEBUG] ни один вариант не сработал');
+        clearPlaying();
+        return;
+      }
+      const url = candidates[index];
+      console.log(`[TTS DEBUG] вариант ${index + 1}/${candidates.length}:`, url);
+      index++;
+
+      const audio = new Audio(url);
+      currentAudioEl = audio;
+      audio.addEventListener('canplay', () => console.log('[TTS DEBUG] canplay — этот вариант рабочий'));
+      audio.addEventListener('playing', () => console.log('[TTS DEBUG] playing — реально звучит'));
+      audio.addEventListener('error', () => {
+        const err = audio.error;
+        console.log('[TTS DEBUG] вариант не подошёл, code:', err && err.code,
+          '(1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED)');
+        tryNext();
+      });
+      audio.addEventListener('ended', clearPlaying);
+      audio.play().catch((e) => {
+        console.log('[TTS DEBUG] play() отклонён для этого варианта:', e && e.name);
+      });
+    };
+    tryNext();
   }
 
   function toggleFavorite(id) {
