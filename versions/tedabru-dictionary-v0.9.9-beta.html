@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.10 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.9 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1511,61 +1511,61 @@
 
   <div class="add-word-panel" id="addWordPanel" style="display:none;">
     <div class="add-mode-toggle">
-      <button type="button" class="link-btn" id="toggleBulkModeBtn" data-i18n="Добавить несколько слов сразу">Добавить несколько слов сразу</button>
+      <button type="button" class="link-btn" id="toggleBulkModeBtn">Добавить несколько слов сразу</button>
     </div>
 
     <div id="singleAddFields">
       <div class="nikkud-suggestion" id="nikkudSuggestion"></div>
 
       <div class="field">
-        <label data-i18n="Транскрипция">Транскрипция</label>
+        <label>Транскрипция</label>
         <input type="text" id="inputTranslit" />
       </div>
 
       <div class="field">
-        <label data-i18n="Перевод">Перевод</label>
+        <label>Перевод</label>
         <input type="text" id="inputTranslation" />
       </div>
 
       <div class="field">
-        <label data-i18n="Часть речи">Часть речи</label>
+        <label>Часть речи</label>
         <select id="inputPos">
-          <option value="сущ, м.р" data-i18n="Существительное, м.р.">Существительное, м.р.</option>
-          <option value="сущ, ж.р" data-i18n="Существительное, ж.р.">Существительное, ж.р.</option>
-          <option value="прил" data-i18n="Прилагательное">Прилагательное</option>
-          <option value="пааль" data-i18n="Глагол, пааль">Глагол, пааль</option>
-          <option value="пиэль" data-i18n="Глагол, пиэль">Глагол, пиэль</option>
-          <option value="хифиль" data-i18n="Глагол, хифиль">Глагол, хифиль</option>
-          <option value="нифаль" data-i18n="Глагол, нифаль">Глагол, нифаль</option>
-          <option value="hитпаэль" data-i18n="Глагол, hитпаэль">Глагол, hитпаэль</option>
-          <option value="пуаль" data-i18n="Глагол, пуаль">Глагол, пуаль</option>
-          <option value="хуфаль" data-i18n="Глагол, хуфаль">Глагол, хуфаль</option>
-          <option value="местоим" data-i18n="Местоимение">Местоимение</option>
-          <option value="числ" data-i18n="Числительное">Числительное</option>
-          <option value="нареч" data-i18n="Наречие">Наречие</option>
-          <option value="др" data-i18n="Другое">Другое</option>
+          <option value="сущ, м.р">Существительное, м.р.</option>
+          <option value="сущ, ж.р">Существительное, ж.р.</option>
+          <option value="прил">Прилагательное</option>
+          <option value="пааль">Глагол, пааль</option>
+          <option value="пиэль">Глагол, пиэль</option>
+          <option value="хифиль">Глагол, хифиль</option>
+          <option value="нифаль">Глагол, нифаль</option>
+          <option value="hитпаэль">Глагол, hитпаэль</option>
+          <option value="пуаль">Глагол, пуаль</option>
+          <option value="хуфаль">Глагол, хуфаль</option>
+          <option value="местоим">Местоимение</option>
+          <option value="числ">Числительное</option>
+          <option value="нареч">Наречие</option>
+          <option value="др">Другое</option>
         </select>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-save" id="saveBtn" disabled data-i18n="Добавить">Добавить</button>
+        <button class="btn-save" id="saveBtn" disabled>Добавить</button>
       </div>
     </div>
 
     <div id="bulkAddFields" style="display:none;">
       <div class="field">
-        <label data-i18n="Слова через запятую или перенос строки">Слова через запятую или перенос строки</label>
-        <textarea id="bulkInput" rows="7" placeholder="мишпаха, шалом, ילד, тода раба, спасибо..." data-i18n-placeholder="мишпаха, шалом, ילד, тода раба, спасибо..."></textarea>
+        <label>Слова через запятую или перенос строки</label>
+        <textarea id="bulkInput" rows="7" placeholder="мишпаха, шалом, ילד, тода раба, спасибо..."></textarea>
       </div>
       <div class="bulk-progress" id="bulkProgress" style="display:none;"></div>
       <div class="modal-actions">
-        <button class="btn-save" id="bulkAddSubmitBtn" data-i18n="Добавить все">Добавить все</button>
-        <button class="btn-stop" id="bulkAddStopBtn" style="display:none;" data-i18n="Остановить">Остановить</button>
+        <button class="btn-save" id="bulkAddSubmitBtn">Добавить все</button>
+        <button class="btn-stop" id="bulkAddStopBtn" style="display:none;">Остановить</button>
       </div>
     </div>
 
     <div class="bulk-collection-picker">
-      <div class="bulk-collection-label" data-i18n="Добавить сразу в подборку (необязательно)">Добавить сразу в подборку (необязательно)</div>
+      <div class="bulk-collection-label">Добавить сразу в подборку (необязательно)</div>
       <div class="filter-row" id="bulkCollectionChips"></div>
     </div>
   </div>
@@ -1573,24 +1573,24 @@
   <div class="edit-db-panel" id="editDbPanel" style="display:none;">
     <div id="editDbResults"></div>
 
-    <button type="button" class="link-btn" id="editDbAddNewToggle" style="display:none; margin-top:10px;" data-i18n="+ добавить новое значение к этому слову">+ добавить новое значение к этому слову</button>
+    <button type="button" class="link-btn" id="editDbAddNewToggle" style="display:none; margin-top:10px;">+ добавить новое значение к этому слову</button>
 
     <div id="editDbAddNewForm" style="display:none; margin-top:12px;">
       <div class="field">
-        <label data-i18n="Слово на иврите (с огласовками)">Слово на иврите (с огласовками)</label>
+        <label>Слово на иврите (с огласовками)</label>
         <input type="text" id="editDbNewWord" dir="rtl" />
       </div>
       <div class="field">
-        <label data-i18n="Часть речи">Часть речи</label>
+        <label>Часть речи</label>
         <select id="editDbNewPos">
-          <option value="noun-m" data-i18n="Существительное, м.р.">Существительное, м.р.</option>
-          <option value="noun-f" data-i18n="Существительное, ж.р.">Существительное, ж.р.</option>
-          <option value="adj" data-i18n="Прилагательное">Прилагательное</option>
-          <option value="other" data-i18n="Другое">Другое</option>
+          <option value="noun-m">Существительное, м.р.</option>
+          <option value="noun-f">Существительное, ж.р.</option>
+          <option value="adj">Прилагательное</option>
+          <option value="other">Другое</option>
         </select>
       </div>
       <div class="field">
-        <label data-i18n="Перевод">Перевод</label>
+        <label>Перевод</label>
         <textarea id="editDbNewGloss" rows="2"></textarea>
       </div>
       <div class="field">
@@ -1837,8 +1837,6 @@
     'В словаре пока нет слов': 'Your dictionary is empty yet',
     'Ничего не найдено по этому фильтру.': 'Nothing found for this filter.',
     'Результаты поиска': 'Search results',
-    'показаны первые': 'showing first',
-    'из': 'of',
     'Скрытые результаты': 'Hidden results',
     'Нажмите, чтобы отменить': 'Tap to undo',
     'Слово добавлено в ваш словарь': 'Word added to your dictionary',
@@ -1857,7 +1855,6 @@
     'Слова через запятую или перенос строки': 'Words separated by comma or line break',
     'Отменить добавление': 'Cancel adding',
     // ===== Общие кнопки/действия =====
-    'Добавить': 'Add',
     'Отмена': 'Cancel',
     'Сохранить': 'Save',
     'Сохранено': 'Saved',
@@ -1911,20 +1908,6 @@
     // ===== Редактор базы =====
     'Найдите слово, которое хотите отредактировать': 'Find the word you want to edit',
     'Добавить значение': 'Add a sense',
-    'Транскрипция': 'Transcription',
-    'Перевод': 'Translation',
-    'Существительное, м.р.': 'Noun, masc.',
-    'Существительное, ж.р.': 'Noun, fem.',
-    'Глагол, пааль': "Verb, pa'al",
-    'Глагол, пиэль': "Verb, pi'el",
-    'Глагол, хифиль': "Verb, hif'il",
-    'Глагол, нифаль': "Verb, nif'al",
-    'Глагол, hитпаэль': "Verb, hitpa'el",
-    'Глагол, пуаль': "Verb, pu'al",
-    'Глагол, хуфаль': "Verb, huf'al",
-    'Остановить': 'Stop',
-    '+ добавить новое значение к этому слову': '+ add a new sense to this word',
-    'мишпаха, шалом, ילד, тода раба, спасибо...': 'mishpakha, shalom, ילד, toda raba, thank you...',
     'добавить новое значение к этому слову': 'add a new sense to this word',
     'Ничего не найдено в редактируемых базах. Если слова совсем нет — можно завести первое значение для него кнопкой ниже.':
       "Nothing found in the editable databases. If the word doesn't exist at all, you can create its first entry with the button below.",
@@ -1941,38 +1924,6 @@
     let result = t(template);
     args.forEach(a => { result = result.replace('%s', a); });
     return result;
-  }
-
-  // Статичные атрибуты (title/placeholder), которые нельзя перевести прямо
-  // в HTML-разметке (там нет JS) — применяем их программно один раз при
-  // загрузке и заново при каждом переключении языка
-  const STATIC_TRANSLATIONS = [
-    { id: 'trainModeBtn', attr: 'title', key: 'Тренировка' },
-    { id: 'selectModeBtn', attr: 'title', key: 'Режим выбора' },
-    { id: 'editDbBtn', attr: 'title', key: 'Редактировать базу' },
-    { id: 'openModalBtn', attr: 'title', key: 'Добавить слово' },
-    { id: 'themeToggleBtn', attr: 'title', key: 'Переключить тему' },
-    { id: 'zoomInBtn', attr: 'title', key: 'Увеличить масштаб' },
-    { id: 'zoomOutBtn', attr: 'title', key: 'Уменьшить масштаб' },
-    { id: 'categoryFilterToggleBtn', attr: 'title', key: 'Фильтры по части речи' },
-  ];
-
-  function applyStaticTranslations() {
-    STATIC_TRANSLATIONS.forEach(({ id, attr, key }) => {
-      const el = document.getElementById(id);
-      if (el) el[attr] = t(key);
-    });
-    // универсальный обход — элементы сами объявляют, что и как у них переводить,
-    // через data-i18n (textContent), data-i18n-placeholder, data-i18n-title
-    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
-    document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
-    const searchInputEl = document.getElementById('searchInput');
-    if (searchInputEl && (!searchInputEl.placeholder ||
-        searchInputEl.placeholder.startsWith('Ищите по слову, переводу или транскрипции') ||
-        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription'))) {
-      searchInputEl.placeholder = defaultSearchPlaceholder();
-    }
   }
 
   // ===== Каскадная анимация появления карточек =====
@@ -2296,7 +2247,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.10';
+  const APP_VERSION = '0.9.9';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2591,7 +2542,7 @@
       <div id="instantDictResults"></div>
       ${categoryFilterActive() ? '' : `
       <button type="button" class="global-search-btn" id="globalSearchBtn" style="display:none;">
-        ${t('Искать среди всех слов')} «${searchQuery}»
+        Искать среди всех слов «${searchQuery}»
       </button>
       <div id="globalSearchResults"></div>
       `}
@@ -2680,18 +2631,18 @@
     el.innerHTML = `
       <div class="filter-row">
         ${MASTERY_LEVELS.filter(m => countByMastery[m.key]).map(m =>
-          `<button type="button" class="chip ${filterMastery === m.key ? 'active' : ''}" data-mastery="${m.key}">${t(m.label)} · ${countByMastery[m.key] || 0}</button>`
+          `<button type="button" class="chip ${filterMastery === m.key ? 'active' : ''}" data-mastery="${m.key}">${m.label} · ${countByMastery[m.key] || 0}</button>`
         ).join('')}
       </div>
       <div class="filter-row">
         ${(() => {
           const isAllActive = !filterMastery && !filterCollectionId && !filterFavorite && !filterPos;
-          return `<button type="button" class="chip ${isAllActive ? 'active' : ''}" id="allChip">${t('Все')} · ${words.length}</button>`;
+          return `<button type="button" class="chip ${isAllActive ? 'active' : ''}" id="allChip">Все · ${words.length}</button>`;
         })()}
-        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="${t('Избранное')}">★ ${favoriteCount}</button>` : ''}
+        ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="Избранное">★ ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
-          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="${t('Название подборки')}" />`
-          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${t('Добавить подборку')} +</button>`}
+          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="Название подборки" />`
+          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">Добавить подборку +</button>`}
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
@@ -2709,13 +2660,13 @@
             return `
               <div class="chip ${stateClass} chip-with-pencil">
                 <button type="button" class="chip-body" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>
-                <button type="button" class="chip-pencil-btn" data-coll-rename="${c.id}" title="${t('Переименовать')}">${PENCIL_ICON}</button>
+                <button type="button" class="chip-pencil-btn" data-coll-rename="${c.id}" title="Переименовать">${PENCIL_ICON}</button>
               </div>
             `;
           }
           return `<button type="button" class="chip" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
-        <button type="button" class="chip chip-text-only" id="filtersToggleChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg> ${t('Фильтры')}</button>
+        <button type="button" class="chip chip-text-only" id="filtersToggleChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg> Фильтры</button>
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
         <div class="filter-row">
@@ -2955,7 +2906,7 @@
           <div class="pos">${w.pos}</div>
         </div>
         ${isPendingDelete
-          ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
+          ? `<div class="delete-cancel-label">Нажмите, чтобы отменить</div>`
           : (editingWordId === w.id
             ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
             : `<div class="translation">${w.translation}</div>`)}
@@ -3343,7 +3294,7 @@
       primaryActionBtn.title = 'Удалить выбранное';
       primaryActionBtn.setAttribute('data-drop-delete', '1');
     } else if (addMode) {
-      headerTitleEl.textContent = t('Введите слово, которое хотите добавить');
+      headerTitleEl.textContent = 'Введите слово, которое хотите добавить';
       primaryActionBtn.innerHTML = EXIT_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
@@ -4293,10 +4244,8 @@
   let totalDictWordCount = null; // заполнится после того, как словарь реально загрузится
 
   function defaultSearchPlaceholder() {
-    const base = t('Ищите по слову, переводу или транскрипции');
-    if (totalDictWordCount === null) return base;
-    const count = totalDictWordCount.toLocaleString(currentLang === 'en' ? 'en-US' : 'ru-RU');
-    return currentLang === 'en' ? `${base} [${count} words in the database]` : `${base} [${count} слов в базе]`;
+    if (totalDictWordCount === null) return 'Ищите по слову, переводу или транскрипции';
+    return `Ищите по слову, переводу или транскрипции [${totalDictWordCount.toLocaleString('ru-RU')} слов в базе]`;
   }
 
   loadHebrewDict().then(() => { // запускаем загрузку сразу при открытии страницы, не дожидаясь первого поиска
@@ -4308,9 +4257,7 @@
     // обновляем текст подсказки, только если поле сейчас и так показывает
     // подсказку по умолчанию (а не "Впишите слово..."/"Найдите слово..." —
     // человек мог уже успеть зайти в другой режим, пока грузился словарь)
-    if (searchInputEl && (!searchInputEl.placeholder ||
-        searchInputEl.placeholder.startsWith('Ищите по слову, переводу или транскрипции') ||
-        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription'))) {
+    if (searchInputEl && (searchInputEl.placeholder === 'Ищите по слову, переводу или транскрипции' || !searchInputEl.placeholder)) {
       searchInputEl.placeholder = defaultSearchPlaceholder();
     }
   });
@@ -5450,7 +5397,7 @@
   function renderCandidatesInto(resultsEl, rawCandidates, total) {
     if (!rawCandidates.length) {
       resultsEl.innerHTML = categoryFilterActive()
-        ? `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">${t('Результаты поиска')} (0)</div><div class="sugg-note">${t('Ничего не найдено по этому фильтру.')}</div>`
+        ? `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
         : '';
       requestAnimationFrame(() => {
         const countEl = document.getElementById('searchResultsCountEl');
@@ -5535,12 +5482,12 @@
     };
 
     const countLabel = (total && total > visibleMatches.length)
-      ? `${t('Результаты поиска')} (${t('показаны первые')} ${visibleMatches.length} ${t('из')} ${total})`
-      : `${t('Результаты поиска')} (${visibleMatches.length})`;
+      ? `Результаты поиска (показаны первые ${visibleMatches.length} из ${total})`
+      : `Результаты поиска (${visibleMatches.length})`;
     resultsEl.innerHTML = `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
       visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
-        ${t('Скрытые результаты')} (${hiddenMatches.length})
+        Скрытые результаты (${hiddenMatches.length})
       </button>
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
@@ -5654,7 +5601,7 @@
     } finally {
       if (!isStale()) {
         btn.disabled = false;
-        btn.textContent = `${t('Искать среди всех слов')} «${query}»`;
+        btn.textContent = `Искать среди всех слов «${query}»`;
       }
     }
   }
@@ -6720,7 +6667,7 @@
     bulkMode = on;
     singleAddFieldsEl.style.display = on ? 'none' : '';
     bulkAddFieldsEl.style.display = on ? '' : 'none';
-    toggleBulkModeBtn.textContent = t(on ? 'Добавить одно слово' : 'Добавить несколько слов сразу');
+    toggleBulkModeBtn.textContent = on ? 'Добавить одно слово' : 'Добавить несколько слов сразу';
     if (on) {
       bulkInputEl.value = '';
       bulkProgressEl.style.display = 'none';
@@ -6979,12 +6926,10 @@
     currentLang = currentLang === 'ru' ? 'en' : 'ru';
     localStorage.setItem(LANG_STORAGE_KEY, currentLang);
     applyLangToggleUI();
-    applyStaticTranslations();
     renderFilterBar();
     renderList();
   });
   applyLangToggleUI();
-  applyStaticTranslations();
 
   // ===== Первичный рендер =====
   renderFilterBar();
