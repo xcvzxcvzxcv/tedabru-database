@@ -259,7 +259,7 @@
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 1fr 105px 105px;
+    grid-template-columns: 32px 1fr 105px 105px 94px 26px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -281,6 +281,7 @@
     background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
   }
   .search-result-row .search-status-icon {
+    justify-content: flex-start;
     padding: 4px 4px 4px 0;
   }
   .search-result-row .search-status-icon svg { width: 20px; height: 20px; }
@@ -288,6 +289,11 @@
   .search-result-row .meta-col { margin: 0; }
   .search-result-row .search-definition {
     text-align: left;
+  }
+  .search-result-row .row-num {
+    text-align: right;
+    font-size: 15px;
+    color: var(--muted);
   }
   @media (hover: hover) {
     .search-result-row:hover .hebrew-word,
@@ -1251,7 +1257,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.2</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.1</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1884,7 +1890,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.2';
+  const APP_VERSION = '0.8.1';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2230,10 +2236,6 @@
 
   function renderFilterBar() {
     const el = document.getElementById('filterBar');
-    if (categoryFilterPanelOpen || categoryFilterActive()) {
-      el.innerHTML = '';
-      return;
-    }
     const posValues = [...new Set(words.map(w => w.pos))].sort();
     const hasFavorites = words.some(w => w.favorite);
     // если избранных слов не осталось, а фильтр "Избранное" всё ещё был
@@ -2479,13 +2481,6 @@
     }
 
     const listEl = document.getElementById('wordList');
-
-    if (categoryFilterPanelOpen || categoryFilterActive()) {
-      listEl.innerHTML = `<div class="empty-state" style="padding:20px;">${globalSearchBlockHtml()}</div>`;
-      attachGlobalSearchHandler();
-      return;
-    }
-
     const filtered = getFilteredWords();
 
     if (filtered.length === 0) {
@@ -2878,8 +2873,6 @@
     categoryFilterPanelOpen = !categoryFilterPanelOpen;
     document.getElementById('categoryFilterToggleBtn').classList.toggle('active', categoryFilterPanelOpen || categoryFilterActive());
     renderCategoryFilterPanel();
-    renderFilterBar();
-    renderList();
   });
 
   function selectionHeaderText() {
@@ -5027,7 +5020,7 @@
     // ними. Зеркалирование — намеренное: человек должен на глаз отличать,
     // где он сейчас — в поиске или уже в своём словаре, даже при похожем
     // визуальном языке карточек.
-    const visibleRowHtml = (m) => {
+    const visibleRowHtml = (m, i) => {
       const existing = findExistingWordByHebrew(m.text);
       return `
       <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
@@ -5038,6 +5031,8 @@
           ${m.grammarLabel ? `<div class="pos">${m.grammarLabel}</div>` : ''}
         </div>
         <div class="hebrew-word">${m.text}</div>
+        <div></div>
+        <div class="row-num">${i + 1}</div>
       </button>
     `;
     };
@@ -6332,22 +6327,6 @@
     document.body.appendChild(lbl);
   }
 
-  function outlineRowTargets(row, targets, colors, labelTopStart) {
-    let labelTop = labelTopStart;
-    targets.forEach(([key, el], i) => {
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const color = colors[i % colors.length];
-      el.style.outline = `1px solid ${color}`;
-      el.classList.add('debug-outlined-el');
-      addDebugLine(Math.round(r.left), color, `${key} L ${Math.round(r.left)}`, labelTop);
-      labelTop += 18;
-      addDebugLine(Math.round(r.right), color, `${key} R ${Math.round(r.right)}`, labelTop);
-      labelTop += 18;
-    });
-    return labelTop;
-  }
-
   function renderDebugGrid() {
     clearDebugOverlay();
     const searchInput = document.getElementById('searchInput');
@@ -6359,53 +6338,41 @@
     addDebugLine(Math.round(searchRect.left), '#ff3b3b', 'search L ' + Math.round(searchRect.left), 40);
     addDebugLine(Math.round(searchRect.right), '#ff3b3b', 'search R ' + Math.round(searchRect.right), 60);
 
+    const firstRow = Array.from(document.querySelectorAll('.word-row')).find(r => !r.classList.contains('row-deleting'));
+    if (!firstRow) return;
+
+    const targets = [
+      ['favorite', firstRow.querySelector('.favorite-btn')],
+      ['hebrew', firstRow.querySelector('.hebrew-word')],
+      ['meta', firstRow.querySelector('.meta-col')],
+      ['translation', firstRow.querySelector('.translation')],
+      ['mastery', firstRow.querySelector('.mastery-dots')],
+      ['delete', firstRow.querySelector('.delete-btn')],
+      ['editdef', firstRow.querySelector('.edit-def-btn')],
+      ['rownum', firstRow.querySelector('.row-num')],
+    ];
     const colors = ['#39ff88', '#39d3ff', '#ffe539', '#ff39d3', '#ff9e39', '#8a7bff', '#c07bff', '#ffffff'];
     let labelTop = 100;
+    targets.forEach(([key, el], i) => {
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const color = colors[i % colors.length];
+      el.style.outline = `1px solid ${color}`;
+      el.classList.add('debug-outlined-el');
+      addDebugLine(Math.round(r.left), color, `${key} L ${Math.round(r.left)}`, labelTop);
+      labelTop += 18;
+      addDebugLine(Math.round(r.right), color, `${key} R ${Math.round(r.right)}`, labelTop);
+      labelTop += 18;
+    });
 
-    // ===== карта в личном словаре (.word-row) =====
-    const firstWordRow = Array.from(document.querySelectorAll('.word-row')).find(r => !r.classList.contains('row-deleting'));
-    if (firstWordRow) {
-      const targets = [
-        ['favorite', firstWordRow.querySelector('.favorite-btn')],
-        ['hebrew', firstWordRow.querySelector('.hebrew-word')],
-        ['meta', firstWordRow.querySelector('.meta-col')],
-        ['translation', firstWordRow.querySelector('.translation')],
-        ['mastery', firstWordRow.querySelector('.mastery-dots')],
-        ['delete', firstWordRow.querySelector('.delete-btn')],
-        ['editdef', firstWordRow.querySelector('.edit-def-btn')],
-        ['rownum', firstWordRow.querySelector('.row-num')],
-      ];
-      labelTop = outlineRowTargets(firstWordRow, targets, colors, labelTop) + 20;
-      const rowRect = firstWordRow.getBoundingClientRect();
-      console.log('[DEBUG GRID] word-row:', rowRect.left, '-', rowRect.right, '(width', rowRect.width, ')');
-    }
-
-    // ===== карта в результатах поиска (.search-result-row) — та же сетка,
-    // рядом, чтобы расхождения были видны напрямую, без переключения вкладок
-    const firstSearchRow = document.querySelector('.search-result-row');
-    if (firstSearchRow) {
-      const targets = [
-        ['status', firstSearchRow.querySelector('.search-status-icon')],
-        ['definition', firstSearchRow.querySelector('.search-definition')],
-        ['meta', firstSearchRow.querySelector('.meta-col')],
-        ['hebrew', firstSearchRow.querySelector('.hebrew-word')],
-      ];
-      outlineRowTargets(firstSearchRow, targets, colors, labelTop);
-      const rowRect = firstSearchRow.getBoundingClientRect();
-      console.log('[DEBUG GRID] search-result-row:', rowRect.left, '-', rowRect.right, '(width', rowRect.width, ')');
-    }
-
-    console.log('[DEBUG GRID] search input:', searchRect.left, '-', searchRect.right, '(width', searchRect.width, ')');
+    // сам row — целиком, для сверки с шириной строки поиска
+    const rowRect = firstRow.getBoundingClientRect();
+    console.log('[DEBUG GRID] search:', searchRect.left, '-', searchRect.right, '(width', searchRect.width, ')');
+    console.log('[DEBUG GRID] word-row:', rowRect.left, '-', rowRect.right, '(width', rowRect.width, ')');
   }
 
   if (location.hash.includes('debug')) {
-    window.addEventListener('load', () => {
-      setTimeout(renderDebugGrid, 1000);
-      // перерисовываем раз в секунду, пока включён #debug — проще и надёжнее,
-      // чем вешаться на все места, где может обновиться разметка (ввод в
-      // поиск, переключение фильтров, подгрузка результатов и т.д.)
-      setInterval(renderDebugGrid, 1000);
-    });
+    window.addEventListener('load', () => setTimeout(renderDebugGrid, 1000));
   }
 
   // ===== Первичный рендер =====
