@@ -134,7 +134,7 @@
 
   .search-input {
     width: 100%;
-    padding: 12px 40px 12px 40px;
+    padding: 12px 14px 12px 40px;
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 12px;
@@ -146,66 +146,6 @@
   }
   .search-input:focus { border-color: var(--purple); }
   .search-input::placeholder { color: var(--muted); }
-
-  .filter-toggle-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--muted);
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .filter-toggle-btn svg { width: 18px; height: 18px; }
-  .filter-toggle-btn.active { color: var(--gold); }
-
-  .category-filter-panel {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border-purple);
-    border-radius: 12px;
-    padding: 12px;
-    margin-top: 8px;
-  }
-  .category-filter-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .category-filter-row:not(:last-child) {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed rgba(123,53,212,0.2);
-  }
-  .category-filter-chip {
-    background: transparent;
-    border: 1px solid var(--border-purple);
-    color: var(--muted);
-    border-radius: 16px;
-    padding: 6px 14px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .category-filter-chip.active {
-    color: var(--gold);
-    border-color: var(--gold);
-    background: rgba(235,166,74,0.1);
-  }
-  .category-filter-clear {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 6px 0 0;
-  }
 
   /* ===== Word list ===== */
 
@@ -242,19 +182,11 @@
      Та же высота/паддинг/разделитель — чтобы ощущалось как "тот же язык
      карточек", но зеркалирование само по себе не даёт спутать поиск со
      своим словарём. */
-  .search-results-count {
-    font-size: 15px;
-    color: var(--muted);
-    padding: 10px 0 4px;
-    border-bottom: 1px solid rgba(123,53,212,0.15);
-    margin-bottom: 4px;
-  }
-
   .search-result-row {
     position: relative;
     display: grid;
     width: 100%;
-    grid-template-columns: 32px 1fr 105px 105px 94px 26px;
+    grid-template-columns: 32px 1fr 105px 105px;
     align-items: center;
     gap: 8px;
     padding: 14px 0;
@@ -276,7 +208,6 @@
     background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
   }
   .search-result-row .search-status-icon {
-    justify-content: flex-start;
     padding: 4px 4px 4px 0;
   }
   .search-result-row .search-status-icon svg { width: 20px; height: 20px; }
@@ -284,11 +215,6 @@
   .search-result-row .meta-col { margin: 0; }
   .search-result-row .search-definition {
     text-align: left;
-  }
-  .search-result-row .row-num {
-    text-align: right;
-    font-size: 15px;
-    color: var(--muted);
   }
   @media (hover: hover) {
     .search-result-row:hover .hebrew-word,
@@ -1252,7 +1178,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.0</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.4</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1271,11 +1197,7 @@
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input class="search-input" id="searchInput" placeholder="Ищите по слову, переводу или транскрипции" />
-      <button type="button" class="filter-toggle-btn" id="categoryFilterToggleBtn" title="Фильтры по части речи">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
-      </button>
     </div>
-    <div class="category-filter-panel" id="categoryFilterPanel" style="display:none;"></div>
     <div class="filter-bar" id="filterBar"></div>
   </div>
 
@@ -1581,291 +1503,6 @@
   let collections = loadCollections(); // [{ id, name }]
   let searchQuery = '';
 
-  // ===== Браузинг всей базы иврита по части речи (не касается личного словаря) =====
-  let categoryFilterPanelOpen = false;
-  let categoryFilter = null; // { pos, binyan, tense, person, number, gender } — null, если фильтр выключен
-
-  const POS_FILTER_CATEGORIES = [
-    { key: 'verb', label: 'Глагол' },
-    { key: 'noun', label: 'Существительное' },
-    { key: 'adj', label: 'Прилагательное' },
-    { key: 'adv', label: 'Наречие' },
-    { key: 'pron', label: 'Местоимение' },
-    { key: 'num', label: 'Числительное' },
-    { key: 'name', label: 'Имя собственное' },
-    { key: 'det', label: 'Определитель' },
-    { key: 'conj', label: 'Союз' },
-    { key: 'prep', label: 'Предлог' },
-    { key: 'particle', label: 'Частица' },
-    { key: 'intj', label: 'Междометие' },
-    { key: 'phrase', label: 'Устойчивое выражение' },
-    { key: 'question', label: 'Вопросительное слово' },
-  ];
-  const BINYAN_FILTER_OPTIONS = [
-    { key: 'pa', label: 'Пааль' },
-    { key: 'pi', label: 'Пиэль' },
-    { key: 'hif', label: 'hифиль' },
-    { key: 'nif', label: 'Нифъаль' },
-    { key: 'hitp', label: 'hитпаэль' },
-  ];
-  // ключ — подстрока, которую реально ищем внутри свободного текста hint у
-  // спряжённых форм (там нет отдельных структурированных полей время/лицо/
-  // число — только 24 варианта готовых русских формулировок)
-  const TENSE_FILTER_OPTIONS = [
-    { key: 'прошедшее время', label: 'Прошедшее' },
-    { key: 'настоящее время', label: 'Настоящее' },
-    { key: 'будущее время', label: 'Будущее' },
-    { key: 'повелительное наклонение', label: 'Повелительное' },
-  ];
-  const PERSON_FILTER_OPTIONS = [
-    { key: 'я', label: 'я' },
-    { key: 'ты', label: 'ты' },
-    { key: 'он', label: 'он' },
-    { key: 'она', label: 'она' },
-    { key: 'мы', label: 'мы' },
-    { key: 'вы', label: 'вы' },
-    { key: 'они', label: 'они' },
-  ];
-  const NUMBER_FILTER_OPTIONS = [
-    { key: 'sg', label: 'ед.ч.' },
-    { key: 'pl', label: 'мн.ч.' },
-  ];
-  const GENDER_FILTER_OPTIONS = [
-    { key: 'm', label: 'м.р.' },
-    { key: 'f', label: 'ж.р.' },
-  ];
-  // часть речи в базе не размечена отдельно для вопросительных слов (они
-  // расползлись по adv/pron/det/particle) — единственный надёжный способ
-  // выделить их как категорию — явный список скелетов
-  const QUESTION_WORD_SKELETONS = ['מי', 'מה', 'כמה', 'למה', 'מאין', 'מאיפה', 'איפה', 'איך', 'לאן', 'איזה', 'איזו', 'מתי', 'ממתי', 'האם'];
-  const CATEGORY_BROWSE_LIMIT = 200; // защита от рендера тысяч строк разом (например, "все существительные")
-
-  function categoryFilterActive() {
-    return !!(categoryFilter && categoryFilter.pos);
-  }
-
-  // Возвращает { candidates, total } — candidates уже обрезаны лимитом,
-  // total — реальное количество найденного (для "показаны первые N из M")
-  function computeCategoryBrowseCandidates(filter) {
-    if (!filter || !filter.pos) return { candidates: [], total: 0 };
-
-    let results = [];
-
-    if (filter.pos === 'question') {
-      QUESTION_WORD_SKELETONS.forEach(sk => {
-        (hebrewDictSkeleton[sk] || []).forEach(e => results.push(buildDictCandidate(e)));
-      });
-    } else if (filter.pos === 'verb') {
-      if (filter.tense || filter.person || filter.number) {
-        // \b в JS не считает кириллицу "словообразующими" символами (\w по
-        // умолчанию — только [A-Za-z0-9_]), так что \bя\b на русском тексте
-        // не работает вообще. Разбиваем вручную по границам не-кириллических
-        // символов и ищем точный токен — надёжно независимо от пунктуации
-        // ("ты (м.р.)" в новой базе форм vs "ты (м.)" в старой — токенизация
-        // одинаково корректно вычленяет чистое "ты" в обоих случаях).
-        const hintMatchesFilter = (hint) => {
-          const hintTokens = hint.split(/[^а-яёА-ЯЁ]+/).filter(Boolean);
-          if (filter.tense && !hint.includes(filter.tense)) return false;
-          if (filter.person && !hintTokens.includes(filter.person)) return false;
-          if (filter.number) {
-            const SINGULAR_PERSONS = ['я', 'ты', 'он', 'она'];
-            const PLURAL_PERSONS = ['мы', 'вы', 'они'];
-            const isSingular = hintTokens.some(t => SINGULAR_PERSONS.includes(t)) || hint.includes('ед.ч.');
-            const isPlural = hintTokens.some(t => PLURAL_PERSONS.includes(t)) || hint.includes('мн.ч.');
-            if (filter.number === 'sg' && !isSingular) return false;
-            if (filter.number === 'pl' && !isPlural) return false;
-          }
-          return true;
-        };
-
-        // основной источник — новая, качественная база сгенерированных форм.
-        // Пока (на момент реализации) она покрывает только биньян пааль —
-        // биньян у самой формы не хранится, подтягиваем перекрёстной ссылкой
-        // через лемму в verbsDict.
-        const coveredSkeletons = new Set();
-        for (const skeleton in generatedVerbForms) {
-          for (const entry of generatedVerbForms[skeleton]) {
-            const lemmaEntries = verbsDict[entry.lemma_skeleton];
-            const binyan = lemmaEntries && lemmaEntries[0] && lemmaEntries[0].binyan;
-            if (filter.binyan && binyan !== filter.binyan) continue;
-            if (!hintMatchesFilter(entry.hint || '')) continue;
-            results.push(buildGeneratedVerbFormCandidate(entry));
-            coveredSkeletons.add(entry.lemma_skeleton);
-          }
-        }
-
-        // старый (Wiktionary) индекс форм — используем ТОЛЬКО как fallback
-        // для биньянов, которых новая база пока не покрывает вообще (сейчас
-        // это все, кроме пааль), и только для лемм, для которых новая база
-        // ничего не дала — та же логика приоритета, что и в обычном поиске
-        const binyanAliases = { hitp: ['hit', 'hitp'] }; // старый индекс называет hитпаэль "hit"
-        for (const skeleton in hebrewVerbForms) {
-          for (const entry of hebrewVerbForms[skeleton]) {
-            if (coveredSkeletons.has(entry.lemma_skeleton)) continue;
-            const entryBinyan = entry.lemma_binyan;
-            if (filter.binyan) {
-              const aliases = binyanAliases[filter.binyan] || [filter.binyan];
-              if (!aliases.includes(entryBinyan)) continue;
-            }
-            if (!hintMatchesFilter(entry.hint || '')) continue;
-            results.push(buildVerbFormCandidate(entry));
-          }
-        }
-      } else {
-        // без уточнения время/лицо/число — просто леммы (инфинитивы) нужного биньяна
-        for (const skeleton in verbsDict) {
-          for (const entry of verbsDict[skeleton]) {
-            if (filter.binyan && entry.binyan !== filter.binyan) continue;
-            results.push(buildVerbDictCandidate(entry));
-          }
-        }
-      }
-    } else {
-      for (const skeleton in hebrewDictSkeleton) {
-        for (const entry of hebrewDictSkeleton[skeleton]) {
-          const isPrepMatch = filter.pos === 'prep' && (entry.pos === 'prep' || entry.pos === 'prep_phrase' || entry.pos === 'postp');
-          if (entry.pos !== filter.pos && !isPrepMatch) continue;
-          if (filter.gender && entry.gender !== filter.gender) continue;
-          results.push(buildDictCandidate(entry));
-        }
-      }
-    }
-
-    // если в строке поиска ещё и что-то введено — дополнительно сужаем уже
-    // отфильтрованный по категории список простым текстовым совпадением
-    // (не гоняем это через resolveCandidates — там своя, более тяжёлая логика
-    // для угадывания написания, тут просто фильтруем то, что уже есть)
-    const q = normalizeForCompare(searchQuery || '');
-    if (q) {
-      results = results.filter(c =>
-        normalizeForCompare(c.translit || '').includes(q) ||
-        normalizeForCompare(c.translation || '').includes(q) ||
-        stripNiqqud(c.text || '').includes((searchQuery || '').trim())
-      );
-    }
-
-    const merged = mergeCandidatesBySense(results);
-    const total = merged.length;
-    return { candidates: merged.slice(0, CATEGORY_BROWSE_LIMIT), total };
-  }
-
-  function categoryFilterSummaryLabel() {
-    if (!categoryFilterActive()) return '';
-    const posDef = POS_FILTER_CATEGORIES.find(c => c.key === categoryFilter.pos);
-    const parts = [posDef ? posDef.label : categoryFilter.pos];
-    if (categoryFilter.binyan) parts.push(BINYAN_FILTER_OPTIONS.find(b => b.key === categoryFilter.binyan).label);
-    if (categoryFilter.tense) parts.push(TENSE_FILTER_OPTIONS.find(t => t.key === categoryFilter.tense).label.toLowerCase());
-    if (categoryFilter.person) parts.push(categoryFilter.person);
-    if (categoryFilter.number) parts.push(NUMBER_FILTER_OPTIONS.find(n => n.key === categoryFilter.number).label);
-    if (categoryFilter.gender) parts.push(GENDER_FILTER_OPTIONS.find(g => g.key === categoryFilter.gender).label);
-    return parts.join(', ');
-  }
-
-  function renderCategoryFilterPanel() {
-    const toggleBtn = document.getElementById('categoryFilterToggleBtn');
-    if (toggleBtn) toggleBtn.classList.toggle('active', categoryFilterPanelOpen || categoryFilterActive());
-    const panel = document.getElementById('categoryFilterPanel');
-    if (!panel) return;
-    if (!categoryFilterPanelOpen) {
-      panel.style.display = 'none';
-      panel.innerHTML = '';
-      return;
-    }
-    panel.style.display = 'block';
-
-    const posChips = POS_FILTER_CATEGORIES.map(c => `
-      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${c.label}</button>
-    `).join('');
-
-    let subRows = '';
-    if (categoryFilter && categoryFilter.pos === 'verb') {
-      const binyanChips = BINYAN_FILTER_OPTIONS.map(b => `
-        <button type="button" class="category-filter-chip ${categoryFilter.binyan === b.key ? 'active' : ''}" data-binyan="${b.key}">${b.label}</button>
-      `).join('');
-      const tenseChips = TENSE_FILTER_OPTIONS.map(t => `
-        <button type="button" class="category-filter-chip ${categoryFilter.tense === t.key ? 'active' : ''}" data-tense="${t.key}">${t.label}</button>
-      `).join('');
-      const personChips = PERSON_FILTER_OPTIONS.map(p => `
-        <button type="button" class="category-filter-chip ${categoryFilter.person === p.key ? 'active' : ''}" data-person="${p.key}">${p.label}</button>
-      `).join('');
-      const numberChips = NUMBER_FILTER_OPTIONS.map(n => `
-        <button type="button" class="category-filter-chip ${categoryFilter.number === n.key ? 'active' : ''}" data-number="${n.key}">${n.label}</button>
-      `).join('');
-      subRows = `
-        <div class="category-filter-row">${binyanChips}</div>
-        <div class="category-filter-row">${tenseChips}</div>
-        <div class="category-filter-row">${personChips}</div>
-        <div class="category-filter-row">${numberChips}</div>
-      `;
-    } else if (categoryFilter && ['noun', 'adj', 'pron', 'num', 'name', 'det'].includes(categoryFilter.pos)) {
-      const genderChips = GENDER_FILTER_OPTIONS.map(g => `
-        <button type="button" class="category-filter-chip ${categoryFilter.gender === g.key ? 'active' : ''}" data-gender="${g.key}">${g.label}</button>
-      `).join('');
-      subRows = `<div class="category-filter-row">${genderChips}</div>`;
-    }
-
-    panel.innerHTML = `
-      <div class="category-filter-row">${posChips}</div>
-      ${subRows}
-      ${categoryFilterActive() ? '<button type="button" class="category-filter-clear" id="categoryFilterClearBtn">Сбросить фильтр</button>' : ''}
-    `;
-
-    panel.querySelectorAll('[data-pos]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.pos;
-        categoryFilter = (categoryFilter && categoryFilter.pos === key) ? null : { pos: key };
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    panel.querySelectorAll('[data-binyan]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.binyan;
-        categoryFilter.binyan = categoryFilter.binyan === key ? null : key;
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    panel.querySelectorAll('[data-tense]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.tense;
-        categoryFilter.tense = categoryFilter.tense === key ? null : key;
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    panel.querySelectorAll('[data-person]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.person;
-        categoryFilter.person = categoryFilter.person === key ? null : key;
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    panel.querySelectorAll('[data-number]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.number;
-        categoryFilter.number = categoryFilter.number === key ? null : key;
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    panel.querySelectorAll('[data-gender]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.gender;
-        categoryFilter.gender = categoryFilter.gender === key ? null : key;
-        renderCategoryFilterPanel();
-        renderList();
-      });
-    });
-    const clearBtn = document.getElementById('categoryFilterClearBtn');
-    if (clearBtn) clearBtn.addEventListener('click', () => {
-      categoryFilter = null;
-      renderCategoryFilterPanel();
-      renderList();
-    });
-  }
-
   // ===== Универсальная модалка — замена confirm()/prompt() =====
   // ===== Тост-уведомление (не модалка) — держится 2 секунды, потом фейд-аут =====
   const toastEl = document.getElementById('toast');
@@ -1885,7 +1522,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.0';
+  const APP_VERSION = '0.7.4';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2172,15 +1809,13 @@
   }
 
   function globalSearchBlockHtml() {
-    if (!searchQuery.trim() && !categoryFilterActive()) return '';
+    if (!searchQuery.trim()) return '';
     return `
       <div id="instantDictResults"></div>
-      ${categoryFilterActive() ? '' : `
       <button type="button" class="global-search-btn" id="globalSearchBtn">
-        Искать среди всех слов «${searchQuery}»
+        Искать среди всех слов иврита по транскрипции «${searchQuery}»
       </button>
       <div id="globalSearchResults"></div>
-      `}
     `;
   }
 
@@ -2190,18 +1825,6 @@
     const myGeneration = ++instantSearchGeneration;
     const el = document.getElementById('instantDictResults');
     if (!el) return;
-    if (categoryFilterActive()) {
-      // браузинг всей базы по части речи — синхронно, без сети, значит
-      // никакой гонки поколений можно не бояться, но проверяем на всякий
-      // случай (categoryFilter мог смениться, пока ждали loadHebrewDict)
-      await loadHebrewDict();
-      if (myGeneration !== instantSearchGeneration) return;
-      const el2 = document.getElementById('instantDictResults');
-      if (!el2) return;
-      const { candidates, total } = computeCategoryBrowseCandidates(categoryFilter);
-      renderCandidatesInto(el2, candidates, total);
-      return;
-    }
     const candidates = await resolveCandidatesDictOnly(query);
     if (myGeneration !== instantSearchGeneration) return; // устарело — стартовал более новый ввод
     const el2 = document.getElementById('instantDictResults'); // список мог перерисоваться за время ожидания
@@ -2211,10 +1834,10 @@
 
   function attachGlobalSearchHandler() {
     const btn = document.getElementById('globalSearchBtn');
-    if (btn && searchQuery.trim() && !categoryFilterActive()) {
+    if (btn && searchQuery.trim()) {
       btn.addEventListener('click', () => runGlobalTranscriptionSearch(searchQuery.trim(), btn));
     }
-    if (searchQuery.trim() || categoryFilterActive()) {
+    if (searchQuery.trim()) {
       runInstantDictSearch(searchQuery.trim());
     }
   }
@@ -2863,12 +2486,6 @@
   const primaryActionBtn = document.getElementById('openModalBtn');
   const headerTitleEl = document.getElementById('headerTitle');
   const wordListEl = document.getElementById('wordList');
-
-  document.getElementById('categoryFilterToggleBtn').addEventListener('click', () => {
-    categoryFilterPanelOpen = !categoryFilterPanelOpen;
-    document.getElementById('categoryFilterToggleBtn').classList.toggle('active', categoryFilterPanelOpen || categoryFilterActive());
-    renderCategoryFilterPanel();
-  });
 
   function selectionHeaderText() {
     const parts = [];
@@ -4956,11 +4573,9 @@
   // Общая логика обработки и отрисовки кандидатов — используется и мгновенным
   // словарным поиском (при вводе), и поиском через сеть (по кнопке). Отдельно
   // вынесено, чтобы не дублировать дедупликацию/фильтр мусора/рендер дважды.
-  function renderCandidatesInto(resultsEl, rawCandidates, total) {
+  function renderCandidatesInto(resultsEl, rawCandidates) {
     if (!rawCandidates.length) {
-      resultsEl.innerHTML = categoryFilterActive()
-        ? `<div class="search-results-count">Результаты поиска (0)</div><div class="sugg-note">Ничего не найдено по этому фильтру.</div>`
-        : '';
+      resultsEl.innerHTML = '';
       return false;
     }
 
@@ -5015,7 +4630,7 @@
     // ними. Зеркалирование — намеренное: человек должен на глаз отличать,
     // где он сейчас — в поиске или уже в своём словаре, даже при похожем
     // визуальном языке карточек.
-    const visibleRowHtml = (m, i) => {
+    const visibleRowHtml = (m) => {
       const existing = findExistingWordByHebrew(m.text);
       return `
       <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
@@ -5026,17 +4641,11 @@
           ${m.grammarLabel ? `<div class="pos">${m.grammarLabel}</div>` : ''}
         </div>
         <div class="hebrew-word">${m.text}</div>
-        <div></div>
-        <div class="row-num">${i + 1}</div>
       </button>
     `;
     };
 
-    const countLabel = (total && total > visibleMatches.length)
-      ? `Результаты поиска (показаны первые ${visibleMatches.length} из ${total})`
-      : `Результаты поиска (${visibleMatches.length})`;
-    resultsEl.innerHTML = `<div class="search-results-count">${countLabel}</div>` +
-      visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
+    resultsEl.innerHTML = visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
         Скрытые результаты (${hiddenMatches.length})
       </button>
@@ -5135,7 +4744,7 @@
     } finally {
       if (!isStale()) {
         btn.disabled = false;
-        btn.textContent = `Искать среди всех слов «${query}»`;
+        btn.textContent = `Искать среди всех слов иврита по транскрипции «${query}»`;
       }
     }
   }
