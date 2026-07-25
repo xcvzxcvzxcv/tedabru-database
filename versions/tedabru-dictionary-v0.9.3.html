@@ -20,52 +20,18 @@
     --border-purple: #6b21a8;
     --card-bg: #150a26;
     --muted: #7c5fa0;
-    --text-main: #e8ddf5;
-    --bg-glow: #1a0d33;
-    --ink-rgb: 255,255,255;
-    --dim-text: #8b7fa8;
-    --dim-text-soft: #6a5f85;
-    --rating-good-text: #d6c8ff;
-    --danger-text: #e08a9a;
   }
-
-  /* ===== Светлая тема — тёплый кремовый пергамент вместо тёмного манускрипта.
-     Переопределяем те же имена переменных, поэтому всё, что уже написано
-     через var(...), подхватывает новую палитру само собой без переписывания
-     каждого правила заново. --ink-rgb — RGB-триплет "чернил" для всех
-     полупрозрачных подложек вида rgba(var(--ink-rgb), 0.05): на тёмном фоне
-     подсветка идёт белым поверх тёмного, на светлом — тёмным поверх
-     кремового, без отдельной переменной под каждое значение прозрачности. */
-  html[data-theme="light"] {
-    --gold: #c9822e;
-    --gold-soft: #b8874a;
-    --purple: #7b35d4;
-    --purple-dark: #5b1fa0;
-    --text-secondary: #6b5490;
-    --bg-dark: #f7efdc;
-    --border-purple: #b79ae0;
-    --card-bg: #efe3c5;
-    --muted: #8577a0;
-    --text-main: #2d1f42;
-    --bg-glow: #fff8ec;
-    --ink-rgb: 45,31,66;
-    --dim-text: #a89880;
-    --dim-text-soft: #b8ac98;
-    --rating-good-text: #4a2f7a;
-    --danger-text: #8a2f42;
-  }
-
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    background: radial-gradient(ellipse at top, var(--bg-glow) 0%, var(--bg-dark) 60%);
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
     background-attachment: fixed;
     min-height: 100vh;
     min-height: 100dvh;
     overscroll-behavior-y: none;
     font-family: 'Noto Serif', serif;
-    color: var(--text-main);
+    color: #e8ddf5;
   }
 
   .zoom-control {
@@ -75,7 +41,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--card-bg);
+    background: rgba(20,10,35,0.92);
     border: 1px solid var(--border-purple);
     border-radius: 20px;
     padding: 6px 10px;
@@ -106,28 +72,6 @@
     font-family: 'Inter', sans-serif;
   }
 
-  .theme-toggle-btn {
-    position: fixed;
-    bottom: 16px;
-    left: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-purple);
-    border-radius: 20px;
-    color: var(--muted);
-    cursor: pointer;
-    z-index: 500;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .theme-toggle-btn svg { width: 18px; height: 18px; }
-  @media (hover: hover) {
-    .theme-toggle-btn:hover { color: var(--gold); }
-  }
-
   .app {
     max-width: 792px;
     margin: 0 auto;
@@ -151,7 +95,7 @@
     margin: 0 -20px 20px;
     padding-left: calc(20px + env(safe-area-inset-left));
     padding-right: calc(20px + env(safe-area-inset-right));
-    background: radial-gradient(ellipse at top, var(--bg-glow) 0%, var(--bg-dark) 60%);
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
     background-attachment: fixed;
   }
   .header::after {
@@ -161,7 +105,7 @@
     right: 0;
     bottom: -28px;
     height: 28px;
-    background: radial-gradient(ellipse at top, var(--bg-glow) 0%, var(--bg-dark) 60%);
+    background: radial-gradient(ellipse at top, #1a0d33 0%, var(--bg-dark) 60%);
     background-attachment: fixed;
     -webkit-mask-image: linear-gradient(to bottom, black, transparent);
     mask-image: linear-gradient(to bottom, black, transparent);
@@ -238,10 +182,10 @@
   .search-input {
     width: 100%;
     padding: 12px 40px 12px 40px;
-    background: rgba(var(--ink-rgb),0.03);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 12px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     outline: none;
@@ -273,7 +217,7 @@
   .filter-toggle-btn.active { color: var(--gold); }
 
   .category-filter-panel {
-    background: rgba(var(--ink-rgb),0.02);
+    background: rgba(255,255,255,0.02);
     border: 1px solid var(--border-purple);
     border-radius: 12px;
     padding: 12px;
@@ -542,8 +486,8 @@
 
   .chip.chip-input {
     width: 150px;
-    background: rgba(var(--ink-rgb),0.03);
-    color: var(--text-main);
+    background: rgba(255,255,255,0.03);
+    color: #e8ddf5;
     outline: none;
   }
   .chip.chip-input:focus { border-color: var(--purple); }
@@ -585,13 +529,13 @@
     flex-shrink: 0;
     border: none;
     border-radius: 50%;
-    background: rgba(var(--ink-rgb),0.1);
+    background: rgba(255,255,255,0.1);
     color: inherit;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
   .chip-with-pencil .chip-pencil-btn svg { width: 13px; height: 13px; }
-  .chip-with-pencil .chip-pencil-btn:active { background: rgba(var(--ink-rgb),0.2); }
+  .chip-with-pencil .chip-pencil-btn:active { background: rgba(255,255,255,0.2); }
 
   /* Подборка-цель слияния — визуально "раздвигается" под наведённым чипом */
   .chip.coll-drop-widen {
@@ -659,7 +603,7 @@
     border: 1px solid var(--border-purple);
     padding: 12px 22px;
     border-radius: 12px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 15px;
     z-index: 300;
@@ -726,7 +670,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(var(--ink-rgb),0.12);
+    background: rgba(255,255,255,0.12);
     flex-shrink: 0;
   }
   .mastery-dot.filled { background: var(--gold); }
@@ -808,7 +752,7 @@
   .translation {
     font-family: 'Noto Serif', serif;
     font-size: 16px;
-    color: var(--text-main);
+    color: #e8ddf5;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -816,8 +760,8 @@
   .translation-edit {
     font-family: 'Noto Serif', serif;
     font-size: 16px;
-    color: var(--text-main);
-    background: rgba(var(--ink-rgb),0.03);
+    color: #e8ddf5;
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--purple);
     border-radius: 6px;
     padding: 2px 6px;
@@ -861,7 +805,7 @@
     position: absolute;
     left: 0; right: 0; bottom: 0;
     height: 2px;
-    background: rgba(var(--ink-rgb),0.06);
+    background: rgba(255,255,255,0.06);
   }
   .delete-timer-bar {
     height: 100%;
@@ -871,8 +815,8 @@
   }
 
   .row-dimmed .hebrew-word,
-  .row-dimmed .translation { color: var(--dim-text); }
-  .row-dimmed .translit { color: var(--dim-text-soft); }
+  .row-dimmed .translation { color: #8b7fa8; }
+  .row-dimmed .translit { color: #6a5f85; }
 
   @media (hover: hover) {
     .word-row:hover .hebrew-word,
@@ -967,10 +911,10 @@
     width: 100%;
     padding: 10px 12px;
     margin-bottom: 14px;
-    background: rgba(var(--ink-rgb),0.03);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 10px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 15px;
     outline: none;
@@ -994,7 +938,7 @@
   }
   .action-modal-btn:active { background: rgba(107,33,168,0.25); }
   .action-modal-btn.primary { background: var(--gold); border-color: var(--gold); color: #2a1608; font-weight: 700; }
-  .action-modal-btn.danger { background: rgba(168,69,90,0.2); border-color: #a8455a; color: var(--danger-text); }
+  .action-modal-btn.danger { background: rgba(168,69,90,0.2); border-color: #a8455a; color: #e08a9a; }
   .action-modal-btn.cancel { background: transparent; color: var(--muted); }
 
   .add-word-panel {
@@ -1020,10 +964,10 @@
   .field textarea {
     width: 100%;
     padding: 10px 12px;
-    background: rgba(var(--ink-rgb),0.03);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 10px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 15px;
     resize: vertical;
@@ -1084,10 +1028,10 @@
     width: 100%;
     min-height: 60px;
     padding: 10px 12px;
-    background: rgba(var(--ink-rgb),0.03);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 10px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 15px;
     resize: vertical;
@@ -1184,7 +1128,7 @@
   .train-card-face.train-card-face-ru {
     font-family: 'Noto Serif', serif;
     font-size: 26px;
-    color: var(--text-main);
+    color: #e8ddf5;
     direction: ltr;
   }
   .train-card-back {
@@ -1205,7 +1149,7 @@
   .train-card-back .translation {
     font-family: 'Noto Serif', serif;
     font-size: 20px;
-    color: var(--text-main);
+    color: #e8ddf5;
     white-space: normal;
     text-align: center;
   }
@@ -1227,7 +1171,7 @@
     border-radius: 12px;
     border: 1px solid var(--border-purple);
     background: transparent;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 14px;
     cursor: pointer;
@@ -1237,9 +1181,9 @@
     font-size: 11px;
     color: var(--muted);
   }
-  .train-rate-again { border-color: #a8455a; color: var(--danger-text); }
+  .train-rate-again { border-color: #a8455a; color: #e08a9a; }
   .train-rate-hard { border-color: var(--gold-soft); color: var(--gold-soft); }
-  .train-rate-good { border-color: var(--purple); color: var(--rating-good-text); }
+  .train-rate-good { border-color: var(--purple); color: #d6c8ff; }
   .train-rate-easy { border-color: #4ec98a; color: #4ec98a; }
   .train-rate-btn:active { transform: scale(0.97); }
 
@@ -1265,10 +1209,10 @@
   .field select {
     width: 100%;
     padding: 10px 12px;
-    background: rgba(var(--ink-rgb),0.03);
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border-purple);
     border-radius: 10px;
-    color: var(--text-main);
+    color: #e8ddf5;
     font-family: 'Noto Serif', serif;
     font-size: 15px;
     outline: none;
@@ -1343,7 +1287,7 @@
   .candidate-translation {
     font-family: 'Noto Serif', serif;
     font-size: 15px;
-    color: var(--text-main);
+    color: #e8ddf5;
     text-align: left;
     direction: ltr;
     margin-top: 4px;
@@ -1416,14 +1360,10 @@
   <button type="button" id="zoomInBtn" title="Увеличить масштаб">+</button>
 </div>
 
-<button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Переключить тему">
-  <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-</button>
-
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.4</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.3</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1607,7 +1547,7 @@
 
       <div class="field">
         <label>Новых слов за раз (карт уже введённых в повтор это не касается)</label>
-        <input type="number" id="trainNewLimit" min="0" value="20" style="width:100px; padding:8px 12px; background:rgba(var(--ink-rgb),0.03); border:1px solid var(--border-purple); border-radius:10px; color:var(--text-main); font-family:'Noto Serif', serif; font-size:15px;" />
+        <input type="number" id="trainNewLimit" min="0" value="20" style="width:100px; padding:8px 12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-purple); border-radius:10px; color:#e8ddf5; font-family:'Noto Serif', serif; font-size:15px;" />
       </div>
 
       <div class="edit-db-status" id="trainSetupStatus"></div>
@@ -2073,7 +2013,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.4';
+  const APP_VERSION = '0.9.3';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2420,8 +2360,6 @@
   const SPEAKER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 9 8 9 12 5 12 19 8 15 4 15" fill="currentColor" stroke="none"/><path d="M16 8a5 5 0 0 1 0 8"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   const CHECK_ON_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4" fill="rgba(235,166,74,0.2)"/><polyline points="7 12 10.5 15.5 17 8.5"/></svg>';
   const CHECK_OFF_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg>';
-  const SUN_ICON_INNER = '<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-  const MOON_ICON_INNER = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   const EXIT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
@@ -6690,28 +6628,6 @@
     applyAppZoom();
   });
   applyAppZoom();
-
-  // ===== Тема (тёмная/светлая) =====
-  // Тот же паттерн, что и у масштаба — состояние в localStorage, применяем
-  // сразу при загрузке. Тема переключается через атрибут data-theme на
-  // <html>, вся палитра — это переопределение одних и тех же CSS-переменных,
-  // поэтому почти всё в интерфейсе подхватывает её само собой.
-  const THEME_STORAGE_KEY = 'tedabru_theme';
-  let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
-
-  function applyTheme() {
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    const icon = document.getElementById('themeToggleIcon');
-    // показываем иконку того, ЧТО получится, если нажать — солнце на тёмной
-    // теме ("включить светлую"), луна на светлой ("включить тёмную")
-    if (icon) icon.innerHTML = currentTheme === 'dark' ? SUN_ICON_INNER : MOON_ICON_INNER;
-    localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
-  }
-  document.getElementById('themeToggleBtn').addEventListener('click', () => {
-    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    applyTheme();
-  });
-  applyTheme();
 
   // ===== Первичный рендер =====
   renderFilterBar();
