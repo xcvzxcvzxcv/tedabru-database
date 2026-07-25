@@ -29,44 +29,6 @@
     color: #e8ddf5;
   }
 
-  .zoom-control {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(20,10,35,0.92);
-    border: 1px solid var(--border-purple);
-    border-radius: 20px;
-    padding: 6px 10px;
-    z-index: 500;
-  }
-  .zoom-control button {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 18px;
-    line-height: 1;
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-  }
-  @media (hover: hover) {
-    .zoom-control button:hover { color: var(--gold); }
-  }
-  .zoom-control span {
-    font-size: 12px;
-    color: var(--muted);
-    min-width: 34px;
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-  }
-
   .app {
     max-width: 792px;
     margin: 0 auto;
@@ -259,17 +221,6 @@
     padding-bottom: 100px;
     position: relative;
     z-index: 1;
-  }
-
-  @keyframes cascadeFadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .cascade-in {
-    animation: cascadeFadeIn 0.28s ease-out both;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .cascade-in { animation: none; }
   }
 
   .word-row {
@@ -1309,16 +1260,10 @@
 </head>
 <body>
 
-<div class="zoom-control" id="zoomControl">
-  <button type="button" id="zoomOutBtn" title="Уменьшить масштаб">−</button>
-  <span id="zoomLevelLabel">100%</span>
-  <button type="button" id="zoomInBtn" title="Увеличить масштаб">+</button>
-</div>
-
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.5</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.4</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1647,23 +1592,6 @@
   let collections = loadCollections(); // [{ id, name }]
   let searchQuery = '';
 
-  // ===== Каскадная анимация появления карточек =====
-  // Личный словарь — только при самом первом открытии страницы (не при
-  // каждой перерисовке — иначе замотало бы глаза при любом действии).
-  // Результаты поиска — при каждом новом поиске, это отдельная логика,
-  // вызывается прямо в месте рендера карточек поиска.
-  let hasDoneInitialDictCascade = false;
-  const CASCADE_STEP_MS = 30;
-  const CASCADE_MAX_DELAY_MS = 300; // не растягиваем каскад бесконечно на длинных списках
-
-  function applyCascadeAnimation(container, selector) {
-    const rows = container.querySelectorAll(selector);
-    rows.forEach((row, i) => {
-      row.classList.add('cascade-in');
-      row.style.animationDelay = Math.min(i * CASCADE_STEP_MS, CASCADE_MAX_DELAY_MS) + 'ms';
-    });
-  }
-
   // ===== Браузинг всей базы иврита по части речи (не касается личного словаря) =====
   let categoryFilterPanelOpen = false;
   let categoryFilter = null; // { pos, binyan, tense, person, number, gender } — null, если фильтр выключен
@@ -1968,7 +1896,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.5';
+  const APP_VERSION = '0.8.4';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2262,7 +2190,7 @@
     return `
       <div id="instantDictResults"></div>
       ${categoryFilterActive() ? '' : `
-      <button type="button" class="global-search-btn" id="globalSearchBtn" style="display:none;">
+      <button type="button" class="global-search-btn" id="globalSearchBtn">
         Искать среди всех слов «${searchQuery}»
       </button>
       <div id="globalSearchResults"></div>
@@ -2293,12 +2221,6 @@
     const el2 = document.getElementById('instantDictResults'); // список мог перерисоваться за время ожидания
     if (!el2) return;
     renderCandidatesInto(el2, candidates);
-    // кнопку "искать среди всех слов" показываем ТОЛЬКО когда локальный
-    // поиск реально завершился — иначе она успевает мелькнуть раньше
-    // результатов и человек может ткнуть на неё раньше времени, ещё не
-    // увидев, что на самом деле нашлось локально
-    const btn = document.getElementById('globalSearchBtn');
-    if (btn) btn.style.display = '';
   }
 
   function attachGlobalSearchHandler() {
@@ -2651,11 +2573,6 @@
     `;
     }).join('') + `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
     fitHebrewWordsInList(listEl);
-
-    if (!hasDoneInitialDictCascade) {
-      applyCascadeAnimation(listEl, '.word-row');
-      hasDoneInitialDictCascade = true;
-    }
 
     listEl.querySelectorAll('.listen-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -5163,7 +5080,6 @@
       </button>
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
-    applyCascadeAnimation(resultsEl, '.search-result-row');
 
     // Высота "разделительных карточек" (пустой и с текстом "Результаты
     // поиска") должна равняться высоте настоящей карточки — измеряем прямо
@@ -6358,13 +6274,11 @@
   });
 
   bulkAddSubmitBtn.addEventListener('click', async () => {
-    // делим ТОЛЬКО по переносу строки или запятой (с необязательным пробелом
-    // после неё) — НЕ по одиночному пробелу, иначе словосочетание вроде
-    // "язык жестов" разваливалось бы на "язык" и "жестов" по отдельности.
-    // Убираем пустые токены и дубликаты (одно и то же слово дважды в списке
-    // незачем гонять через API повторно)
+    // делим по пробелам/запятым/переносам строк — ровно как попросили;
+    // убираем пустые токены и дубликаты (одно и то же слово дважды в
+    // списке незачем гонять через API повторно)
     const tokens = [...new Set(
-      bulkInputEl.value.split(/\r?\n|,\s*/).map(s => s.trim()).filter(Boolean)
+      bulkInputEl.value.split(/[\s,]+/).map(s => s.trim()).filter(Boolean)
     )];
     if (!tokens.length) return;
 
@@ -6538,34 +6452,6 @@
       setInterval(renderDebugGrid, 1000);
     });
   }
-
-  // ===== Масштаб всего приложения =====
-  // Быстрый вариант "на сейчас" — потом переедет в полноценное окно настроек.
-  // CSS zoom (не transform:scale) специально — он реально пересчитывает
-  // раскладку и скролл, а не просто рисует картинку крупнее/мельче поверх
-  // старого места.
-  const ZOOM_STEP = 10;
-  const ZOOM_MIN = 50;
-  const ZOOM_MAX = 150;
-  const ZOOM_STORAGE_KEY = 'tedabru_app_zoom';
-  let appZoom = parseInt(localStorage.getItem(ZOOM_STORAGE_KEY), 10);
-  if (!appZoom || isNaN(appZoom)) appZoom = 100;
-
-  function applyAppZoom() {
-    document.querySelector('.app').style.zoom = String(appZoom / 100);
-    const label = document.getElementById('zoomLevelLabel');
-    if (label) label.textContent = appZoom + '%';
-    localStorage.setItem(ZOOM_STORAGE_KEY, String(appZoom));
-  }
-  document.getElementById('zoomInBtn').addEventListener('click', () => {
-    appZoom = Math.min(ZOOM_MAX, appZoom + ZOOM_STEP);
-    applyAppZoom();
-  });
-  document.getElementById('zoomOutBtn').addEventListener('click', () => {
-    appZoom = Math.max(ZOOM_MIN, appZoom - ZOOM_STEP);
-    applyAppZoom();
-  });
-  applyAppZoom();
 
   // ===== Первичный рендер =====
   renderFilterBar();
