@@ -37,7 +37,7 @@
      подсветка идёт белым поверх тёмного, на светлом — тёмным поверх
      кремового, без отдельной переменной под каждое значение прозрачности. */
   html[data-theme="light"] {
-    --gold: #AA6A1C;
+    --gold: #c9822e;
     --gold-soft: #b8874a;
     --purple: #7b35d4;
     --purple-dark: #5b1fa0;
@@ -507,7 +507,7 @@
   .chip.active {
     background: rgba(155,93,229,0.25);
     border-color: var(--purple);
-    color: var(--purple-dark);
+    color: var(--gold);
   }
   .chip.chip-add-collection {
     border-color: var(--gold-soft);
@@ -1423,7 +1423,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.5</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.4</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -2073,7 +2073,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.5';
+  const APP_VERSION = '0.9.4';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
