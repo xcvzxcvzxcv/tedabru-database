@@ -1174,7 +1174,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.2</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.1</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1518,7 +1518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.7.2';
+  const APP_VERSION = '0.7.1';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -5341,9 +5341,9 @@
   function previewRatingLabel(word, rating) {
     const srs = word.srs || initSrs();
     if (srs.learning) {
-      if (rating === 'again') return 'скоро';
-      if (rating === 'easy') return '4 дня';
-      return '1 день'; // hard и good — оба выпускают из цикла обучения
+      if (rating === 'again' || rating === 'hard') return 'скоро';
+      if (rating === 'good') return '1 день';
+      return '4 дня'; // easy
     }
     if (rating === 'again') return 'скоро';
     if (rating === 'hard') return formatIntervalDays(Math.max(1, Math.round(srs.interval * 1.2)));
@@ -5351,33 +5351,22 @@
     return formatIntervalDays(Math.max(1, Math.round(srs.interval * srs.ease * 1.3))); // easy
   }
 
-  // Собственно алгоритм — SM-2-подобный, как в Anki. "Не помню" у совсем
-  // новой карточки держит её в "обучении" (снова покажется в этой же
+  // Собственно алгоритм — SM-2-подобный, как в Anki. "Не помню"/"Трудно" у
+  // совсем новой карточки держат её в "обучении" (снова покажется в этой же
   // сессии, а не через дни) — упрощённая версия учебных шагов Anki без
   // привязки к реальным минутам, раз это веб-сессия, а не постоянно
-  // открытое приложение с фоновым таймером. "Трудно" — САМОСТОЯТЕЛЬНЫЙ
-  // исход, а не синоним "Снова": слово всё равно покидает цикл повторения
-  // в этой же сессии (иначе сессия физически не может закончиться, если
-  // попалось действительно сложное слово — человек вынужден был бы соврать
-  // и нажать "Хорошо", лишь бы вырваться), просто коэффициент лёгкости
-  // при этом чуть снижается — как и для "Трудно" у уже выученных слов ниже.
+  // открытое приложение с фоновым таймером.
   function rateWord(word, rating) {
     const srs = word.srs || (word.srs = initSrs());
     const now = Date.now();
 
     if (srs.learning) {
-      if (rating === 'again') {
+      if (rating === 'again' || rating === 'hard') {
         return { requeue: true };
       }
       srs.learning = false;
       srs.reps = 1;
-      if (rating === 'easy') {
-        srs.interval = 4;
-        srs.ease = srs.ease + 0.15;
-      } else {
-        srs.interval = 1;
-        if (rating === 'hard') srs.ease = Math.max(1.3, srs.ease - 0.15);
-      }
+      srs.interval = rating === 'easy' ? 4 : 1;
       srs.dueDate = now + srs.interval * SRS_DAY_MS;
       return { requeue: false };
     }
