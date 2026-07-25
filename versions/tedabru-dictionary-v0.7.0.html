@@ -1174,7 +1174,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.1</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.0</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1518,7 +1518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.7.1';
+  const APP_VERSION = '0.7.0';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3587,7 +3587,7 @@
       if (entry.gender === 'f') return 'сущ, ж.р';
       return 'сущ';
     }
-    if ((entry.pos === 'pron' || entry.pos === 'name' || entry.pos === 'det' || entry.pos === 'num') && entry.gender) {
+    if ((entry.pos === 'pron' || entry.pos === 'name' || entry.pos === 'det') && entry.gender) {
       return (POS_LABELS[entry.pos] || entry.pos) + (entry.gender === 'm' ? ', м.р' : ', ж.р');
     }
     return POS_LABELS[entry.pos] || entry.pos;
@@ -3606,7 +3606,6 @@
     const ACCENTED = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ɛ́': 'ɛ', 'ɔ́': 'ɔ' };
     const VOWELS = 'aeiouɛɔə';
     let count = 0, stressedCount = -1;
-    let inRun = false;
     for (let i = 0; i < first.length; i++) {
       const ch = first[i];
       const chLower = ch.toLowerCase();
@@ -3617,19 +3616,12 @@
         if (first[i + 1] === '\u0301') isStressed = true; // комбинирующий акут отдельным символом
       }
       if (isVowel) {
-        // считаем СЛОГИ (группы подряд идущих гласных букв), а не отдельные
-        // буквы — дифтонг вроде "ei"/"ai" в транслитерации физически две
-        // буквы, но один слог; без этого ударение на словах с дифтонгами
-        // могло сместиться на одну позицию
-        if (!inRun) count++;
+        count++;
         if (isStressed) stressedCount = count;
-        inRun = true;
-      } else {
-        inRun = false;
       }
     }
     if (stressedCount === -1 || count === 0) return null;
-    return count - stressedCount; // сколько слогов ПОСЛЕ ударного, считая с конца (0 = последний слог)
+    return count - stressedCount; // сколько гласных ПОСЛЕ ударной, считая с конца (0 = последняя гласная)
   }
 
   function applyStressFromEnd(translit, indexFromEnd) {
@@ -3647,18 +3639,9 @@
   }
 
   function countVowelsIn(str, vowelSet) {
-    // считаем НЕ отдельные гласные буквы, а ГРУППЫ подряд идущих гласных —
-    // это ближе к настоящему слоговому ядру. Дифтонг вроде "ei" в "shteim"
-    // физически состоит из двух латинских букв, но это один слог, а не два:
-    // при счёте "по буквам" количество слогов в tr искусственно завышалось,
-    // совпадало со (неверно) озвученным вариантом и маскировало случаи, где
-    // начальную шва на самом деле нужно было заглушить ("штейм", не "шетейм")
     let count = 0;
-    let inRun = false;
     for (const ch of (str || '').toLowerCase()) {
-      const isVowel = vowelSet.includes(ch);
-      if (isVowel && !inRun) count++;
-      inRun = isVowel;
+      if (vowelSet.includes(ch)) count++;
     }
     return count;
   }
