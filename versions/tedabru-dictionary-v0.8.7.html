@@ -679,6 +679,10 @@
     opacity: 1;
     pointer-events: auto;
   }
+  /* избранное слово прячет точки прогресса и держит видимой ровно звезду —
+     в ТОЧНО той же позиции и того же размера, что и при обычном hover/тапе,
+     это один и тот же элемент, просто у него меняется видимость */
+  .word-row.row-has-favorite .mastery-dots-wrap { opacity: 0; }
 
   .hebrew-word {
     font-family: 'Frank Ruhl Libre', serif;
@@ -748,9 +752,7 @@
   }
   .word-row.row-deleting .listen-btn,
   .word-row.row-deleting .hebrew-word,
-  .word-row.row-deleting .meta-col,
-  .word-row.row-deleting .row-num,
-  .word-row.row-deleting .mastery-dots-wrap {
+  .word-row.row-deleting .meta-col {
     opacity: 0.2;
     pointer-events: none;
   }
@@ -760,10 +762,14 @@
     color: var(--text-secondary);
   }
   /* пока слово удаляется — избранное/редактирование/удаление принудительно
-     недоступны и не нужны */
+     недоступны и не нужны, а рейтинг (точки прогресса) всегда виден, даже
+     если слово было в избранном (в обычном состоянии звезда его прячет) */
   .word-row.row-deleting .row-actions-buttons .icon-btn {
     opacity: 0 !important;
     pointer-events: none !important;
+  }
+  .word-row.row-deleting .mastery-dots-wrap {
+    opacity: 1 !important;
   }
   .delete-timer-track {
     position: absolute;
@@ -1327,7 +1333,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.8</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.7</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1977,7 +1983,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.8';
+  const APP_VERSION = '0.8.7';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2843,25 +2849,7 @@
     word.favorite = !word.favorite;
     saveWords();
     renderFilterBar();
-
-    // Если сейчас активен фильтр "избранное" — снятие звезды должно убрать
-    // слово из текущего списка, тут без полной перерисовки не обойтись.
-    // Иначе — точечно обновляем DOM только этой строки: полная renderList()
-    // пересоздаёт DOM-узлы заново, а свежий узел не наследует состояние CSS-
-    // перехода старого — из-за этого анимация прозрачности у hover-панели
-    // проигрывалась заново с нуля и выглядела как мерцание/потеря hover
-    if (filterFavorite) {
-      renderList();
-      return;
-    }
-    const row = document.querySelector(`.word-row[data-id="${id}"]`);
-    if (row) {
-      row.classList.toggle('row-has-favorite', word.favorite);
-      const btn = row.querySelector('.favorite-btn');
-      if (btn) btn.classList.toggle('favorite-on', word.favorite);
-    } else {
-      renderList(); // строка почему-то не найдена — подстрахуемся полной перерисовкой
-    }
+    renderList();
   }
 
   // Удаление теперь без модального confirm() — карточка гаснет на месте,
