@@ -228,7 +228,7 @@
     background: transparent;
     border: 1px solid var(--border-purple);
     color: var(--muted);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 6px 14px;
     font-size: 14px;
     font-family: 'Inter', sans-serif;
@@ -402,7 +402,7 @@
   .chip {
     flex-shrink: 0;
     padding: 8px 16px;
-    border-radius: 12px;
+    border-radius: 18px;
     border: 1px solid var(--border-purple);
     background: transparent;
     color: var(--text-secondary);
@@ -1327,7 +1327,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.9</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.8.8</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1399,7 +1399,7 @@
 
     <div id="bulkAddFields" style="display:none;">
       <div class="field">
-        <label>Слова через запятую или перенос строки</label>
+        <label>Слова через пробел, запятую или перенос строки</label>
         <textarea id="bulkInput" rows="7" placeholder="мишпаха, шалом, ילד, тода раба, спасибо..."></textarea>
       </div>
       <div class="bulk-progress" id="bulkProgress" style="display:none;"></div>
@@ -1977,7 +1977,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.8.9';
+  const APP_VERSION = '0.8.8';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2842,22 +2842,15 @@
     if (!word) return;
     word.favorite = !word.favorite;
     saveWords();
-
-    // запоминаем ДО renderFilterBar() — она сама сбрасывает filterFavorite,
-    // если это было последнее избранное слово (чип "Избранное" пропадает),
-    // и если проверять флаг ПОСЛЕ вызова, он уже будет сброшен в false —
-    // из-за этого полная перерисовка списка не срабатывала, и старое
-    // отфильтрованное представление зависало на экране
-    const wasFilteringFavorites = filterFavorite;
     renderFilterBar();
 
-    // Если фильтр "избранное" был активен — снятие звезды должно убрать
+    // Если сейчас активен фильтр "избранное" — снятие звезды должно убрать
     // слово из текущего списка, тут без полной перерисовки не обойтись.
     // Иначе — точечно обновляем DOM только этой строки: полная renderList()
     // пересоздаёт DOM-узлы заново, а свежий узел не наследует состояние CSS-
     // перехода старого — из-за этого анимация прозрачности у hover-панели
     // проигрывалась заново с нуля и выглядела как мерцание/потеря hover
-    if (wasFilteringFavorites) {
+    if (filterFavorite) {
       renderList();
       return;
     }
