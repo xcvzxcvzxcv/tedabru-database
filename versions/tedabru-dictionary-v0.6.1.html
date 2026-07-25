@@ -1174,7 +1174,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.2</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.6.1</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1518,7 +1518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.6.2';
+  const APP_VERSION = '0.6.1';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2169,11 +2169,7 @@
     fitHebrewWordsInList(listEl);
 
     listEl.querySelectorAll('.listen-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        playWordAudio(decodeURIComponent(btn.dataset.hebrew), btn).catch((e) => {
-          console.warn('[TTS] не удалось воспроизвести слово:', e);
-        });
-      });
+      btn.addEventListener('click', () => playWordAudio(decodeURIComponent(btn.dataset.hebrew), btn));
     });
     listEl.querySelectorAll('.favorite-btn').forEach(btn => {
       btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
@@ -2283,15 +2279,10 @@
   }
 
   function ttsUrl(text) {
-    // на всякий случай схлопываем лишние пробелы — у части слов в базе
-    // остались двойные/тройные пробелы ещё с более ранних правок, и
-    // отправлять их в TTS "как есть" рискованно
-    const cleaned = (text || '').replace(/\s+/g, ' ').trim();
-    return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleaned)}&tl=iw&client=tw-ob`;
+    return `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=iw&client=tw-ob`;
   }
 
   let currentAudioEl = null;
-  let ttsFetchBlocked = false; // взводится после первого сбоя fetch (например, CORS) — дальше не пытаемся снова и снова получать один и тот же отказ
 
   async function playWordAudio(hebrewText, btnEl) {
     if (!hebrewText) return;
@@ -2302,24 +2293,15 @@
     let audioSrc;
     try {
       let blob = await getCachedAudioBlob(hebrewText);
-      if (!blob && !ttsFetchBlocked) {
-        try {
-          const response = await fetch(ttsUrl(hebrewText));
-          if (!response.ok) throw new Error('tts fetch failed: ' + response.status);
-          blob = await response.blob();
-          setCachedAudioBlob(hebrewText, blob); // в фоне, не блокируем воспроизведение
-        } catch (fetchErr) {
-          // сеть/CORS не пустили — запоминаем на всю сессию, чтобы не
-          // долбиться в один и тот же отказ на каждое следующее новое слово
-          ttsFetchBlocked = true;
-          throw fetchErr;
-        }
+      if (!blob) {
+        const response = await fetch(ttsUrl(hebrewText));
+        if (!response.ok) throw new Error('tts fetch failed: ' + response.status);
+        blob = await response.blob();
+        setCachedAudioBlob(hebrewText, blob); // в фоне, не блокируем воспроизведение
       }
-      if (!blob) throw new Error('no cached blob and fetch is blocked');
       audioSrc = URL.createObjectURL(blob);
     } catch (e) {
-      // fetch не прошёл (сеть/CORS) или заведомо заблокирован — играем
-      // напрямую по URL, без кэша
+      // fetch не прошёл (сеть/CORS) — играем напрямую по URL, без кэша
       audioSrc = ttsUrl(hebrewText);
     }
 
