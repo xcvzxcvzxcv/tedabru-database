@@ -250,10 +250,6 @@
   .icon-btn.favorite-on { color: var(--gold); }
   .icon-btn.listen-btn.playing { color: var(--gold); }
   .icon-btn.delete-btn:active { color: #e05a5a; }
-  @media (hover: hover) {
-    .icon-btn:hover { color: var(--gold); }
-    .icon-btn.delete-btn:hover { color: #e05a5a; }
-  }
 
   .filter-bar {
     display: flex;
@@ -1178,7 +1174,7 @@
 <div class="app">
   <div class="header">
     <div class="header-top">
-      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.3</span></div>
+      <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.7.2</span></div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
@@ -1522,7 +1518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.7.3';
+  const APP_VERSION = '0.7.2';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2162,8 +2158,8 @@
           <div class="mastery-dots-wrap">${masteryDotsHtml(w)}</div>
           <div class="row-actions-buttons">
             <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
-            <button class="icon-btn edit-def-btn" data-id="${w.id}" title="Редактировать определение (только в вашем словаре)">${PENCIL_ICON}</button>
             <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
+            <button class="icon-btn edit-def-btn" data-id="${w.id}" title="Редактировать определение (только в вашем словаре)">${PENCIL_ICON}</button>
           </div>
         </div>
         <div class="row-num">${i + 1}</div>
@@ -3714,28 +3710,11 @@
   // слово — инфинитив, а не смешение форм от Wiktionary). Отдельная функция
   // от buildDictCandidate, потому что структура записи немного другая
   // (translation вместо gloss_ru, нет отдельного поля gender и т.п.)
-  // ===== Ударение в инфинитивах глаголов =====
-  // Правило (задано явно, не выводится из общих принципов транскрипции):
-  // 1. Оканчивается на "сеголь+тав" (־ֶת) → ударение на ПРЕДПОСЛЕДНЕМ слоге.
-  // 2. Оканчивается на "патах+тав" (־ַת) → ударение на ПРЕДПОСЛЕДНЕМ слоге.
-  // 3. Иначе → ударение на ПОСЛЕДНЕМ слоге.
-  function verbInfinitiveStressIndexFromEnd(word) {
-    const groups = tokenizeNiqqud(word);
-    if (!groups.length) return 0;
-    const last = groups[groups.length - 1];
-    const prev = groups[groups.length - 2];
-    if (last && last.letter === 'ת' && prev &&
-        (prev.marks.includes(NIQQUD.SEGOL) || prev.marks.includes(NIQQUD.PATAH))) {
-      return 1; // предпоследний слог
-    }
-    return 0; // последний слог
-  }
-
   function buildVerbDictCandidate(entry) {
     const binyan = BINYAN_LABELS[entry.binyan] || entry.binyan;
     return {
       text: entry.word,
-      translit: applyStressFromEnd(niqqudToTranslit(entry.word), verbInfinitiveStressIndexFromEnd(entry.word)),
+      translit: niqqudToTranslit(entry.word),
       grammarLabel: binyan ? `глагол, ${binyan}` : 'глагол',
       translation: entry.translation,
       root: entry.root || null,
@@ -3862,8 +3841,7 @@
   //    озвучиваем через Nakdan, тоже только топ-кандидат.
   // Поиск по транскрипции (гиль, медабер и т.п. без точного совпадения)
   // временно отключён из этого потока — отдельная задача на будущее.
-  async function resolveCandidates(raw, opts) {
-    opts = opts || {};
+  async function resolveCandidates(raw) {
     await loadHebrewDict();
 
     if (containsHebrew(raw)) {
@@ -3927,7 +3905,7 @@
     // человек реально имел в виду ("рак" = רַק, "только")
     const transcriptionMatches = fuzzyMatchTranslitIndex(raw);
 
-    if (!opts.skipLocalShortcut && (translationMatches.length || transcriptionMatches.length)) {
+    if (translationMatches.length || transcriptionMatches.length) {
       console.log('[RC] локально нашлось:', ruKey, '—', translationMatches.length, 'по переводу +', transcriptionMatches.length, 'по транскрипции');
       if (!translationMatches.length) return transcriptionMatches;
       if (!transcriptionMatches.length) return translationMatches;
@@ -4358,11 +4336,6 @@
     // просто орфографически удвоенная. лесаййем → лесайем.
     result = result.replace(/йй+/g, 'й');
 
-    // "согласная+й+е" — чуждое русской орфографии сочетание (по-русски эта
-    // мягкость обычно передаётся мягким знаком: "статья", "пьеса", а не
-    // отдельной "й"). ледамйен → ледамьен.
-    result = result.replace(/([бвгджзклмнпрстфхцчшщ])йе/gi, '$1ье');
-
     return result || '?';
   }
 
@@ -4730,7 +4703,7 @@
     const isStale = () => myGeneration !== searchGeneration;
 
     try {
-      const rawCandidates = await resolveCandidates(query, { skipLocalShortcut: true });
+      const rawCandidates = await resolveCandidates(query);
       if (isStale()) return;
       console.log('[DEBUG] кандидаты от resolveCandidates:', rawCandidates.map(c => ({ text: c.text, source: c.source, translation: c.translation })));
       if (!rawCandidates.length) {
