@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.11 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.10 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1632,46 +1632,46 @@
   <div class="train-panel" id="trainPanel" style="display:none;">
     <div id="trainSetup">
       <div class="field">
-        <label data-i18n="Что тренируем">Что тренируем</label>
+        <label>Что тренируем</label>
         <div class="filter-row" id="trainScopeChips">
-          <button type="button" class="chip active" data-scope="all" data-i18n="Все слова">Все слова</button>
-          <button type="button" class="chip" data-scope="collection" data-i18n="Подборка">Подборка</button>
-          <button type="button" class="chip" data-scope="manual" data-i18n="Выбрать вручную">Выбрать вручную</button>
+          <button type="button" class="chip active" data-scope="all">Все слова</button>
+          <button type="button" class="chip" data-scope="collection">Подборка</button>
+          <button type="button" class="chip" data-scope="manual">Выбрать вручную</button>
         </div>
       </div>
 
       <div class="field" id="trainCollectionPickerWrap" style="display:none;">
-        <label data-i18n="Какая подборка">Какая подборка</label>
+        <label>Какая подборка</label>
         <div class="filter-row" id="trainCollectionChips"></div>
       </div>
 
       <div class="field" id="trainManualPickerWrap" style="display:none;">
-        <label><span data-i18n="Отметьте слова (найдено:">Отметьте слова (найдено:</span> <span id="trainManualCount">0</span>)</label>
+        <label>Отметьте слова (найдено: <span id="trainManualCount">0</span>)</label>
         <div id="trainManualList" class="train-manual-list-scroll"></div>
       </div>
 
       <div class="field">
-        <label data-i18n="Направление">Направление</label>
+        <label>Направление</label>
         <div class="filter-row" id="trainDirectionChips">
-          <button type="button" class="chip active" data-direction="he-ru" data-i18n="Иврит → перевод">Иврит → перевод</button>
-          <button type="button" class="chip" data-direction="ru-he" data-i18n="Перевод → иврит">Перевод → иврит</button>
+          <button type="button" class="chip active" data-direction="he-ru">Иврит → перевод</button>
+          <button type="button" class="chip" data-direction="ru-he">Перевод → иврит</button>
         </div>
       </div>
 
       <div class="field" id="trainNiqqudFieldWrap">
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-          <input type="checkbox" id="trainShowNiqqud" checked /> <span data-i18n="Показывать огласовки">Показывать огласовки</span>
+          <input type="checkbox" id="trainShowNiqqud" checked /> Показывать огласовки
         </label>
       </div>
 
       <div class="field">
-        <label data-i18n="Новых слов за раз (карт уже введённых в повтор это не касается)">Новых слов за раз (карт уже введённых в повтор это не касается)</label>
+        <label>Новых слов за раз (карт уже введённых в повтор это не касается)</label>
         <input type="number" id="trainNewLimit" min="0" value="20" style="width:100px; padding:8px 12px; background:rgba(var(--ink-rgb),0.03); border:1px solid var(--border-purple); border-radius:10px; color:var(--text-main); font-family:'Noto Serif', serif; font-size:15px;" />
       </div>
 
       <div class="edit-db-status" id="trainSetupStatus"></div>
       <div class="modal-actions" style="margin-top:20px;">
-        <button class="btn-save" id="trainStartBtn" data-i18n="Начать">Начать</button>
+        <button class="btn-save" id="trainStartBtn">Начать</button>
       </div>
     </div>
 
@@ -1681,12 +1681,12 @@
         <div class="train-card-face" id="trainCardFace"></div>
         <div class="train-card-back" id="trainCardBack" style="display:none;"></div>
       </div>
-      <button class="btn-save" id="trainShowAnswerBtn" style="width:100%;" data-i18n="Показать ответ">Показать ответ</button>
+      <button class="btn-save" id="trainShowAnswerBtn" style="width:100%;">Показать ответ</button>
       <div class="train-rate-buttons" id="trainRateButtons" style="display:none;">
-        <button type="button" class="train-rate-btn train-rate-again" data-rating="again"><span data-i18n="Не помню">Не помню</span><span></span></button>
-        <button type="button" class="train-rate-btn train-rate-hard" data-rating="hard"><span data-i18n="Трудно">Трудно</span><span></span></button>
-        <button type="button" class="train-rate-btn train-rate-good" data-rating="good"><span data-i18n="Хорошо">Хорошо</span><span></span></button>
-        <button type="button" class="train-rate-btn train-rate-easy" data-rating="easy"><span data-i18n="Легко">Легко</span><span></span></button>
+        <button type="button" class="train-rate-btn train-rate-again" data-rating="again">Не помню<span></span></button>
+        <button type="button" class="train-rate-btn train-rate-hard" data-rating="hard">Трудно<span></span></button>
+        <button type="button" class="train-rate-btn train-rate-good" data-rating="good">Хорошо<span></span></button>
+        <button type="button" class="train-rate-btn train-rate-easy" data-rating="easy">Легко<span></span></button>
       </div>
     </div>
 
@@ -1857,7 +1857,6 @@
     'Слова через запятую или перенос строки': 'Words separated by comma or line break',
     'Отменить добавление': 'Cancel adding',
     // ===== Общие кнопки/действия =====
-    'Лексикариум': 'Lexicarium',
     'Добавить': 'Add',
     'Отмена': 'Cancel',
     'Сохранить': 'Save',
@@ -1897,22 +1896,6 @@
     'Часть речи': 'Part of speech',
     // ===== Тренировка =====
     'Что тренируем': "What we're training",
-    'Все слова': 'All words',
-    'Подборка': 'Collection',
-    'Выбрать вручную': 'Select manually',
-    'Какая подборка': 'Which collection',
-    'Отметьте слова (найдено:': 'Check words (found:',
-    'Направление': 'Direction',
-    'Иврит → перевод': 'Hebrew → translation',
-    'Перевод → иврит': 'Translation → Hebrew',
-    'Показывать огласовки': 'Show niqqud',
-    'сегодня': 'today',
-    '1 день': '1 day',
-    'дн.': 'd.',
-    'нед.': 'wk.',
-    'мес.': 'mo.',
-    '4 дня': '4 days',
-    'скоро': 'soon',
     'Легко': 'Easy',
     'Хорошо': 'Good',
     'Трудно': 'Hard',
@@ -1920,7 +1903,6 @@
     'Прервать тренировку?': 'Stop training?',
     'Останавливаю после текущего слова': 'Stopping after the current word',
     'Нечего тренировать — сначала выберите слова.': 'Nothing to train — select some words first.',
-    'Сессия завершена. Отвечено карточек:': 'Session finished. Cards answered:',
     'На сейчас повторять нечего — все выбранные слова либо уже отвечены сегодня, либо ждут своей даты. Загляните позже.':
       "There's nothing to review right now — all selected words have already been answered today or aren't due yet. Check back later.",
     'Новых слов за раз (карт уже введённых в повтор это не касается)': "New cards per session (doesn't affect cards already in review)",
@@ -1980,15 +1962,6 @@
       const el = document.getElementById(id);
       if (el) el[attr] = t(key);
     });
-    document.title = `${t('Лексикариум')} · Tedabru`;
-    // заголовок в шапке — только если сейчас в "обычном" (не тренировочном,
-    // не режиме добавления/выбора) состоянии, иначе он уже содержит другой
-    // текст ("Тренировка"/"Введите слово..." и т.п.), который сам обновится
-    // через свой собственный код при следующей смене режима
-    const headerTitleEl = document.getElementById('headerTitle');
-    if (headerTitleEl && headerTitleEl.querySelector('.app-version')) {
-      headerTitleEl.innerHTML = `${t('Лексикариум')} <span class="app-version">v${APP_VERSION} Beta</span>`;
-    }
     // универсальный обход — элементы сами объявляют, что и как у них переводить,
     // через data-i18n (textContent), data-i18n-placeholder, data-i18n-title
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
@@ -2323,7 +2296,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.11';
+  const APP_VERSION = '0.9.10';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3384,14 +3357,14 @@
       primaryActionBtn.title = 'Выйти из редактирования';
       primaryActionBtn.removeAttribute('data-drop-delete');
     } else if (trainMode) {
-      headerTitleEl.textContent = t('Тренировка');
+      headerTitleEl.textContent = 'Тренировка';
       primaryActionBtn.innerHTML = EXIT_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = t('Выйти из тренировки');
+      primaryActionBtn.title = 'Выйти из тренировки';
       primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
-      headerTitleEl.innerHTML = `${t('Лексикариум')} <span class="app-version">v${APP_VERSION} Beta</span>`;
+      headerTitleEl.innerHTML = `Лексикариум <span class="app-version">v${APP_VERSION} Beta</span>`;
       primaryActionBtn.innerHTML = PLUS_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
@@ -6293,11 +6266,11 @@
   }
 
   function formatIntervalDays(days) {
-    if (days < 1) return t('сегодня');
-    if (days === 1) return t('1 день');
-    if (days < 7) return days + ' ' + t('дн.');
-    if (days < 30) return Math.round(days / 7) + ' ' + t('нед.');
-    return Math.round(days / 30) + ' ' + t('мес.');
+    if (days < 1) return 'сегодня';
+    if (days === 1) return '1 день';
+    if (days < 7) return days + ' дн.';
+    if (days < 30) return Math.round(days / 7) + ' нед.';
+    return Math.round(days / 30) + ' мес.';
   }
 
   // Показывает, что БУДЕТ, если нажать эту кнопку — не меняя реального
@@ -6305,11 +6278,11 @@
   function previewRatingLabel(word, rating) {
     const srs = word.srs || initSrs();
     if (srs.learning) {
-      if (rating === 'again') return t('скоро');
-      if (rating === 'easy') return t('4 дня');
-      return t('1 день'); // hard и good — оба выпускают из цикла обучения
+      if (rating === 'again') return 'скоро';
+      if (rating === 'easy') return '4 дня';
+      return '1 день'; // hard и good — оба выпускают из цикла обучения
     }
-    if (rating === 'again') return t('скоро');
+    if (rating === 'again') return 'скоро';
     if (rating === 'hard') return formatIntervalDays(Math.max(1, Math.round(srs.interval * 1.2)));
     if (rating === 'good') return formatIntervalDays(Math.max(1, Math.round(srs.interval * srs.ease)));
     return formatIntervalDays(Math.max(1, Math.round(srs.interval * srs.ease * 1.3))); // easy
@@ -6395,11 +6368,11 @@
   function exitTrainMode() {
     if (trainSessionActive) {
       showActionModal({
-        title: t('Прервать тренировку?'),
-        message: t('Прогресс по уже отвеченным карточкам уже сохранён — но текущая сессия закроется, и оставшиеся карточки сейчас показаны не будут.'),
+        title: 'Прервать тренировку?',
+        message: 'Прогресс по уже отвеченным карточкам уже сохранён — но текущая сессия закроется, и оставшиеся карточки сейчас показаны не будут.',
         buttons: [
-          { label: t('Остаться'), variant: 'cancel' },
-          { label: t('Прервать'), variant: 'danger', action: () => actuallyExitTrainMode() },
+          { label: 'Остаться', variant: 'cancel' },
+          { label: 'Прервать', variant: 'danger', action: () => actuallyExitTrainMode() },
         ]
       });
       return;
@@ -6505,7 +6478,7 @@
     const candidates = getTrainCandidateWords();
     const statusEl = document.getElementById('trainSetupStatus');
     if (!candidates.length) {
-      statusEl.textContent = t('Нечего тренировать — сначала выберите слова.');
+      statusEl.textContent = 'Нечего тренировать — сначала выберите слова.';
       return;
     }
 
@@ -6523,7 +6496,7 @@
     queue = Array.from(new Set(queue)); // на случай пересечения — не должно, но на всякий случай
 
     if (!queue.length) {
-      statusEl.textContent = t('На сейчас повторять нечего — все выбранные слова либо уже отвечены сегодня, либо ждут своей даты. Загляните позже.');
+      statusEl.textContent = 'На сейчас повторять нечего — все выбранные слова либо уже отвечены сегодня, либо ждут своей даты. Загляните позже.';
       return;
     }
 
@@ -6625,7 +6598,7 @@
     trainSummaryEl.style.display = '';
     const s = trainSessionStats;
     document.getElementById('trainSummaryText').textContent =
-      `${t('Сессия завершена. Отвечено карточек:')} ${s.studied}.\n${t('Не помню')}: ${s.again} · ${t('Трудно')}: ${s.hard} · ${t('Хорошо')}: ${s.good} · ${t('Легко')}: ${s.easy}`;
+      `Сессия завершена. Отвечено карточек: ${s.studied}.\nНе помню: ${s.again} · Трудно: ${s.hard} · Хорошо: ${s.good} · Легко: ${s.easy}`;
   }
 
   document.getElementById('trainFinishBtn').addEventListener('click', () => {
