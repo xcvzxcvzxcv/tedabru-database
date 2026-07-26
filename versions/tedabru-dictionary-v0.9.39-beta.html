@@ -1617,7 +1617,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.40 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.39 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2564,7 +2564,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.40';
+  const APP_VERSION = '0.9.39';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2584,22 +2584,6 @@
       })
       .catch(() => {}); // офлайн или version.json недоступен — работаем с тем, что уже загружено
   })();
-
-  // ===== iOS-баг: position:fixed элементы (нижняя панель) иногда лейаутятся против
-  // «протухшего» вьюпорта при самой первой отрисовке — особенно в режиме Home Screen
-  // App — и остаются с зазором снизу (а свайпы по карточкам не работают корректно),
-  // пока не случится любой нативный скролл/ресайз вьюпорта. Фокус на поле поиска
-  // (открытие клавиатуры) как раз и триггерит такой ресайз — отсюда и "чинится само"
-  // после тапа в поиск. Форсируем этот пересчёт сами, не дожидаясь действий пользователя.
-  function nudgeIOSFixedPositionBug() {
-    window.scrollTo(0, 1);
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-  }
-  window.addEventListener('load', nudgeIOSFixedPositionBug);
-  // 'pageshow' — на случай возврата из bfcache (переоткрытие иконки на Home Screen
-  // после того, как система просто "разбудила" уже открытую вкладку, без полной
-  // перезагрузки и без события 'load')
-  window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
