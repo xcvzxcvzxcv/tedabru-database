@@ -1619,7 +1619,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.45 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.44 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2566,7 +2566,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.45';
+  const APP_VERSION = '0.9.44';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2619,44 +2619,121 @@
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
 
-  // ===== Подтверждено с реального устройства: набор в поиск ИЛИ тап по иконке
-  // фильтров чинят баг с нижней панелью/свайпом. Оба действия вызывают одну и ту
-  // же renderList() (плюс renderFilterBar() у фильтров) — полную пересборку
-  // innerHTML списка. Мелкий display:none-туда-обратно на паре элементов эффекта
-  // не дал (проверено диагностикой — геометрия вообще не менялась ни разу), значит
-  // нужен именно такой, "настоящий", большой reflow всего списка. Воспроизводим
-  // ровно то же действие программно, вместо мелкого тоггла.
-  window.__rerenderAttempts = [];
-  function forceRerenderSuspects() {
-    try {
-      renderFilterBar();
-      renderList();
-      window.__rerenderAttempts.push(new Date().toISOString().slice(11, 19));
-      renderRerenderDebugPanel();
-    } catch (e) {
-      window.__rerenderAttempts.push('ERROR: ' + e.message);
-      renderRerenderDebugPanel();
-    }
+  // ===== Основная гипотеза после диагностики: дело не в геометрии (layout уже верный
+  // с самого начала — getBoundingClientRect совпадает и до, и после), а в отрисовке —
+  // WebKit иногда "запаздывает" с обновлением композитного (GPU) слоя для position:fixed
+  // и для transform-элементов сразу после первой отрисовки, пока что-то не форсирует
+  // пересборку слоя. Форсируем её сами: на мгновение снимаем элемент из потока рендера
+  // (display:none) и возвращаем обратно — это гарантированно пересоздаёт его композитный
+  // слой с нуля, с верными координатами.
+  window.__repaintForceCount = 0;
+  function forceRepaint(el) {
+    if (!el) return;
+    const prevDisplay = el.style.display;
+    el.style.display = 'none';
+    void el.offsetHeight; // форсируем синхронный reflow между снятием и возвратом
+    el.style.display = prevDisplay || '';
   }
-  [400, 900, 1800, 3200].forEach(ms => setTimeout(forceRerenderSuspects, ms));
+  function forceRepaintSuspects() {
+    forceRepaint(document.getElementById('bottomNav'));
+    forceRepaint(document.getElementById('wordList'));
+    window.__repaintForceCount++;
+  }
+  [0, 50, 150, 300, 600, 1200, 2500].forEach(ms => setTimeout(forceRepaintSuspects, ms));
+  window.addEventListener('load', forceRepaintSuspects);
+  window.addEventListener('pageshow', forceRepaintSuspects);
 
-  // ===== Временная диагностика — просто лог таймкодов попыток (геометрию уже
-  // проверили в прошлой сборке, JS её не отличает от рабочего состояния, поэтому
-  // тут только счётчик/тайминг для сопоставления с тем, что видно глазами)
-  function renderRerenderDebugPanel() {
+  // ===== ВРЕМЕННАЯ ДИАГНОСТИКА (убрать после того, как баг с нижней панелью/свайпом
+  // на холодном старте будет наконец найден) — две прошлые гипотезы (масштаб вьюпорта,
+  // dvh-геометрия) не подтвердились на реальном устройстве. Вместо третьей догадки
+  // вслепую — снимаем реальные метрики в момент бага (сразу при загрузке) и повторно
+  // в момент, когда всё "само чинится" (первый ввод в поиск), и показываем оба снимка
+  // прямо на экране, чтобы можно было просто прислать скриншот.
+  function collectNavDebugSnapshot() {
+    const nav = document.getElementById('bottomNav');
+    const rect = nav ? nav.getBoundingClientRect() : null;
+    const cs = nav ? getComputedStyle(nav) : null;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;bottom:0;left:0;height:0;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    const safeAreaBottom = getComputedStyle(probe).paddingBottom;
+    document.body.removeChild(probe);
+    return {
+      t: new Date().toISOString().slice(11, 19),
+      innerH: window.innerHeight,
+      innerW: window.innerWidth,
+      docClientH: document.documentElement.clientHeight,
+      vvH: window.visualViewport ? Math.round(window.visualViewport.height * 100) / 100 : 'n/a',
+      vvW: window.visualViewport ? Math.round(window.visualViewport.width * 100) / 100 : 'n/a',
+      vvScale: window.visualViewport ? window.visualViewport.scale : 'n/a',
+      vvOffsetTop: window.visualViewport ? window.visualViewport.offsetTop : 'n/a',
+      dpr: window.devicePixelRatio,
+      navRectTop: rect ? Math.round(rect.top * 100) / 100 : 'n/a',
+      navRectBottom: rect ? Math.round(rect.bottom * 100) / 100 : 'n/a',
+      navRectHeight: rect ? Math.round(rect.height * 100) / 100 : 'n/a',
+      navPosition: cs ? cs.position : 'n/a',
+      navBottomCSS: cs ? cs.bottom : 'n/a',
+      navPaddingBottom: cs ? cs.paddingBottom : 'n/a',
+      navDisplay: cs ? cs.display : 'n/a',
+      navTransform: cs ? cs.transform : 'n/a',
+      bodyTransform: getComputedStyle(document.body).transform,
+      htmlTransform: getComputedStyle(document.documentElement).transform,
+      appHeightVar: document.documentElement.style.getPropertyValue('--app-height'),
+      safeAreaBottom,
+      mobileMQ: (typeof isMobileViewport === 'function') ? isMobileViewport() : 'n/a',
+      standalone: window.navigator.standalone,
+      repaintForceCount: window.__repaintForceCount,
+    };
+  }
+
+  function renderNavDebugPanel() {
     let panel = document.getElementById('navDebugPanel');
     if (!panel) {
       panel = document.createElement('div');
       panel.id = 'navDebugPanel';
-      panel.style.cssText = 'position:fixed;left:6px;right:6px;bottom:84px;z-index:99999;background:rgba(0,0,0,0.92);color:#7CFC7C;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.5;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;pointer-events:none;';
+      panel.style.cssText = 'position:fixed;left:6px;right:6px;bottom:84px;z-index:99999;background:rgba(0,0,0,0.92);color:#7CFC7C;font-family:monospace;font-size:9.5px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.35;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;pointer-events:auto;';
       document.body.appendChild(panel);
     }
+    // ставим верхнюю границу сразу под шапкой (заголовок + поиск + фильтры), чтобы
+    // сам поиск и кнопка фильтров оставались кликабельны, а не перекрывались панелью
     const headerEl = document.querySelector('.header');
     const topOffset = headerEl ? Math.ceil(headerEl.getBoundingClientRect().bottom) + 4 : 64;
     panel.style.top = topOffset + 'px';
-    panel.textContent = 'Попытки принудительного renderList() (имитация поиска/фильтра):\n'
-      + window.__rerenderAttempts.map((t, i) => `  #${i + 1} @ ${t}`).join('\n');
+    const fmt = (label, snap) => label + ':\n' + (snap ? Object.entries(snap).map(([k, v]) => `  ${k}: ${v}`).join('\n') : '  (нет данных)');
+    panel.textContent = fmt('COLD (до форс-репейнта)', window.__navDebugCold)
+      + '\n\n' + fmt('POST_REPAINT (после наших авто-фиксов, ~3с)', window.__navDebugPostRepaint)
+      + '\n\n' + fmt('AFTER (после поиска/фильтра)', window.__navDebugAfter);
   }
+
+  setTimeout(() => {
+    window.__navDebugCold = collectNavDebugSnapshot();
+    renderNavDebugPanel();
+  }, 150);
+  setTimeout(() => {
+    window.__navDebugPostRepaint = collectNavDebugSnapshot();
+    renderNavDebugPanel();
+  }, 3000);
+
+  function captureAfterSnapshot() {
+    if (!window.__navDebugAfter) {
+      window.__navDebugAfter = collectNavDebugSnapshot();
+      renderNavDebugPanel();
+    }
+  }
+  function bindAfterCapture() {
+    const si = document.getElementById('searchInput');
+    if (si && !si.__navDebugBound) {
+      si.__navDebugBound = true;
+      si.addEventListener('input', captureAfterSnapshot);
+    }
+    const fb = document.getElementById('categoryFilterToggleBtn');
+    if (fb && !fb.__navDebugBound) {
+      fb.__navDebugBound = true;
+      fb.addEventListener('click', captureAfterSnapshot);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', bindAfterCapture);
+  if (document.readyState !== 'loading') bindAfterCapture();
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
