@@ -591,11 +591,12 @@
       -webkit-tap-highlight-color: transparent;
     }
     .swipe-delete-btn svg { width: 20px; height: 20px; }
-    /* мета (транскрипция+часть речи) — 12px стандартом, адаптивно ужимается
-       через fitTextEl, если строка не влезает в колонку (85px) */
-    .word-row .translit,
+    /* пункт: "транскрипция и мета — оба по 15 стандартом" — .translit уже
+       15px по умолчанию (наследует из базового правила), .pos поднимаем
+       с 12px до тех же 15px; оба теперь ещё и адаптивно ужимаются через
+       fitTextEl, если строка не влезает в колонку (95px) */
     .word-row .pos {
-      font-size: 12px;
+      font-size: 15px;
     }
     /* дефиниция — фиксированные 15px (было 16px), БЕЗ адаптивного сжатия —
        длинные определения по-прежнему обрезаются многоточием (ellipsis) */
@@ -1667,7 +1668,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.59 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.58 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2614,7 +2615,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.59';
+  const APP_VERSION = '0.9.58';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3346,8 +3347,8 @@
     // теперь применяется и к транскрипции/части речи, не только к ивриту.
     const HEBREW_WORD_MAX_FONT = isMobileViewport() ? 26 : 30;
     const HEBREW_WORD_MIN_FONT = 17;
-    const META_TEXT_MAX_FONT = 12;
-    const META_TEXT_MIN_FONT = 9;
+    const META_TEXT_MAX_FONT = 15;
+    const META_TEXT_MIN_FONT = 10;
     function fitTextEl(el, maxFont, minFont) {
       // Считаем ширину в один ряд (nowrap), чтобы поймать случай, когда
       // отдельное слово внутри фразы шире колонки — обычный scrollWidth
