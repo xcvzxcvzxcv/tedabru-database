@@ -246,13 +246,17 @@
     -webkit-tap-highlight-color: transparent;
   }
   .header-icon-btn svg { width: 18px; height: 18px; }
-  .header-icon-btn:hover { filter: brightness(0.94); }
-  .header-icon-btn:active { filter: brightness(0.88); }
-  .header-icon-btn.active { background: rgba(var(--ink-rgb),0.08); border-color: var(--muted); color: var(--gold); }
+  .header-icon-btn:active { background: rgba(123,53,212,0.3); }
+  .header-icon-btn.active { background: rgba(155,93,229,0.3); border-color: var(--purple); color: var(--gold); }
   .header-icon-btn-gold {
     background: var(--gold);
     border: none;
     color: #2a1608;
+  }
+  .header-icon-btn-danger {
+    background: linear-gradient(180deg, #f5a9b4 0%, #c94a5e 45%, #7a1f2c 100%);
+    border: none;
+    color: #2a0810;
   }
 
   .search-wrap {
@@ -396,6 +400,10 @@
      Та же высота/паддинг/разделитель — чтобы ощущалось как "тот же язык
      карточек", но зеркалирование само по себе не даёт спутать поиск со
      своим словарём. */
+  .search-results-spacer {
+    /* пустая "карточка"-пробел перед заголовком "Результаты поиска" —
+       высота выставляется через JS = высоте одной настоящей карточки */
+  }
   .search-results-count {
     display: flex;
     align-items: center;
@@ -448,7 +456,7 @@
     .search-result-row:hover .translit,
     .search-result-row:hover .pos,
     .search-result-row:hover .search-definition {
-      filter: brightness(1.08);
+      filter: brightness(1.2);
     }
   }
 
@@ -676,20 +684,7 @@
   .word-row.selectable .row-num {
     cursor: grab;
   }
-  .word-row.row-selected {
-    background: rgba(var(--ink-rgb),0.08);
-    border-radius: 8px;
-  }
-  /* выделенная карточка — весь текст одного, нейтрального цвета (в цвет
-     обычной дефиниции), без золотого акцента на иврите и без hover-эффекта
-     вообще: подсветка выделения самодостаточна, доп. эффекты только мешают */
-  .word-row.row-selected .hebrew-word,
-  .word-row.row-selected .translit,
-  .word-row.row-selected .pos,
-  .word-row.row-selected .translation {
-    color: var(--text-main) !important;
-    filter: none !important;
-  }
+  .word-row.row-selected { background: rgba(155,93,229,0.12); border-radius: 8px; }
 
   /* Подсветка чипа/корзины, когда над ним держат перетаскиваемое выделение */
   .drop-hover {
@@ -941,7 +936,7 @@
     .word-row:hover .translit,
     .word-row:hover .pos,
     .word-row:hover .translation {
-      filter: brightness(1.08);
+      filter: brightness(1.2);
     }
     .word-row:hover .listen-btn,
     .word-row:hover .favorite-btn,
@@ -1490,7 +1485,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.30 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.29 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1816,7 +1811,6 @@
   let words = loadWords();
   let collections = loadCollections(); // [{ id, name }]
   let searchQuery = '';
-  let personalDictEmptyForQuery = false; // для подписи "В вашем словаре ничего не найдено." перед результатами поиска
 
   // ===== Интернационализация (RU/EN) =====
   // Ключ словаря — сам русский текст (не абстрактный код вида "addWord") —
@@ -1866,7 +1860,6 @@
     // ===== Пустые состояния / сообщения =====
     'В словаре пока нет слов': 'Your dictionary is empty yet',
     'Ничего не найдено по этому фильтру.': 'Nothing found for this filter.',
-    'В вашем словаре ничего не найдено.': 'Nothing found in your dictionary.',
     'Результаты поиска': 'Search results',
     'показаны первые': 'showing first',
     'из': 'of',
@@ -2392,7 +2385,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.30';
+  const APP_VERSION = '0.9.29';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3069,7 +3062,6 @@
     }
 
     const filtered = getFilteredWords();
-    personalDictEmptyForQuery = filtered.length === 0 && !!searchQuery.trim();
 
     if (filtered.length === 0) {
       listEl.innerHTML = `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
@@ -3523,7 +3515,8 @@
     if (selectionMode) {
       headerTitleEl.textContent = selectionHeaderText();
       primaryActionBtn.innerHTML = TRASH_ICON;
-      primaryActionBtn.classList.add('header-icon-btn-gold');
+      primaryActionBtn.classList.remove('header-icon-btn-gold');
+      primaryActionBtn.classList.add('header-icon-btn-danger');
       primaryActionBtn.title = t('Удалить выбранное');
       primaryActionBtn.setAttribute('data-drop-delete', '1');
     } else if (addMode) {
@@ -3917,7 +3910,8 @@
 
   function showHeaderAsDeleteTarget() {
     primaryActionBtn.innerHTML = TRASH_ICON;
-    primaryActionBtn.classList.add('header-icon-btn-gold');
+    primaryActionBtn.classList.remove('header-icon-btn-gold');
+    primaryActionBtn.classList.add('header-icon-btn-danger');
     primaryActionBtn.setAttribute('data-drop-delete', '1');
   }
 
@@ -5919,14 +5913,18 @@
   function renderCandidatesInto(resultsEl, rawCandidates, total) {
     if (!rawCandidates.length) {
       resultsEl.innerHTML = categoryFilterActive()
-        ? `<div class="search-results-count" id="searchResultsCountEl">${t('Результаты поиска')} (0)</div><div class="sugg-note">${t('Ничего не найдено по этому фильтру.')}</div>`
+        ? `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">${t('Результаты поиска')} (0)</div><div class="sugg-note">${t('Ничего не найдено по этому фильтру.')}</div>`
         : '';
       requestAnimationFrame(() => {
         const countEl = document.getElementById('searchResultsCountEl');
+        const spacerEl = document.getElementById('searchResultsSpacerEl');
         const sampleRow = document.querySelector('.word-row:not(.row-deleting)');
         if (sampleRow) {
           const h = sampleRow.getBoundingClientRect().height;
-          if (h > 0 && countEl) countEl.style.height = h + 'px';
+          if (h > 0) {
+            if (countEl) countEl.style.height = h + 'px';
+            if (spacerEl) spacerEl.style.height = h + 'px';
+          }
         }
       });
       return false;
@@ -5999,11 +5997,10 @@
     `;
     };
 
-    const emptyPersonalPrefix = personalDictEmptyForQuery ? `${t('В вашем словаре ничего не найдено.')} ` : '';
     const countLabel = (total && total > visibleMatches.length)
-      ? `${emptyPersonalPrefix}${t('Результаты поиска')} (${t('показаны первые')} ${visibleMatches.length} ${t('из')} ${total})`
-      : `${emptyPersonalPrefix}${t('Результаты поиска')} (${visibleMatches.length})`;
-    resultsEl.innerHTML = `<div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
+      ? `${t('Результаты поиска')} (${t('показаны первые')} ${visibleMatches.length} ${t('из')} ${total})`
+      : `${t('Результаты поиска')} (${visibleMatches.length})`;
+    resultsEl.innerHTML = `<div class="search-results-spacer" id="searchResultsSpacerEl"></div><div class="search-results-count" id="searchResultsCountEl">${countLabel}</div>` +
       visibleMatches.map(visibleRowHtml).join('') + (hiddenMatches.length ? `
       <button type="button" class="global-search-btn" id="showHiddenBtn" style="margin:12px auto 0;">
         ${t('Скрытые результаты')} (${hiddenMatches.length})
@@ -6011,15 +6008,20 @@
       <div id="hiddenResults" style="display:none;"></div>
     ` : '');
 
-    // Высота "разделительной карточки" (с текстом "Результаты поиска") должна
-    // равняться высоте настоящей карточки — измеряем прямо в браузере вместо
-    // того, чтобы подбирать число на глаз (шрифты/масштаб у людей разные)
+    // Высота "разделительных карточек" (пустой и с текстом "Результаты
+    // поиска") должна равняться высоте настоящей карточки — измеряем прямо
+    // в браузере вместо того, чтобы подбирать число на глаз (шрифты/масштаб
+    // у людей разные)
     requestAnimationFrame(() => {
       const countEl = document.getElementById('searchResultsCountEl');
+      const spacerEl = document.getElementById('searchResultsSpacerEl');
       const sampleRow = resultsEl.querySelector('.search-result-row') || document.querySelector('.word-row:not(.row-deleting)');
       if (sampleRow) {
         const h = sampleRow.getBoundingClientRect().height;
-        if (h > 0 && countEl) countEl.style.height = h + 'px';
+        if (h > 0) {
+          if (countEl) countEl.style.height = h + 'px';
+          if (spacerEl) spacerEl.style.height = h + 'px';
+        }
       }
     });
 
