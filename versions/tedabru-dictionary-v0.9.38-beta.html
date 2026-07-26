@@ -1617,7 +1617,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.39 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.38 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2564,26 +2564,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.39';
-
-  // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
-  // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
-  // открытии сверяем version.json (без кэша, с cache-busting параметром) с версией,
-  // зашитой в уже загруженный HTML. Если на сервере версия новее — значит открыт
-  // устаревший кэш, и мы принудительно перезагружаем страницу с уникальным ?v=,
-  // чтобы обойти локальный кэш и подтянуть свежий файл.
-  (function checkForUpdate() {
-    fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data && data.version && data.version !== APP_VERSION) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('v', data.version);
-          window.location.replace(url.toString());
-        }
-      })
-      .catch(() => {}); // офлайн или version.json недоступен — работаем с тем, что уже загружено
-  })();
+  const APP_VERSION = '0.9.37';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
