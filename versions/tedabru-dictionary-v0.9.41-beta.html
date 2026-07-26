@@ -1619,7 +1619,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.42 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.41 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2566,7 +2566,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.42';
+  const APP_VERSION = '0.9.41';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2618,89 +2618,6 @@
   }
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
-
-  // ===== ВРЕМЕННАЯ ДИАГНОСТИКА (убрать после того, как баг с нижней панелью/свайпом
-  // на холодном старте будет наконец найден) — две прошлые гипотезы (масштаб вьюпорта,
-  // dvh-геометрия) не подтвердились на реальном устройстве. Вместо третьей догадки
-  // вслепую — снимаем реальные метрики в момент бага (сразу при загрузке) и повторно
-  // в момент, когда всё "само чинится" (первый ввод в поиск), и показываем оба снимка
-  // прямо на экране, чтобы можно было просто прислать скриншот.
-  function collectNavDebugSnapshot() {
-    const nav = document.getElementById('bottomNav');
-    const rect = nav ? nav.getBoundingClientRect() : null;
-    const cs = nav ? getComputedStyle(nav) : null;
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;bottom:0;left:0;height:0;padding-bottom:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none;';
-    document.body.appendChild(probe);
-    const safeAreaBottom = getComputedStyle(probe).paddingBottom;
-    document.body.removeChild(probe);
-    return {
-      t: new Date().toISOString().slice(11, 19),
-      innerH: window.innerHeight,
-      innerW: window.innerWidth,
-      docClientH: document.documentElement.clientHeight,
-      vvH: window.visualViewport ? Math.round(window.visualViewport.height * 100) / 100 : 'n/a',
-      vvW: window.visualViewport ? Math.round(window.visualViewport.width * 100) / 100 : 'n/a',
-      vvScale: window.visualViewport ? window.visualViewport.scale : 'n/a',
-      vvOffsetTop: window.visualViewport ? window.visualViewport.offsetTop : 'n/a',
-      dpr: window.devicePixelRatio,
-      navRectTop: rect ? Math.round(rect.top * 100) / 100 : 'n/a',
-      navRectBottom: rect ? Math.round(rect.bottom * 100) / 100 : 'n/a',
-      navRectHeight: rect ? Math.round(rect.height * 100) / 100 : 'n/a',
-      navPosition: cs ? cs.position : 'n/a',
-      navBottomCSS: cs ? cs.bottom : 'n/a',
-      navPaddingBottom: cs ? cs.paddingBottom : 'n/a',
-      navDisplay: cs ? cs.display : 'n/a',
-      navTransform: cs ? cs.transform : 'n/a',
-      bodyTransform: getComputedStyle(document.body).transform,
-      htmlTransform: getComputedStyle(document.documentElement).transform,
-      appHeightVar: document.documentElement.style.getPropertyValue('--app-height'),
-      safeAreaBottom,
-      mobileMQ: (typeof isMobileViewport === 'function') ? isMobileViewport() : 'n/a',
-      standalone: window.navigator.standalone,
-    };
-  }
-
-  function renderNavDebugPanel() {
-    let panel = document.getElementById('navDebugPanel');
-    if (!panel) {
-      panel = document.createElement('div');
-      panel.id = 'navDebugPanel';
-      panel.style.cssText = 'position:fixed;top:64px;left:6px;right:6px;z-index:99999;background:rgba(0,0,0,0.88);color:#7CFC7C;font-family:monospace;font-size:9.5px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.35;max-height:70vh;overflow:auto;';
-      document.body.appendChild(panel);
-    }
-    const fmt = (label, snap) => label + ':\n' + (snap ? Object.entries(snap).map(([k, v]) => `  ${k}: ${v}`).join('\n') : '  (нет данных)');
-    panel.textContent = fmt('COLD (при загрузке)', window.__navDebugCold) + '\n\n' + fmt('AFTER (после ввода в поиск)', window.__navDebugAfter);
-  }
-
-  [300, 1200].forEach(ms => setTimeout(() => {
-    window.__navDebugCold = collectNavDebugSnapshot();
-    renderNavDebugPanel();
-  }, ms));
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const si = document.getElementById('searchInput');
-    if (si) {
-      si.addEventListener('input', () => {
-        if (!window.__navDebugAfter) {
-          window.__navDebugAfter = collectNavDebugSnapshot();
-          renderNavDebugPanel();
-        }
-      });
-    }
-  });
-  if (document.readyState !== 'loading') {
-    const si2 = document.getElementById('searchInput');
-    if (si2 && !si2.__navDebugBound) {
-      si2.__navDebugBound = true;
-      si2.addEventListener('input', () => {
-        if (!window.__navDebugAfter) {
-          window.__navDebugAfter = collectNavDebugSnapshot();
-          renderNavDebugPanel();
-        }
-      });
-    }
-  }
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
