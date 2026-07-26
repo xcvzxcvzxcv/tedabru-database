@@ -1485,7 +1485,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.27 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.26 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2385,7 +2385,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.27';
+  const APP_VERSION = '0.9.26';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4814,24 +4814,13 @@
   // просили не трогать язык таких карточек. Реализовано через временный
   // флип currentLang и повторный вызов УЖЕ существующих builder-функций —
   // так не дублируем логику выбора gloss/tr, которая и так работает верно.
-  function computeBilingualFields(hebrewWord, expectedTranslation) {
+  function computeBilingualFields(hebrewWord) {
     const skeleton = stripNiqqud(hebrewWord).normalize('NFC');
     const savedLang = currentLang;
     let result = null;
-    const expectedNorm = expectedTranslation ? expectedTranslation.trim() : null;
     try {
       const dictEntries = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
-      const wordMatches = dictEntries.filter(e => e.word === hebrewWord);
-      // Одно и то же написание на иврите нередко скрывает НЕСКОЛЬКО разных
-      // значений — омографы вроде אָח ("брат" / "камин" / "медсестра" /
-      // межд. "чёрт возьми"). Если знаем, какой ИМЕННО перевод человек видел
-      // на экране (карточка, которую он реально кликнул), ищем ТУ самую
-      // запись по совпадению перевода — иначе рискуем молча подставить
-      // совсем другое значение того же слова
-      let dictEntry = expectedNorm && wordMatches.length > 1
-        ? wordMatches.find(e => (e.gloss_ru && e.gloss_ru.trim() === expectedNorm) || (e.gloss && e.gloss.trim() === expectedNorm))
-        : null;
-      if (!dictEntry) dictEntry = wordMatches[0];
+      const dictEntry = dictEntries.find(e => e.word === hebrewWord);
       if (dictEntry) {
         currentLang = 'ru';
         const ru = buildDictCandidate(dictEntry);
@@ -4843,11 +4832,7 @@
         };
       } else {
         const verbEntries = (verbsDict && verbsDict[skeleton]) || [];
-        const verbWordMatches = verbEntries.filter(e => e.word === hebrewWord);
-        let verbEntry = expectedNorm && verbWordMatches.length > 1
-          ? verbWordMatches.find(e => e.translation && e.translation.trim() === expectedNorm)
-          : null;
-        if (!verbEntry) verbEntry = verbWordMatches[0];
+        const verbEntry = verbEntries.find(e => e.word === hebrewWord);
         if (verbEntry) {
           currentLang = 'ru';
           const ru = buildVerbDictCandidate(verbEntry);
@@ -5978,7 +5963,7 @@
             const translitEl = row.querySelector('.translit');
             const posEl = row.querySelector('.pos');
             const defEl = row.querySelector('.search-definition');
-            const bilingual = computeBilingualFields(hebrewText, defEl ? defEl.textContent : null);
+            const bilingual = computeBilingualFields(hebrewText);
             // pos надёжнее брать из bilingual.ru (посчитан из сырой записи),
             // а не парсить обратно из ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue
             // понимает только русские метки и молча вернёт null на английской
@@ -7039,7 +7024,7 @@
     // считаем, что слово взято из базы как есть (не отредактировано), и
     // сохраняем сразу оба языка. Если хоть что-то отличается — значит,
     // человек поправил значение руками, дальше язык карточки не трогаем.
-    const bilingual = computeBilingualFields(hebrewValue, typedTranslation);
+    const bilingual = computeBilingualFields(hebrewValue);
     const matchesAutofill = bilingual && bilingual[currentLang] &&
       bilingual[currentLang].translation === typedTranslation &&
       bilingual[currentLang].translit === typedTranslit;
@@ -7221,7 +7206,7 @@
       }
 
       const existing = findExistingWordByHebrew(best.text);
-      const bilingual = computeBilingualFields(best.text, best.translation);
+      const bilingual = computeBilingualFields(best.text);
       // pos надёжнее брать из bilingual.ru, а не парсить обратно из
       // ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue понимает только русские
       // подписи и молча вернёт null на английской (тот же баг, что был у
