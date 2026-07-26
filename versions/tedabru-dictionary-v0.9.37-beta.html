@@ -295,8 +295,6 @@
     outline: none;
     transition: border-color 0.15s;
   }
-  /* font-size < 16px триггерит авто-зум страницы в мобильном Safari/Chrome при фокусе на поле —
-     переопределение на 16px именно для мобильного см. в медиа-запросе ниже */
   .search-input:focus { border-color: var(--purple); }
   .search-input::placeholder { color: var(--muted); }
 
@@ -489,7 +487,6 @@
   }
   .bottom-nav-btn {
     display: flex;
-    flex: 1 1 0;
     flex-direction: column;
     align-items: center;
     gap: 4px;
@@ -498,7 +495,7 @@
     color: var(--muted);
     font-family: 'Inter', sans-serif;
     font-size: 12px;
-    padding: 4px 0;
+    padding: 4px 18px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
@@ -511,19 +508,16 @@
        на мобильном больше не нужны (это упустили в первом заходе рефактора) */
     #themeToggleBtn, #zoomControl { display: none; }
 
-    /* Компактная карточка под пиксельные ориентиры: 80px иврит | 95px мета |
-       гибкая дефиниция | ~42px под избранное+рейтинг; отступ слева 15px, справа 0 —
-       row-actions-cell сам прижат к правому краю (justify-content: flex-end / right:0),
-       так что правая граница блока рейтинг+избранное совпадает с правым краем контента
-       (той же линией, что и правая граница поля поиска).
+    /* Компактная карточка под пиксельные ориентиры: 90px иврит | 95px мета |
+       гибкая дефиниция | ~42px под избранное+рейтинг, отступы 15px по краям.
        Прослушивание/номер строки остаются скрыты (тап на иврите зарезервирован
        под будущий жест — см. обсуждение); кнопки действий скрыты (заменяются
        жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
        остаются видны в правом углу */
     .word-row {
-      grid-template-columns: 80px 95px 1fr 42px;
+      grid-template-columns: 90px 95px 1fr 42px;
       column-gap: 10px;
-      padding: 9px 0 9px 15px;
+      padding: 9px 15px;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
       transition: transform 0.2s ease-out;
       touch-action: pan-y; /* горизонтальный свайп обрабатываем сами, вертикальный скролл остаётся браузеру */
@@ -531,9 +525,6 @@
     .word-row-swipe-wrap {
       overflow: hidden;
       border-radius: 8px;
-    }
-    .search-input {
-      font-size: 16px; /* >=16px — иначе мобильный браузер зумит страницу при фокусе на поле */
     }
     .swipe-delete-btn {
       display: flex;
@@ -587,7 +578,7 @@
     /* Шапка: язык переехал в настройки (шестерёнка на месте "+" в состоянии
        покоя — см. JS isMobileViewport), тренировка/выбор — в нижнюю панель.
        Редактирование базы и сама многофункциональная кнопка остаются. */
-    #langToggleBtn { display: none; } /* именно header-кнопка; не класс — панель настроек переиспользует .lang-toggle-btn и должна остаться видимой */
+    .lang-toggle-btn { display: none; }
     #trainModeBtn, #selectModeBtn { display: none; }
 
     /* Чипы качества запоминания на мобильном не показываем вовсе — рейтинг
@@ -1617,7 +1608,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.38 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.37 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
