@@ -858,8 +858,6 @@
   }
 
   .translation {
-    position: relative;
-    min-height: 22px;
     font-family: 'Noto Serif', serif;
     font-size: 16px;
     color: var(--text-main);
@@ -869,7 +867,10 @@
   }
   .translation-edit {
     position: absolute;
-    inset: 0;
+    grid-column: 4; /* тот же столбец, где в норме .translation (1fr) */
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 30;
     font-family: 'Noto Serif', serif;
     font-size: 16px;
@@ -1485,7 +1486,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.26 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.25 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2385,7 +2386,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.26';
+  const APP_VERSION = '0.9.25';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3317,23 +3318,19 @@
     if (!row || !word) return;
     editingWordId = id;
 
-    // ВАЖНО: textarea не заменяет .translation, а вставляется ВНУТРЬ него.
-    // Сам .translation остаётся обычным элементом в потоке сетки (грид сам
-    // корректно ставит его в нужную колонку — тут ошибиться невозможно),
-    // а textarea позиционируется abolute relative к ЭТОЙ маленькой обёртке
-    // через inset:0. Раньше пробовали позиционировать relative ко всей
-    // строке (вручную и через grid-column) — оба раза уезжало в реальном
-    // браузере, вероятно из-за особенностей RTL-контента внутри строки.
-    // Этот способ не требует вообще никаких вычислений координат.
     const translationEl = row.querySelector('.translation');
-    translationEl.textContent = '';
     const textarea = document.createElement('textarea');
     textarea.className = 'translation-edit';
     textarea.dataset.id = String(id);
     textarea.rows = 1; // без этого браузер по умолчанию подставляет rows=2,
                         // и высота "auto" всё равно не опускается ниже неё
     textarea.value = word.translation;
-    translationEl.appendChild(textarea);
+    translationEl.replaceWith(textarea);
+    // Позиционирование — через саму сетку строки (grid-column), а не через
+    // ручной пересчёт координат getBoundingClientRect: тот способ ломался в
+    // реальном браузере (карточка на иврите — вероятно, конфликт с RTL),
+    // тогда как grid-column работает надёжно в любом направлении текста,
+    // потому что браузер сам решает, где физически находится 4-я колонка
 
     // Высота — строго по содержимому, без искусственного минимума в 2
     // строки: короткое определение получает ровно одну строку
@@ -3381,16 +3378,16 @@
       if (!word) { renderList(); return; }
 
       // Никакой анимации высоты строки не требуется вообще — она никогда не
-      // менялась. textarea просто убираем, а текст возвращаем в ТОТ ЖЕ
-      // .translation-контейнер (он никуда не девался, просто был пуст, пока
-      // в нём жила textarea) — с лёгким fade-ином
-      const translationEl = textarea.parentElement;
-      textarea.remove();
-      translationEl.style.opacity = '0';
-      translationEl.textContent = personalWordDisplay(word).translation;
+      // менялась, текстовое поле было наложено поверх абсолютным
+      // позиционированием. Просто лёгкий fade-ин нового текста
+      const newDiv = document.createElement('div');
+      newDiv.className = 'translation';
+      newDiv.textContent = personalWordDisplay(word).translation;
+      newDiv.style.opacity = '0';
+      textarea.replaceWith(newDiv);
       requestAnimationFrame(() => {
-        translationEl.style.transition = 'opacity 0.15s ease-out';
-        translationEl.style.opacity = '1';
+        newDiv.style.transition = 'opacity 0.15s ease-out';
+        newDiv.style.opacity = '1';
       });
     };
 
