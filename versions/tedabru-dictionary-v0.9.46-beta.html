@@ -1619,7 +1619,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.47 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.46 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2566,7 +2566,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.47';
+  const APP_VERSION = '0.9.46';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2619,50 +2619,42 @@
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
 
-  // ===== Второе уточнение: на настоящем холодном старте (переустановка +
-  // перезагрузка) словарь реально грузится дольше фиксированного таймаута —
-  // именно поэтому в прошлой версии словарь "ещё не успел". Вместо угадывания
-  // времени — дожидаемся НАСТОЯЩЕГО промиса загрузки словаря (тот же самый,
-  // что использует runInstantDictSearch внутри), сколько бы он ни занял, и
-  // только потом рисуем результаты и откатываем обратно. Работает и на
-  // мгновенной, и на очень медленной сети одинаково надёжно.
+  // ===== Уточнение с реального устройства: чинит не просто вызов renderList(),
+  // а именно отображение РЕАЛЬНЫХ результатов поиска по всему словарю (тяжёлый
+  // блок с настоящими карточками) — открытие панели фильтров БЕЗ выбора категории
+  // не помогает, нужен реальный список результатов. Эти результаты подгружаются
+  // асинхронно (runInstantDictSearch), поэтому просто выставить searchQuery и тут
+  // же откатить не выйдет — нужно реально дождаться отрисовки, и только потом
+  // вернуть пустое состояние. Да, это даёт видимую вспышку результатов поиска на
+  // экране на секунду-две при холодном старте — осознанный компромисс, чтобы
+  // прямо проверить гипотезу перед тем, как прятать её "по-тихому".
   window.__searchCycleLog = [];
   window.__searchCycleDone = false;
   function logSearchCycle(msg) {
     window.__searchCycleLog.push(new Date().toISOString().slice(11, 19) + ' — ' + msg);
     renderSearchCycleDebugPanel();
   }
-  async function forceRealSearchCycle() {
+  function forceRealSearchCycle() {
     if (window.__searchCycleDone) return;
     if (document.activeElement && document.activeElement.id === 'searchInput') { logSearchCycle('пропуск: юзер сам в поиске'); return; }
     if (searchQuery && searchQuery.trim()) { logSearchCycle('пропуск: searchQuery уже занят юзером'); return; }
     if (categoryFilterPanelOpen) { logSearchCycle('пропуск: фильтры уже открыты юзером'); return; }
-    window.__searchCycleDone = true; // застолбили сразу — без параллельных гонок повторных попыток
     const probeQuery = 'а';
     searchQuery = probeQuery;
-    renderList();
-    logSearchCycle('запустили пробный поиск, ждём загрузки словаря (может занять время на холодную сеть)...');
-    try {
-      const candidates = await resolveCandidatesDictOnly(probeQuery); // сама дождётся loadHebrewDict(), сколько нужно
-      logSearchCycle('словарь загружен, кандидатов найдено: ' + (candidates ? candidates.length : 0));
-      const el = document.getElementById('instantDictResults');
-      if (el && searchQuery === probeQuery) {
-        renderCandidatesInto(el, candidates);
-        logSearchCycle('результаты реально отрисованы в DOM (' + el.children.length + ' узлов)');
-      }
-    } catch (e) {
-      logSearchCycle('ошибка загрузки словаря: ' + e.message);
-    }
-    await new Promise(r => setTimeout(r, 400)); // дать браузеру реально нарисовать кадр с результатами
-    if (searchQuery === probeQuery) {
+    renderList(); // это само вызовет attachGlobalSearchHandler() -> runInstantDictSearch() асинхронно
+    logSearchCycle('запустили пробный поиск "' + probeQuery + '", ждём реальных результатов...');
+    setTimeout(() => {
+      if (searchQuery !== probeQuery) { logSearchCycle('юзер сам сменил поиск за это время — не трогаем'); return; }
+      const resultsEl = document.getElementById('instantDictResults');
+      const gotResults = resultsEl && resultsEl.children.length > 0;
+      logSearchCycle(gotResults ? 'результаты реально отрисовались, откатываем' : 'результатов пока нет (словарь ещё грузится?), откатываем всё равно');
       searchQuery = '';
       renderList();
+      window.__searchCycleDone = true;
       logSearchCycle('откатили обратно к пустому списку — цикл завершён');
-    } else {
-      logSearchCycle('юзер сам сменил поиск, не трогаем');
-    }
+    }, 1500);
   }
-  setTimeout(forceRealSearchCycle, 500);
+  [800, 4000].forEach(ms => setTimeout(forceRealSearchCycle, ms));
 
   // ===== Временная диагностика — лог таймкодов цикла (геометрию уже проверили,
   // JS её не отличает от рабочего состояния)
