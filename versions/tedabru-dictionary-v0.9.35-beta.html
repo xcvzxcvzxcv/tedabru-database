@@ -385,13 +385,6 @@
     .cascade-in { animation: none; }
   }
 
-  .word-row-swipe-wrap {
-    position: relative;
-  }
-  .swipe-delete-btn {
-    display: none; /* включается только в мобильном медиа-запросе ниже */
-  }
-
   .word-row {
     position: relative;
     display: grid;
@@ -483,33 +476,7 @@
       grid-template-columns: 90px 95px 1fr 42px;
       column-gap: 10px;
       padding: 9px 15px;
-      background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
-      transition: transform 0.2s ease-out;
-      touch-action: pan-y; /* горизонтальный свайп обрабатываем сами, вертикальный скролл остаётся браузеру */
     }
-    .word-row-swipe-wrap {
-      overflow: hidden;
-      border-radius: 8px;
-    }
-    .swipe-delete-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 80px;
-      background: var(--gold);
-      color: #2a1608;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .swipe-delete-btn svg { width: 20px; height: 20px; }
     .word-row .hebrew-word {
       font-size: 26px;
     }
@@ -1604,7 +1571,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.36 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.35 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2551,7 +2518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.36';
+  const APP_VERSION = '0.9.35';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3267,9 +3234,7 @@
       const isPendingDelete = pendingDeleteIds.has(w.id);
       const disp = personalWordDisplay(w);
       return `
-      <div class="word-row-swipe-wrap" data-id="${w.id}">
-        <button type="button" class="swipe-delete-btn" data-id="${w.id}">${TRASH_ICON}<span>${t('Удалить')}</span></button>
-        <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
+      <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
         <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
@@ -3294,7 +3259,6 @@
         </div>
         <div class="row-num">${i + 1}</div>
         ${isPendingDelete ? `<div class="delete-timer-track"><div class="delete-timer-bar" data-timerbar="${w.id}"></div></div>` : ''}
-      </div>
       </div>
     `;
     }).join('') + `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
@@ -4097,82 +4061,6 @@
         if (isSecondTapOf(e, translationEl)) enterInlineEdit(parseInt(row.dataset.id));
       }
     }
-  });
-
-  // ===== Свайп влево — открыть кнопку удаления (iOS-паттерн) =====
-  // Карточка сама (не обёртка) сдвигается через transform, кнопка удаления
-  // всё это время лежит под ней (см. CSS .word-row-swipe-wrap с overflow:hidden).
-  // Одновременно открытой может быть только одна карточка — как в iOS.
-  const SWIPE_REVEAL_WIDTH = 80;
-  const SWIPE_OPEN_THRESHOLD = SWIPE_REVEAL_WIDTH / 2;
-  let swipeState = null; // { row, startX, startY, currentX, active, wasOpen }
-  let openSwipeRow = null;
-
-  function closeSwipeRow(row) {
-    if (!row) return;
-    row.style.transition = '';
-    row.style.transform = '';
-    row.classList.remove('swipe-open');
-    if (openSwipeRow === row) openSwipeRow = null;
-  }
-
-  wordListEl.addEventListener('pointerdown', (e) => {
-    if (!isMobileViewport() || selectionMode) return;
-    const row = e.target.closest('.word-row');
-    if (!row || !wordListEl.contains(row) || row.classList.contains('row-deleting')) return;
-    if (e.target.closest('.swipe-delete-btn')) return; // клик по самой кнопке обрабатывается отдельно ниже
-    if (openSwipeRow && openSwipeRow !== row) closeSwipeRow(openSwipeRow);
-    swipeState = { row, startX: e.clientX, startY: e.clientY, currentX: 0, active: false, wasOpen: row.classList.contains('swipe-open') };
-  }, { passive: true });
-
-  wordListEl.addEventListener('pointermove', (e) => {
-    if (!swipeState || !isMobileViewport()) return;
-    const dx = e.clientX - swipeState.startX;
-    const dy = e.clientY - swipeState.startY;
-    if (!swipeState.active) {
-      // решаем, свайп это или обычный вертикальный скролл — как только
-      // движение однозначно горизонтальное, "захватываем" жест себе
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-      if (Math.abs(dy) > Math.abs(dx)) { swipeState = null; return; } // это скролл, не наш жест
-      swipeState.active = true;
-      swipeState.row.style.transition = 'none';
-    }
-    const base = swipeState.wasOpen ? -SWIPE_REVEAL_WIDTH : 0;
-    const raw = base + dx;
-    swipeState.currentX = Math.max(-SWIPE_REVEAL_WIDTH, Math.min(0, raw));
-    swipeState.row.style.transform = `translateX(${swipeState.currentX}px)`;
-  }, { passive: true });
-
-  function finishSwipe() {
-    if (!swipeState) return;
-    const { row, active, currentX } = swipeState;
-    if (active) {
-      row.style.transition = 'transform 0.2s ease-out';
-      const shouldOpen = currentX <= -SWIPE_OPEN_THRESHOLD;
-      row.style.transform = shouldOpen ? `translateX(-${SWIPE_REVEAL_WIDTH}px)` : '';
-      row.classList.toggle('swipe-open', shouldOpen);
-      openSwipeRow = shouldOpen ? row : (openSwipeRow === row ? null : openSwipeRow);
-    }
-    swipeState = null;
-  }
-  wordListEl.addEventListener('pointerup', finishSwipe);
-  wordListEl.addEventListener('pointercancel', finishSwipe);
-
-  // Тап где угодно вне открытой карточки — закрывает её (стандартное
-  // поведение свайп-удаления в iOS)
-  document.addEventListener('click', (e) => {
-    if (!openSwipeRow) return;
-    if (e.target.closest('.swipe-delete-btn')) return; // обработается отдельным обработчиком ниже
-    if (!openSwipeRow.contains(e.target)) closeSwipeRow(openSwipeRow);
-  });
-
-  wordListEl.addEventListener('click', (e) => {
-    const delBtn = e.target.closest('.swipe-delete-btn');
-    if (!delBtn) return;
-    const id = parseInt(delBtn.dataset.id);
-    const row = delBtn.closest('.word-row-swipe-wrap').querySelector('.word-row');
-    closeSwipeRow(row);
-    deleteWord(id);
   });
 
   wordListEl.addEventListener('pointerdown', (e) => {
