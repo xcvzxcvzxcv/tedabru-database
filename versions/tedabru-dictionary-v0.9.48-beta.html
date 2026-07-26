@@ -77,18 +77,17 @@
     background-attachment: fixed;
     min-height: 100vh;
     min-height: 100dvh;
-    /* +60px сверх высоты вьюпорта — намеренно делает страницу гарантированно
-       скроллящейся ВСЕГДА, с первого кадра, без ожидания реального контента.
-       Корень бага: WebKit не строит скроллинг-дерево (а значит и корректный
-       композитный слой для position:fixed/transform) для страницы без
-       реального оверфлоу — подтверждено тем, что список результатов поиска
-       чинил баг сам по себе. Чистый CSS, без JS — раньше здесь была
-       JS-переменная --app-height, которая переизмерялась несколько раз в
-       первые секунды и каждый раз реально меняла высоту документа, отсюда
-       и видимый "отъезд" панели — статичный calc() этого не делает.
-       2px хватило, чтобы починить позицию панели, но не хватило для свайпа —
-       пробуем более существенный запас. */
-    min-height: calc(100dvh + 60px);
+    min-height: var(--app-height, 100dvh); /* JS-измеренная реальная высота, если уже посчитана — см. refreshAppHeight() */
+    /* +2px сверх высоты вьюпорта — намеренно делает страницу минимально
+       скроллящейся ВСЕГДА, с первого кадра. Корень бага: WebKit толком
+       не строит скроллинг-дерево (а значит и корректный композитный слой
+       для position:fixed/transform) для страницы без реального оверфлоу —
+       мы это подтвердили тем, что появление длинного списка результатов
+       поиска само по себе чинило баг. Пары пикселей достаточно, чтобы
+       WebKit с самого начала считал страницу скроллящейся, не дожидаясь
+       реального контента. */
+    min-height: calc(100dvh + 2px);
+    min-height: calc(var(--app-height, 100dvh) + 2px);
     overscroll-behavior-y: none;
     font-family: 'Noto Serif', serif;
     color: var(--text-main);
@@ -172,6 +171,7 @@
     margin: 0 auto;
     min-height: 100vh;
     min-height: 100dvh;
+    min-height: var(--app-height, 100dvh);
     display: flex;
     flex-direction: column;
     padding: 0 20px;
@@ -1629,7 +1629,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.49 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.48 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2576,7 +2576,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.49';
+  const APP_VERSION = '0.9.48';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2596,6 +2596,29 @@
       })
       .catch(() => {}); // офлайн или version.json недоступен — работаем с тем, что уже загружено
   })();
+
+  // ===== iOS Home Screen App: реальная высота вьюпорта на самой первой отрисовке
+  // иногда ещё не устаканилась (safe-area/статус-бар геометрия достраивается чуть
+  // позже) — из-за этого "плывёт" всё, что зависит от реальных размеров экрана:
+  // и position:fixed нижней панели, и координаты тача для свайпа по карточкам.
+  // Любой нативный ресайз вьюпорта (например, открытие клавиатуры при фокусе на
+  // поиске) заставляет систему пересчитать геометрию — отсюда и "чинится само"
+  // после первого тапа в поиск. Меряем реальную высоту сами через JS (это надёжнее,
+  // чем полагаться на CSS vh/dvh) и держим её в переменной --app-height, обновляя
+  // её многократно в первые секунды и по всем событиям, которые могут её изменить —
+  // чтобы точно поймать момент, когда геометрия уже верна, не дожидаясь тапа юзера.
+  function refreshAppHeight() {
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--app-height', h + 'px');
+  }
+  refreshAppHeight();
+  [0, 50, 150, 300, 600, 1000, 2000].forEach(ms => setTimeout(refreshAppHeight, ms));
+  window.addEventListener('resize', refreshAppHeight);
+  window.addEventListener('orientationchange', refreshAppHeight);
+  window.addEventListener('pageshow', refreshAppHeight);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refreshAppHeight);
+  }
 
   // Доп. подстраховка (оставляем из прошлого фикса — в некоторых версиях WebKit
   // именно скролл-пинок форсирует пересчёт лейаута fixed-элементов):
