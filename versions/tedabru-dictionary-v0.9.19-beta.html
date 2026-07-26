@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.20 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.19 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1840,9 +1840,6 @@
     'Добавить подборку': 'Add collection',
     'Фильтры': 'Filters',
     'Название подборки': 'Collection name',
-    'Новая подборка': 'New collection',
-    'Останавливаю после текущего слова…': 'Stopping after the current word…',
-    'Обрабатываю': 'Processing',
     'Сбросить фильтр': 'Reset filter',
     'Подборок пока нет': 'No collections yet',
     // ===== Пустые состояния / сообщения =====
@@ -1870,9 +1867,6 @@
     'Слово удалено из вашего словаря': 'Word removed from your dictionary',
     'Искать среди всех слов': 'Search all words',
     'Ищу среди вариантов написания...': 'Searching alternate spellings...',
-    'Не удалось получить никуд автоматически': 'Could not auto-generate niqqud',
-    'Возможно, сервер блокирует прямые запросы из браузера (CORS) — введите слово и транскрипцию вручную.':
-      'The server may be blocking direct requests from the browser (CORS) — enter the word and transcription manually.',
     'Не удалось найти это слово ни в словаре, ни через перевод.': "Couldn't find this word in the dictionary or via translation.",
     // ===== Добавление слова =====
     'Добавить одно слово': 'Add one word',
@@ -2371,7 +2365,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.20';
+  const APP_VERSION = '0.9.19';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4058,14 +4052,13 @@
   // видно, что это не тот вариант.
   const DEEPL_URL = 'https://deepltranslate.3an3arah.workers.dev/';
 
-  async function translateHebrewToCurrentLang(hebrewText) {
-    const targetLang = currentLang === 'en' ? 'EN' : 'RU';
+  async function translateToRussian(hebrewText) {
     const response = await fetch(DEEPL_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: [hebrewText],
-        target_lang: targetLang
+        target_lang: 'RU'
       })
     });
     if (!response.ok) throw new Error('DeepL ответил ошибкой: ' + response.status);
@@ -5034,7 +5027,7 @@
       const chosenTranslit = chosen ? niqqudToTranslit(chosen.text, translitOpts) : niqqudToTranslit(raw, translitOpts);
       const chosenGrammar = chosen ? computeGrammarLabelFromMorph(chosen) : null;
       let translation = null;
-      try { translation = await withRetry(() => translateHebrewToCurrentLang(chosenText)); } catch (e) {}
+      try { translation = await withRetry(() => translateToRussian(chosenText)); } catch (e) {}
       if (!translation) return []; // без перевода добавлять действительно нечего
       return [{ text: chosenText, translit: chosenTranslit, grammarLabel: chosenGrammar, translation, source: 'hebrew-api' }];
     }
@@ -5959,7 +5952,7 @@
     const myGeneration = ++searchGeneration;
     const resultsEl = document.getElementById('globalSearchResults');
     btn.disabled = true;
-    btn.textContent = t('Ищу среди вариантов написания...');
+    btn.textContent = 'Ищу среди вариантов написания...';
     resultsEl.innerHTML = '';
 
     // если пока этот запрос летал по сети, стартовал более новый запрос —
@@ -5971,7 +5964,7 @@
       if (isStale()) return;
       console.log('[DEBUG] кандидаты от resolveCandidates:', rawCandidates.map(c => ({ text: c.text, source: c.source, translation: c.translation })));
       if (!rawCandidates.length) {
-        resultsEl.innerHTML = `<div class="sugg-note">${t('Не удалось найти это слово ни в словаре, ни через перевод.')}</div>`;
+        resultsEl.innerHTML = '<div class="sugg-note">Не удалось найти это слово ни в словаре, ни через перевод.</div>';
         return;
       }
       if (isStale()) return; // за время запроса стартовал более новый поиск — не перезаписываем его результат
@@ -6030,7 +6023,7 @@
 
       if (!candidates.length) {
         nikkudSuggestion.classList.add('visible');
-        nikkudSuggestion.innerHTML = `<div class="sugg-note">${t('Не удалось найти это слово ни в словаре, ни через перевод.')}</div>`;
+        nikkudSuggestion.innerHTML = '<div class="sugg-note">Не удалось найти это слово ни в словаре, ни через перевод.</div>';
         return;
       }
 
@@ -6080,8 +6073,8 @@
       nikkudSuggestion.classList.add('visible', 'error');
       nikkudSuggestion.innerHTML = `
         <div class="sugg-note">
-          ${t('Не удалось получить никуд автоматически')} (${err.message}).
-          ${t('Возможно, сервер блокирует прямые запросы из браузера (CORS) — введите слово и транскрипцию вручную.')}
+          Не удалось получить никуд автоматически (${err.message}).
+          Возможно, сервер блокирует прямые запросы из браузера (CORS) — введите слово и транскрипцию вручную.
         </div>
       `;
     }
@@ -7029,8 +7022,8 @@
       `<button type="button" class="chip ${bulkTargetCollectionIds.has(c.id) ? 'chip-selected' : ''}" data-bulk-coll="${c.id}">${c.name}</button>`
     ).join('') + (
       bulkCreatingCollectionInline
-        ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="${t('Название подборки')}" />`
-        : `<button type="button" class="chip chip-icon-only" id="bulkNewCollectionChip" title="${t('Новая подборка')}">${PLUS_ICON}</button>`
+        ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="Название подборки" />`
+        : `<button type="button" class="chip chip-icon-only" id="bulkNewCollectionChip" title="Новая подборка">${PLUS_ICON}</button>`
     );
 
     bulkCollectionChipsEl.querySelectorAll('[data-bulk-coll]').forEach(btn => {
@@ -7092,7 +7085,7 @@
 
   bulkAddStopBtn.addEventListener('click', () => {
     bulkAddAborted = true;
-    bulkProgressEl.textContent = t('Останавливаю после текущего слова…');
+    bulkProgressEl.textContent = 'Останавливаю после текущего слова…';
   });
 
   bulkAddSubmitBtn.addEventListener('click', async () => {
@@ -7121,7 +7114,7 @@
     for (let i = 0; i < tokens.length; i++) {
       if (bulkAddAborted) break;
       const token = tokens[i];
-      bulkProgressEl.textContent = `${t('Обрабатываю')} ${i + 1} ${t('из')} ${tokens.length}: «${token}»…`;
+      bulkProgressEl.textContent = `Обрабатываю ${i + 1} из ${tokens.length}: «${token}»…`;
 
       let best = null;
       try {
@@ -7137,29 +7130,10 @@
       }
 
       const existing = findExistingWordByHebrew(best.text);
-      const bilingual = computeBilingualFields(best.text);
-      // pos надёжнее брать из bilingual.ru, а не парсить обратно из
-      // ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue понимает только русские
-      // подписи и молча вернёт null на английской (тот же баг, что был у
-      // одноклик-добавления из выдачи, см. commit истории)
-      const posValue = (bilingual && bilingual.ru)
-        ? bilingual.ru.pos
-        : (grammarLabelToPosValue(best.grammarLabel) || 'сущ, м.р');
-      const translitValue = (bilingual && bilingual.ru) ? bilingual.ru.translit : (best.translit || '');
-      const translationValue = (bilingual && bilingual.ru) ? bilingual.ru.translation : best.translation;
-
       if (existing) {
-        existing.translit = translitValue || existing.translit;
-        existing.pos = posValue || existing.pos;
-        existing.translation = translationValue;
-        if (bilingual) {
-          existing.fromDict = true;
-          existing.translation_en = bilingual.en.translation;
-          existing.translit_en = bilingual.en.translit;
-          existing.pos_en = bilingual.en.pos;
-        } else {
-          clearBilingualFields(existing);
-        }
+        existing.translit = best.translit || existing.translit;
+        existing.pos = grammarLabelToPosValue(best.grammarLabel) || existing.pos;
+        existing.translation = best.translation;
         if (bulkTargetCollectionIds.size) {
           existing.collectionIds = existing.collectionIds || [];
           bulkTargetCollectionIds.forEach(cid => {
@@ -7168,23 +7142,16 @@
         }
         updated++;
       } else {
-        const newWord = {
+        words.unshift({
           id: Date.now() + i,
           hebrew: best.text,
-          translit: translitValue,
-          pos: posValue,
-          translation: translationValue,
+          translit: best.translit || '',
+          pos: grammarLabelToPosValue(best.grammarLabel) || 'сущ, м.р',
+          translation: best.translation,
           favorite: false,
           collectionIds: Array.from(bulkTargetCollectionIds),
           addedAt: Date.now()
-        };
-        if (bilingual) {
-          newWord.fromDict = true;
-          newWord.translation_en = bilingual.en.translation;
-          newWord.translit_en = bilingual.en.translit;
-          newWord.pos_en = bilingual.en.pos;
-        }
-        words.unshift(newWord);
+        });
         added++;
       }
     }
