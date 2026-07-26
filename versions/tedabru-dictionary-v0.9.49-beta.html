@@ -1629,7 +1629,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.50 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.49 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2576,7 +2576,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.50';
+  const APP_VERSION = '0.9.49';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2605,32 +2605,6 @@
   }
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
-
-  // ===== Проверяем следующую гипотезу: дело не в высоте страницы самой по себе
-  // (60px оверфлоу не почини­ли свайп), а в том, что WebKit строит нормальный
-  // композитинг для position:fixed/transform-элементов только когда на странице
-  // РЕАЛЬНО присутствует много "тяжёлого" transform-контента — как настоящие
-  // карточки при выдаче результатов поиска (это единственное, что чинило оба
-  // симптома разом). Пробуем создать такой контент без показа пользователю:
-  // те же CSS-классы (.word-row-swipe-wrap/.word-row), что и у настоящих карточек,
-  // но вынесенные далеко за пределы экрана — если WebKit инициализирует
-  // композитинг от одного их присутствия в DOM, баг должен уйти без всякой
-  // вспышки на экране.
-  (function warmUpCompositorLayers() {
-    const N = 40;
-    const host = document.createElement('div');
-    host.id = 'compositorWarmup';
-    host.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:390px;pointer-events:none;';
-    let html = '';
-    for (let i = 0; i < N; i++) {
-      html += '<div class="word-row-swipe-wrap"><div class="word-row"><div class="hebrew-word">א</div><div class="meta-col"><div class="translit">a</div><div class="pos">сущ</div></div><div class="translation">a</div></div></div>';
-    }
-    host.innerHTML = html;
-    document.body.appendChild(host);
-    // держим достаточно долго, чтобы WebKit точно успел построить композитинг
-    // для этих узлов, затем убираем — пользователь их никогда не видел
-    setTimeout(() => { const el = document.getElementById('compositorWarmup'); if (el) el.remove(); }, 2500);
-  })();
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
