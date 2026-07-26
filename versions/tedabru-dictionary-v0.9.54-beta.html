@@ -419,7 +419,7 @@
     right: 0;
     bottom: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent 0, rgba(var(--ink-rgb),0.12) 10%, rgba(var(--ink-rgb),0.12) 90%, transparent 100%);
+    background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
   }
 
   /* Карточка результата поиска — зеркальная версия word-row: статус слева
@@ -458,7 +458,7 @@
     right: 0;
     bottom: 0;
     height: 1px;
-    background: linear-gradient(to right, transparent 0, rgba(var(--ink-rgb),0.12) 10%, rgba(var(--ink-rgb),0.12) 90%, transparent 100%);
+    background: linear-gradient(to right, transparent 0, rgba(123,53,212,0.15) 10%, rgba(123,53,212,0.15) 90%, transparent 100%);
   }
   .search-result-row .search-status-icon {
     padding: 4px 4px 4px 0;
@@ -520,20 +520,6 @@
        на мобильном больше не нужны (это упустили в первом заходе рефактора) */
     #themeToggleBtn, #zoomControl { display: none; }
 
-    /* Bug #6: версия переезжает из отдельной строки НАД заголовком в строку
-       РЯДОМ с ним — освобождает много пустого пространства сверху, поднимаем
-       весь блок контента ближе к динамическому острову/статус-бару */
-    .header {
-      padding-top: calc(10px + env(safe-area-inset-top));
-    }
-    .header-top-left {
-      flex-direction: row;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .title-row { order: 1; }
-    .app-version-line { order: 2; }
-
     /* Компактная карточка под пиксельные ориентиры: 80px иврит | 95px мета |
        гибкая дефиниция | ~42px под избранное+рейтинг; отступ слева 15px, справа 0 —
        row-actions-cell сам прижат к правому краю (justify-content: flex-end / right:0),
@@ -544,19 +530,12 @@
        жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
        остаются видны в правом углу */
     .word-row {
-      grid-template-columns: 60px 95px 1fr 42px;
+      grid-template-columns: 80px 95px 1fr 42px;
       column-gap: 10px;
       padding: 9px 0 9px 15px;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
       transition: transform 0.2s ease-out;
       touch-action: pan-y; /* горизонтальный свайп обрабатываем сами, вертикальный скролл остаётся браузеру */
-    }
-    /* Bug #3: паддинг вокруг мета-колонки (транслит+часть речи) сокращён на 5px
-       с каждой стороны — было margin-left:5px/margin-right:12px (из десктопных
-       значений), съедало слишком много места на мобильном */
-    .word-row .meta-col {
-      margin-left: 0px;
-      margin-right: 7px;
     }
     .word-row-swipe-wrap {
       overflow: hidden;
@@ -623,16 +602,13 @@
     /* Чипы качества запоминания на мобильном не показываем вовсе — рейтинг
        переезжает в саму карточку слова (см. mastery-dots в компактной
        карточке на следующем шаге рефактора) */
-    #filterBar > .filter-row:first-child { display: none; } /* child-комбинатор (>), а не потомок — иначе селектор ЗАОДНО прятал единственную .filter-row внутри .filters-collapse (она тоже была :first-child своего родителя), из-за чего чип 'Фильтры' раскрывался в пустоту */
+    #filterBar .filter-row:first-child { display: none; }
 
     .bottom-nav {
       display: flex;
     }
     .app {
       padding-bottom: 78px; /* место под нижнюю панель, чтобы последняя карточка не пряталась под ней */
-    }
-    .list {
-      padding-bottom: 0; /* десктопные 100px тут не нужны — .app уже резервирует место под панель, вместе получалось лишних ~100px пустоты после последней карточки */
     }
   }
 
@@ -1015,7 +991,6 @@
     font-size: 15px;
     color: var(--text-secondary);
     opacity: 0.9;
-    text-align: center;
   }
   .pos {
     font-family: 'Inter', sans-serif;
@@ -1651,7 +1626,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.55 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.54 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1923,7 +1898,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
     <span data-i18n="Тренировка">Тренировка</span>
   </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavAddBtn">
+  <button type="button" class="bottom-nav-btn bottom-nav-btn-gold" id="bottomNavAddBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <span data-i18n="Добавить">Добавить</span>
   </button>
@@ -2598,7 +2573,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.55';
+  const APP_VERSION = '0.9.54';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
