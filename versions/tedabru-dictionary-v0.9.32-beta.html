@@ -1547,7 +1547,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.33 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.32 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1929,9 +1929,7 @@
     'Редактировать базу': 'Edit database',
     'Добавить слово': 'Add word',
     'Ищите по слову, переводу или транскрипции': 'Search by word, translation, or transcription',
-    'Слово, перевод или транскрипция': 'Word, translation, or transcription',
     'Фильтры по части речи': 'Filter by part of speech',
-    'Очистить поиск': 'Clear search',
     'Переключить тему': 'Toggle theme',
     'Увеличить масштаб': 'Zoom in',
     'Уменьшить масштаб': 'Zoom out',
@@ -2166,9 +2164,7 @@
     const searchInputEl = document.getElementById('searchInput');
     if (searchInputEl && (!searchInputEl.placeholder ||
         searchInputEl.placeholder.startsWith('Ищите по слову, переводу или транскрипции') ||
-        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription') ||
-        searchInputEl.placeholder.startsWith('Слово, перевод или транскрипция') ||
-        searchInputEl.placeholder.startsWith('Word, translation, or transcription'))) {
+        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription'))) {
       searchInputEl.placeholder = defaultSearchPlaceholder();
     }
   }
@@ -2494,7 +2490,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.33';
+  const APP_VERSION = '0.9.32';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3607,35 +3603,7 @@
   const headerTitleEl = document.getElementById('headerTitle');
   const wordListEl = document.getElementById('wordList');
 
-  // На мобильном значок фильтров временно (пока не продуман более
-  // интуитивный вариант — см. обсуждение) выполняет двойную роль: воронка
-  // при пустом поиске, крестик очистки — как только есть введённый текст,
-  // ради быстрого возврата в свой словарь одним тапом
-  const FILTER_FUNNEL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>';
-  const FILTER_CLEAR_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-  function updateMobileFilterToggleIcon() {
-    if (!isMobileViewport()) return;
-    const btn = document.getElementById('categoryFilterToggleBtn');
-    if (!btn) return;
-    if (searchQuery.trim()) {
-      btn.innerHTML = FILTER_CLEAR_ICON;
-      btn.title = t('Очистить поиск');
-    } else {
-      btn.innerHTML = FILTER_FUNNEL_ICON;
-      btn.title = t('Фильтры по части речи');
-    }
-  }
-
   document.getElementById('categoryFilterToggleBtn').addEventListener('click', () => {
-    if (isMobileViewport() && searchQuery.trim()) {
-      // на мобильном с непустым поиском — это крестик очистки, не фильтры
-      const inputEl = document.getElementById('searchInput');
-      inputEl.value = '';
-      searchQuery = '';
-      updateMobileFilterToggleIcon();
-      renderList();
-      return;
-    }
     categoryFilterPanelOpen = !categoryFilterPanelOpen;
     document.getElementById('categoryFilterToggleBtn').classList.toggle('active', categoryFilterPanelOpen || categoryFilterActive());
     renderCategoryFilterPanel();
@@ -4292,7 +4260,6 @@
       return;
     }
     searchQuery = e.target.value;
-    updateMobileFilterToggleIcon();
     renderList();
   });
 
@@ -4630,29 +4597,11 @@
   }
   let totalDictWordCount = null; // заполнится после того, как словарь реально загрузится
 
-  // Меряем реальную ширину текста тем же шрифтом, что у поля поиска — через
-  // canvas, без вставки в DOM (дёшево и не требует reflow)
-  let _placeholderMeasureCanvas = null;
-  function measureTextWidth(text, font) {
-    if (!_placeholderMeasureCanvas) _placeholderMeasureCanvas = document.createElement('canvas');
-    const ctx = _placeholderMeasureCanvas.getContext('2d');
-    ctx.font = font;
-    return ctx.measureText(text).width;
-  }
-
   function defaultSearchPlaceholder() {
-    const base = isMobileViewport() ? t('Слово, перевод или транскрипция') : t('Ищите по слову, переводу или транскрипции');
+    const base = t('Ищите по слову, переводу или транскрипции');
     if (totalDictWordCount === null) return base;
     const count = totalDictWordCount.toLocaleString(currentLang === 'en' ? 'en-US' : 'ru-RU');
-    const withCount = currentLang === 'en' ? `${base} [${count} words in the database]` : `${base} [${count} слов в базе]`;
-    if (!isMobileViewport()) return withCount; // на десктопе места всегда достаточно — как и раньше
-    // на мобильном — только если реально помещается в поле поиска
-    const inputEl = document.getElementById('searchInput');
-    if (!inputEl) return withCount;
-    const style = window.getComputedStyle(inputEl);
-    const font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    const availableWidth = inputEl.clientWidth - parseFloat(style.paddingLeft || 0) - parseFloat(style.paddingRight || 0);
-    return measureTextWidth(withCount, font) <= availableWidth ? withCount : base;
+    return currentLang === 'en' ? `${base} [${count} words in the database]` : `${base} [${count} слов в базе]`;
   }
 
   loadHebrewDict().then(() => { // запускаем загрузку сразу при открытии страницы, не дожидаясь первого поиска
@@ -4666,9 +4615,7 @@
     // человек мог уже успеть зайти в другой режим, пока грузился словарь)
     if (searchInputEl && (!searchInputEl.placeholder ||
         searchInputEl.placeholder.startsWith('Ищите по слову, переводу или транскрипции') ||
-        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription') ||
-        searchInputEl.placeholder.startsWith('Слово, перевод или транскрипция') ||
-        searchInputEl.placeholder.startsWith('Word, translation, or transcription'))) {
+        searchInputEl.placeholder.startsWith('Search by word, translation, or transcription'))) {
       searchInputEl.placeholder = defaultSearchPlaceholder();
     }
   });
@@ -7763,11 +7710,7 @@
   updateHeaderForSelectionMode();
   // на случай смены ориентации/резайза окна — держим иконку кнопки (+/⚙)
   // в актуальном состоянии, не только при смене режима
-  window.matchMedia('(max-width: 480px) and (hover: none) and (pointer: coarse)').addEventListener('change', () => {
-    updateHeaderForSelectionMode();
-    updateMobileFilterToggleIcon();
-  });
-  updateMobileFilterToggleIcon();
+  window.matchMedia('(max-width: 480px) and (hover: none) and (pointer: coarse)').addEventListener('change', updateHeaderForSelectionMode);
   renderFilterBar();
   renderList();
 </script>
