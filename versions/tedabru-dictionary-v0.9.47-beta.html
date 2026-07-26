@@ -78,16 +78,6 @@
     min-height: 100vh;
     min-height: 100dvh;
     min-height: var(--app-height, 100dvh); /* JS-измеренная реальная высота, если уже посчитана — см. refreshAppHeight() */
-    /* +2px сверх высоты вьюпорта — намеренно делает страницу минимально
-       скроллящейся ВСЕГДА, с первого кадра. Корень бага: WebKit толком
-       не строит скроллинг-дерево (а значит и корректный композитный слой
-       для position:fixed/transform) для страницы без реального оверфлоу —
-       мы это подтвердили тем, что появление длинного списка результатов
-       поиска само по себе чинило баг. Пары пикселей достаточно, чтобы
-       WebKit с самого начала считал страницу скроллящейся, не дожидаясь
-       реального контента. */
-    min-height: calc(100dvh + 2px);
-    min-height: calc(var(--app-height, 100dvh) + 2px);
     overscroll-behavior-y: none;
     font-family: 'Noto Serif', serif;
     color: var(--text-main);
@@ -1629,7 +1619,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.48 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.47 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2576,7 +2566,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.48';
+  const APP_VERSION = '0.9.47';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2628,6 +2618,67 @@
   }
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
+
+  // ===== Второе уточнение: на настоящем холодном старте (переустановка +
+  // перезагрузка) словарь реально грузится дольше фиксированного таймаута —
+  // именно поэтому в прошлой версии словарь "ещё не успел". Вместо угадывания
+  // времени — дожидаемся НАСТОЯЩЕГО промиса загрузки словаря (тот же самый,
+  // что использует runInstantDictSearch внутри), сколько бы он ни занял, и
+  // только потом рисуем результаты и откатываем обратно. Работает и на
+  // мгновенной, и на очень медленной сети одинаково надёжно.
+  window.__searchCycleLog = [];
+  window.__searchCycleDone = false;
+  function logSearchCycle(msg) {
+    window.__searchCycleLog.push(new Date().toISOString().slice(11, 19) + ' — ' + msg);
+    renderSearchCycleDebugPanel();
+  }
+  async function forceRealSearchCycle() {
+    if (window.__searchCycleDone) return;
+    if (document.activeElement && document.activeElement.id === 'searchInput') { logSearchCycle('пропуск: юзер сам в поиске'); return; }
+    if (searchQuery && searchQuery.trim()) { logSearchCycle('пропуск: searchQuery уже занят юзером'); return; }
+    if (categoryFilterPanelOpen) { logSearchCycle('пропуск: фильтры уже открыты юзером'); return; }
+    window.__searchCycleDone = true; // застолбили сразу — без параллельных гонок повторных попыток
+    const probeQuery = 'а';
+    searchQuery = probeQuery;
+    renderList();
+    logSearchCycle('запустили пробный поиск, ждём загрузки словаря (может занять время на холодную сеть)...');
+    try {
+      const candidates = await resolveCandidatesDictOnly(probeQuery); // сама дождётся loadHebrewDict(), сколько нужно
+      logSearchCycle('словарь загружен, кандидатов найдено: ' + (candidates ? candidates.length : 0));
+      const el = document.getElementById('instantDictResults');
+      if (el && searchQuery === probeQuery) {
+        renderCandidatesInto(el, candidates);
+        logSearchCycle('результаты реально отрисованы в DOM (' + el.children.length + ' узлов)');
+      }
+    } catch (e) {
+      logSearchCycle('ошибка загрузки словаря: ' + e.message);
+    }
+    await new Promise(r => setTimeout(r, 400)); // дать браузеру реально нарисовать кадр с результатами
+    if (searchQuery === probeQuery) {
+      searchQuery = '';
+      renderList();
+      logSearchCycle('откатили обратно к пустому списку — цикл завершён');
+    } else {
+      logSearchCycle('юзер сам сменил поиск, не трогаем');
+    }
+  }
+  setTimeout(forceRealSearchCycle, 500);
+
+  // ===== Временная диагностика — лог таймкодов цикла (геометрию уже проверили,
+  // JS её не отличает от рабочего состояния)
+  function renderSearchCycleDebugPanel() {
+    let panel = document.getElementById('navDebugPanel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'navDebugPanel';
+      panel.style.cssText = 'position:fixed;left:6px;right:6px;bottom:84px;z-index:99999;background:rgba(0,0,0,0.92);color:#7CFC7C;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.5;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;pointer-events:none;';
+      document.body.appendChild(panel);
+    }
+    const headerEl = document.querySelector('.header');
+    const topOffset = headerEl ? Math.ceil(headerEl.getBoundingClientRect().bottom) + 4 : 64;
+    panel.style.top = topOffset + 'px';
+    panel.textContent = 'Цикл имитации реального поиска:\n' + window.__searchCycleLog.join('\n');
+  }
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
