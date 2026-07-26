@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.18 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.17 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2365,7 +2365,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.18';
+  const APP_VERSION = '0.9.17';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2991,22 +2991,19 @@
     }
 
     if (selectionMode) {
-      listEl.innerHTML = filtered.map((w, i) => {
-        const disp = personalWordDisplay(w);
-        return `
+      listEl.innerHTML = filtered.map((w, i) => `
         <div class="word-row selectable ${selectedIds.has(w.id) ? 'row-selected' : ''}" data-id="${w.id}">
           <div class="icon-btn">${selectedIds.has(w.id) ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
           <div class="hebrew-word">${w.hebrew}</div>
           <div class="meta-col">
-            <div class="translit">${disp.translit}</div>
-            <div class="pos">${disp.pos}</div>
+            <div class="translit">${w.translit}</div>
+            <div class="pos">${w.pos}</div>
           </div>
-          <div class="translation">${disp.translation}</div>
+          <div class="translation">${w.translation}</div>
           <div></div>
           <div class="row-num">${i + 1}</div>
         </div>
-      `;
-      }).join('');
+      `).join('');
       fitHebrewWordsInList(listEl);
       // клики/протаскивание в режиме выделения обрабатываются один раз при
       // инициализации (см. attachSelectionDragHandlers) через делегирование
@@ -3018,20 +3015,19 @@
 
     listEl.innerHTML = filtered.map((w, i) => {
       const isPendingDelete = pendingDeleteIds.has(w.id);
-      const disp = personalWordDisplay(w);
       return `
       <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
         <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
-          <div class="translit">${disp.translit}</div>
-          <div class="pos">${disp.pos}</div>
+          <div class="translit">${w.translit}</div>
+          <div class="pos">${w.pos}</div>
         </div>
         ${isPendingDelete
           ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
           : (editingWordId === w.id
             ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
-            : `<div class="translation">${disp.translation}</div>`)}
+            : `<div class="translation">${w.translation}</div>`)}
         <div class="row-actions-cell" data-id="${w.id}">
           <div class="mastery-dots-wrap">${masteryDotsHtml(w)}</div>
           <div class="row-actions-buttons">
@@ -3324,7 +3320,6 @@
         const newTranslation = textarea.value.trim();
         if (newTranslation && newTranslation !== word.translation) {
           word.translation = newTranslation;
-          clearBilingualFields(word); // отредактировано вручную — дальше язык карточки не переключаем
           saveWords();
         }
       }
@@ -3333,7 +3328,7 @@
       const startHeight = row.getBoundingClientRect().height;
       const newDiv = document.createElement('div');
       newDiv.className = 'translation';
-      newDiv.textContent = personalWordDisplay(word).translation;
+      newDiv.textContent = word.translation;
       textarea.replaceWith(newDiv);
 
       row.style.height = 'auto';
@@ -4731,72 +4726,6 @@
     };
   }
 
-  // ===== Билингвальность личного словаря =====
-  // Если слово добавлено ИЗ ОБЩЕЙ БАЗЫ (не вписано вручную) — хотим, чтобы
-  // при переключении языка карточка сама переключалась вместе с интерфейсом.
-  // Ручной ввод и любое редактирование остаются "как есть" — специально
-  // просили не трогать язык таких карточек. Реализовано через временный
-  // флип currentLang и повторный вызов УЖЕ существующих builder-функций —
-  // так не дублируем логику выбора gloss/tr, которая и так работает верно.
-  function computeBilingualFields(hebrewWord) {
-    const skeleton = stripNiqqud(hebrewWord).normalize('NFC');
-    const savedLang = currentLang;
-    let result = null;
-    try {
-      const dictEntries = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
-      const dictEntry = dictEntries.find(e => e.word === hebrewWord);
-      if (dictEntry) {
-        currentLang = 'ru';
-        const ru = buildDictCandidate(dictEntry);
-        currentLang = 'en';
-        const en = buildDictCandidate(dictEntry);
-        result = {
-          ru: { translation: ru.translation, translit: ru.translit, pos: ru.grammarLabel },
-          en: { translation: en.translation, translit: en.translit, pos: en.grammarLabel },
-        };
-      } else {
-        const verbEntries = (verbsDict && verbsDict[skeleton]) || [];
-        const verbEntry = verbEntries.find(e => e.word === hebrewWord);
-        if (verbEntry) {
-          currentLang = 'ru';
-          const ru = buildVerbDictCandidate(verbEntry);
-          currentLang = 'en';
-          const en = buildVerbDictCandidate(verbEntry);
-          result = {
-            ru: { translation: ru.translation, translit: ru.translit, pos: ru.grammarLabel },
-            en: { translation: en.translation, translit: en.translit, pos: en.grammarLabel },
-          };
-        }
-      }
-    } finally {
-      currentLang = savedLang;
-    }
-    return result;
-  }
-
-  // Что реально показывать на карточке ЛИЧНОГО словаря — учитывая язык,
-  // но только если слово размечено как "из базы" и не редактировалось
-  // (см. computeBilingualFields выше и пометку w.fromDict/w.translation_en)
-  function personalWordDisplay(w) {
-    if (currentLang === 'en' && w.fromDict && w.translation_en) {
-      return {
-        translation: w.translation_en,
-        pos: w.pos_en || w.pos,
-        translit: w.translit_en || w.translit,
-      };
-    }
-    return { translation: w.translation, pos: w.pos, translit: w.translit };
-  }
-
-  // Слово перестаёт быть "из базы" при любом ручном редактировании —
-  // дальше его язык на карточке больше не переключается автоматически
-  function clearBilingualFields(w) {
-    delete w.fromDict;
-    delete w.translation_en;
-    delete w.pos_en;
-    delete w.translit_en;
-  }
-
   // Кандидат для случая "ввели СПРЯГАЕМУЮ ФОРМУ глагола, а не словарную
   // лемму" (медабер, дибарти и т.п.) — показываем саму эту форму с её
   // транскрипцией, но перевод и часть речи берём от ЛЕММЫ (инфинитива),
@@ -5869,30 +5798,16 @@
             const translitEl = row.querySelector('.translit');
             const posEl = row.querySelector('.pos');
             const defEl = row.querySelector('.search-definition');
-            const bilingual = computeBilingualFields(hebrewText);
-            // pos надёжнее брать из bilingual.ru (посчитан из сырой записи),
-            // а не парсить обратно из ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue
-            // понимает только русские метки и молча вернёт null на английской
-            const posValue = (bilingual && bilingual.ru)
-              ? bilingual.ru.pos
-              : (grammarLabelToPosValue(posEl ? posEl.textContent : null) || 'сущ, м.р');
-            const newWord = {
+            words.unshift({
               id: Date.now(),
               hebrew: hebrewText,
-              translit: (bilingual && bilingual.ru) ? bilingual.ru.translit : (translitEl ? translitEl.textContent : ''),
-              pos: posValue,
-              translation: (bilingual && bilingual.ru) ? bilingual.ru.translation : (defEl ? defEl.textContent : ''),
+              translit: translitEl ? translitEl.textContent : '',
+              pos: grammarLabelToPosValue(posEl ? posEl.textContent : null) || 'сущ, м.р',
+              translation: defEl ? defEl.textContent : '',
               favorite: false,
               collectionIds: [],
               addedAt: Date.now()
-            };
-            if (bilingual) {
-              newWord.fromDict = true;
-              newWord.translation_en = bilingual.en.translation;
-              newWord.translit_en = bilingual.en.translit;
-              newWord.pos_en = bilingual.en.pos;
-            }
-            words.unshift(newWord);
+            });
             saveWords();
             row.querySelector('.search-status-icon').innerHTML = CHECK_ON_ICON;
             showToast(t('Слово добавлено в ваш словарь'));
@@ -6921,37 +6836,15 @@
   saveBtn.addEventListener('click', () => {
     const hebrewValue = inputHebrew.value.trim();
     const existing = findExistingWordByHebrew(hebrewValue);
-    const typedTranslit = inputTranslit.value.trim();
-    const typedPos = inputPos.value;
-    const typedTranslation = inputTranslation.value.trim();
-
-    // Если написание совпадает с чем-то в общей базе И введённые значения
-    // ТОЧНО совпадают с тем, что дала бы автоподстановка на текущем языке —
-    // считаем, что слово взято из базы как есть (не отредактировано), и
-    // сохраняем сразу оба языка. Если хоть что-то отличается — значит,
-    // человек поправил значение руками, дальше язык карточки не трогаем.
-    const bilingual = computeBilingualFields(hebrewValue);
-    const matchesAutofill = bilingual && bilingual[currentLang] &&
-      bilingual[currentLang].translation === typedTranslation &&
-      bilingual[currentLang].translit === typedTranslit;
 
     if (existing) {
       // слово с таким написанием уже есть в справочнике — обновляем его
       // на месте вместо того, чтобы завести дубликат; статус/избранное/
       // подборки уже существующего слова не трогаем (кроме явно выбранных
       // подборок в пикере ниже — их всё же добавляем)
-      existing.translit = typedTranslit;
-      existing.pos = typedPos;
-      existing.translation = typedTranslation;
-      if (matchesAutofill) {
-        existing.fromDict = true;
-        const other = currentLang === 'en' ? bilingual.ru : bilingual.en;
-        existing.translation_en = currentLang === 'en' ? typedTranslation : other.translation;
-        existing.translit_en = currentLang === 'en' ? typedTranslit : other.translit;
-        existing.pos_en = currentLang === 'en' ? typedPos : other.pos;
-      } else {
-        clearBilingualFields(existing); // руками поправили — дальше язык карточки не переключаем
-      }
+      existing.translit = inputTranslit.value.trim();
+      existing.pos = inputPos.value;
+      existing.translation = inputTranslation.value.trim();
       if (bulkTargetCollectionIds.size) {
         existing.collectionIds = existing.collectionIds || [];
         bulkTargetCollectionIds.forEach(cid => {
@@ -6962,20 +6855,13 @@
       const newWord = {
         id: Date.now(),
         hebrew: hebrewValue,
-        translit: typedTranslit,
-        pos: typedPos,
-        translation: typedTranslation,
+        translit: inputTranslit.value.trim(),
+        pos: inputPos.value,
+        translation: inputTranslation.value.trim(),
         favorite: false,
         collectionIds: Array.from(bulkTargetCollectionIds),
         addedAt: Date.now()
       };
-      if (matchesAutofill) {
-        newWord.fromDict = true;
-        const other = currentLang === 'en' ? bilingual.ru : bilingual.en;
-        newWord.translation_en = currentLang === 'en' ? typedTranslation : other.translation;
-        newWord.translit_en = currentLang === 'en' ? typedTranslit : other.translit;
-        newWord.pos_en = currentLang === 'en' ? typedPos : other.pos;
-      }
       words.unshift(newWord);
     }
     saveWords();
