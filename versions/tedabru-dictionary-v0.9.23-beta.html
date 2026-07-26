@@ -866,19 +866,17 @@
     white-space: nowrap;
   }
   .translation-edit {
-    position: absolute;
-    z-index: 30;
     font-family: 'Noto Serif', serif;
     font-size: 16px;
     color: var(--text-main);
-    background: var(--card-bg);
+    background: rgba(var(--ink-rgb),0.03);
     border: 1px solid var(--purple);
     border-radius: 6px;
     padding: 2px 6px;
     resize: none;
     outline: none;
+    width: 100%;
     line-height: 1.35;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
   }
 
   .row-num {
@@ -1482,7 +1480,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.24 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.23 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2382,7 +2380,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.24';
+  const APP_VERSION = '0.9.23';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3312,34 +3310,33 @@
     const row = document.getElementById('wordList').querySelector(`.word-row[data-id="${id}"]`);
     const word = words.find(w => w.id === id);
     if (!row || !word) return;
+
+    const startHeight = row.getBoundingClientRect().height;
     editingWordId = id;
 
     const translationEl = row.querySelector('.translation');
-    // Запоминаем ТОЧНОЕ место обычного блока перевода — текстовое поле встаёт
-    // ровно туда же, но как абсолютно спозиционированный элемент (не в
-    // потоке грид-сетки), поэтому высота самой СТРОКИ вообще не меняется —
-    // раньше именно попытка анимировать высоту строки под текстовое поле
-    // (и конфликт этой анимации с анимацией сворачивания при быстром
-    // сохранении) была причиной рывков. Если текста много, текстовое поле
-    // просто визуально "наплывает" на карточки ниже, а не толкает их
-    const rowRect = row.getBoundingClientRect();
-    const rect = translationEl.getBoundingClientRect();
-
     const textarea = document.createElement('textarea');
     textarea.className = 'translation-edit';
     textarea.dataset.id = String(id);
     textarea.value = word.translation;
-    textarea.style.left = (rect.left - rowRect.left) + 'px';
-    textarea.style.top = (rect.top - rowRect.top) + 'px';
-    textarea.style.width = rect.width + 'px';
     translationEl.replaceWith(textarea);
 
-    // Высота — строго по содержимому, без искусственного минимума в 2
-    // строки: короткое определение получает ровно одну строку
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-    textarea.focus();
-    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    row.style.height = startHeight + 'px';
+    row.style.overflow = 'hidden';
+    row.style.transition = 'height 0.25s ease-out';
+
+    requestAnimationFrame(() => {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+      row.style.height = 'auto';
+      const naturalHeight = row.getBoundingClientRect().height;
+      row.style.height = startHeight + 'px';
+      void row.offsetHeight; // форсируем reflow — иначе браузер схлопнёт два присвоения в одно, и transition будет не от чего играть
+      requestAnimationFrame(() => { row.style.height = naturalHeight + 'px'; });
+    });
 
     wireInlineEditTextarea(textarea, id);
   }
@@ -3369,6 +3366,7 @@
       editingWordId = null;
       if (editBtn) editBtn.innerHTML = PENCIL_ICON; // возвращаем карандаш вне зависимости от исхода
       const word = words.find(w => w.id === id);
+      const row = document.getElementById('wordList').querySelector(`.word-row[data-id="${id}"]`);
       if (word && commit) {
         const newTranslation = textarea.value.trim();
         if (newTranslation && newTranslation !== word.translation) {
@@ -3377,20 +3375,46 @@
           saveWords();
         }
       }
-      if (!word) { renderList(); return; }
+      if (!row || !word) { renderList(); return; }
 
-      // Никакой анимации высоты строки не требуется вообще — она никогда не
-      // менялась, текстовое поле было наложено поверх абсолютным
-      // позиционированием. Просто лёгкий fade-ин нового текста
+      // Если человек нажал "сохранить"/carandaш быстро, анимация РАСКРЫТИЯ
+      // из enterInlineEdit (тоже 0.25с) могла ещё не доиграть — тогда высота
+      // была бы взята посреди чужого transition, и наша собственная анимация
+      // сворачивания конфликтовала бы с ней (это и давало эффект "сначала
+      // расширяется, потом схлопывается"). Сначала ПРИНУДИТЕЛЬНО обрываем
+      // любой ещё идущий переход: убираем transition, синхронно фиксируем
+      // РЕАЛЬНУЮ текущую высоту без анимации, форсируем reflow — и только
+      // потом начинаем свою собственную, чистую анимацию сворачивания.
+      row.style.transition = 'none';
+      const startHeight = row.getBoundingClientRect().height;
+      row.style.height = startHeight + 'px';
+      void row.offsetHeight;
+
+      // Текст карточки обновляем сразу, но прячем прозрачностью — он
+      // проявится отдельным, независимым от высоты fade-ином, а не мелькнёт
+      // готовым текстом посреди анимации сворачивания
       const newDiv = document.createElement('div');
       newDiv.className = 'translation';
       newDiv.textContent = personalWordDisplay(word).translation;
       newDiv.style.opacity = '0';
       textarea.replaceWith(newDiv);
+
+      row.style.height = 'auto';
+      const endHeight = row.getBoundingClientRect().height;
+      row.style.height = startHeight + 'px';
+      void row.offsetHeight;
       requestAnimationFrame(() => {
-        newDiv.style.transition = 'opacity 0.15s ease-out';
+        row.style.transition = 'height 0.25s ease-out';
+        newDiv.style.transition = 'opacity 0.2s ease-out';
+        row.style.height = endHeight + 'px';
         newDiv.style.opacity = '1';
       });
+      setTimeout(() => {
+        row.style.height = '';
+        row.style.overflow = '';
+        row.style.transition = '';
+        newDiv.style.transition = '';
+      }, 260);
     };
 
     textarea.addEventListener('keydown', (e) => {
