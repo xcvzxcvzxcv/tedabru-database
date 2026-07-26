@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.12 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.11 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1842,19 +1842,6 @@
     'Скрытые результаты': 'Hidden results',
     'Нажмите, чтобы отменить': 'Tap to undo',
     'Слово добавлено в ваш словарь': 'Word added to your dictionary',
-    'Не удалось воспроизвести слово': 'Failed to play the word',
-    'Пустые подборки удалены': 'Empty collections removed',
-    'Пустая подборка удалена': 'Empty collection removed',
-    'Значение добавлено — не забудьте «Сохранить в GitHub»': 'Sense added — remember to "Save to GitHub"',
-    'Правки сохранены в GitHub': 'Changes saved to GitHub',
-    'Применено:': 'Applied:',
-    'Не забудьте «Сохранить в GitHub».': 'Remember to "Save to GitHub".',
-    'Слово': 'Word',
-    'добавлено': 'added',
-    'добавлено:': 'added:',
-    'обновлено:': 'updated:',
-    'не найдено:': 'not found:',
-    'Остановлено': 'Stopped',
     'Слово удалено из вашего словаря': 'Word removed from your dictionary',
     'Искать среди всех слов': 'Search all words',
     'Ищу среди вариантов написания...': 'Searching alternate spellings...',
@@ -1876,12 +1863,6 @@
     'Сохранить': 'Save',
     'Сохранено': 'Saved',
     'Удалить': 'Delete',
-    'Удалить подборки (слова останутся)': 'Delete collections (words will remain)',
-    'Удалить подборку (слова останутся)': 'Delete collection (words will remain)',
-    'Удалить подборки и слова': 'Delete collections and words',
-    'Удалить подборку и слова': 'Delete collection and words',
-    'Объединить подборки?': 'Merge collections?',
-    'Да': 'Yes',
     'Удалить выбранное': 'Delete selected',
     'Создать': 'Create',
     'Закрыть': 'Close',
@@ -1895,8 +1876,6 @@
     'Выйти из редактирования': 'Exit editing',
     'Выйти из тренировки': 'Exit training',
     'Есть несохранённые правки': 'You have unsaved changes',
-    'Правки применены только в этой вкладке и пропадут при перезагрузке страницы, если не сохранить их в GitHub. Выйти без сохранения?':
-      'Changes only apply in this tab and will be lost on reload unless saved to GitHub. Leave without saving?',
     'Переименовать': 'Rename',
     'Другое': 'Other',
     'Нет': 'No',
@@ -2344,7 +2323,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.12';
+  const APP_VERSION = '0.9.11';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2530,12 +2509,12 @@
 
   function createCollectionViaModal(onCreated) {
     showActionModal({
-      title: t('Новая подборка'),
+      title: 'Новая подборка',
       showInput: true,
-      inputPlaceholder: t('Название подборки'),
+      inputPlaceholder: 'Название подборки',
       buttons: [
-        { label: t('Отмена'), variant: 'cancel' },
-        { label: t('Создать'), variant: 'primary', action: (name) => {
+        { label: 'Отмена', variant: 'cancel' },
+        { label: 'Создать', variant: 'primary', action: (name) => {
             if (!name) return;
             const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
             collections.push(nc);
@@ -3191,7 +3170,7 @@
     const tryNext = () => {
       if (index >= candidates.length) {
         clearPlaying();
-        showToast(t('Не удалось воспроизвести слово'));
+        showToast('Не удалось воспроизвести слово');
         return;
       }
       const url = candidates[index];
@@ -3463,10 +3442,10 @@
     if (!selectedIds.size) return;
     const idsToDelete = new Set(selectedIds); // на случай, если что-то изменит selectedIds пока открыта модалка
     showActionModal({
-      title: currentLang === 'en' ? `Delete ${idsToDelete.size} word(s) from the dictionary?` : `Удалить ${idsToDelete.size} слов(о) из справочника?`,
+      title: `Удалить ${idsToDelete.size} слов(о) из справочника?`,
       buttons: [
-        { label: t('Отмена'), variant: 'cancel' },
-        { label: t('Удалить'), variant: 'danger', action: () => {
+        { label: 'Отмена', variant: 'cancel' },
+        { label: 'Удалить', variant: 'danger', action: () => {
             words = words.filter(w => !idsToDelete.has(w.id));
             saveWords();
             exitSelectionMode();
@@ -3806,18 +3785,16 @@
       // подборка(и) пустая — спрашивать нечего (нет слов, значит нет и
       // выбора "и слова тоже"), удаляем сразу
       deleteCollections(collectionIds, false);
-      showToast(many ? t('Пустые подборки удалены') : t('Пустая подборка удалена'));
+      showToast(many ? 'Пустые подборки удалены' : 'Пустая подборка удалена');
       return;
     }
 
     showActionModal({
-      title: many
-        ? (currentLang === 'en' ? `Delete ${names.length} collections (${names.join(', ')})?` : `Удалить ${names.length} подборки (${names.join(', ')})?`)
-        : (currentLang === 'en' ? `Delete the collection "${names[0]}"?` : `Удалить подборку «${names[0]}»?`),
+      title: many ? `Удалить ${names.length} подборки (${names.join(', ')})?` : `Удалить подборку «${names[0]}»?`,
       buttons: [
-        { label: t('Отмена'), variant: 'cancel' },
-        { label: many ? t('Удалить подборки (слова останутся)') : t('Удалить подборку (слова останутся)'), action: () => deleteCollections(collectionIds, false) },
-        { label: many ? t('Удалить подборки и слова') : t('Удалить подборку и слова'), variant: 'danger', action: () => deleteCollections(collectionIds, true) },
+        { label: 'Отмена', variant: 'cancel' },
+        { label: many ? 'Удалить подборки (слова останутся)' : 'Удалить подборку (слова останутся)', action: () => deleteCollections(collectionIds, false) },
+        { label: many ? 'Удалить подборки и слова' : 'Удалить подборку и слова', variant: 'danger', action: () => deleteCollections(collectionIds, true) },
       ]
     });
   }
@@ -3847,13 +3824,11 @@
     if (!sources.length || !target) return;
     const sourceNames = sources.map(s => s.name).join(', ');
     showActionModal({
-      title: t('Объединить подборки?'),
-      message: currentLang === 'en'
-        ? `"${sourceNames}" and "${target.name}" will become one collection, "${target.name}".`
-        : `«${sourceNames}» и «${target.name}» станут одной подборкой «${target.name}».`,
+      title: 'Объединить подборки?',
+      message: `«${sourceNames}» и «${target.name}» станут одной подборкой «${target.name}».`,
       buttons: [
-        { label: t('Нет'), variant: 'cancel' },
-        { label: t('Да'), variant: 'primary', action: () => mergeCollections(sourceIds, targetId) },
+        { label: 'Нет', variant: 'cancel' },
+        { label: 'Да', variant: 'primary', action: () => mergeCollections(sourceIds, targetId) },
       ]
     });
   }
@@ -5628,7 +5603,7 @@
             words = words.filter(w => w.id !== existingWord.id);
             saveWords();
             row.querySelector('.search-status-icon').innerHTML = CHECK_OFF_ICON;
-            showToast(t('Слово удалено из вашего словаря'));
+            showToast('Слово удалено из вашего словаря');
           } else {
             const translitEl = row.querySelector('.translit');
             const posEl = row.querySelector('.pos');
@@ -5645,7 +5620,7 @@
             });
             saveWords();
             row.querySelector('.search-status-icon').innerHTML = CHECK_ON_ICON;
-            showToast(t('Слово добавлено в ваш словарь'));
+            showToast('Слово добавлено в ваш словарь');
           }
           renderFilterBar();
           renderList();
@@ -5923,11 +5898,11 @@
   function exitEditDbMode() {
     if (editDbDirtyFiles.size) {
       showActionModal({
-        title: t('Есть несохранённые правки'),
-        message: t('Правки применены только в этой вкладке и пропадут при перезагрузке страницы, если не сохранить их в GitHub. Выйти без сохранения?'),
+        title: 'Есть несохранённые правки',
+        message: 'Правки применены только в этой вкладке и пропадут при перезагрузке страницы, если не сохранить их в GitHub. Выйти без сохранения?',
         buttons: [
-          { label: t('Остаться'), variant: 'cancel' },
-          { label: t('Выйти без сохранения'), variant: 'danger', action: () => actuallyExitEditDbMode() },
+          { label: 'Остаться', variant: 'cancel' },
+          { label: 'Выйти без сохранения', variant: 'danger', action: () => actuallyExitEditDbMode() },
         ]
       });
       return;
@@ -6114,7 +6089,7 @@
     markEditDbDirty('hebrewDict');
 
     editDbAddNewForm.style.display = 'none';
-    showToast(t('Значение добавлено — не забудьте «Сохранить в GitHub»'));
+    showToast('Значение добавлено — не забудьте «Сохранить в GitHub»');
     renderEditDbResults(inputHebrew.value.trim());
   });
 
@@ -6163,7 +6138,7 @@
       editDbDirtyFiles = new Set();
       editDbResultsEl.querySelectorAll('.edit-db-entry.edit-db-dirty').forEach(el => el.classList.remove('edit-db-dirty'));
       editDbStatusEl.textContent = 'Сохранено ✓';
-      showToast(t('Правки сохранены в GitHub'));
+      showToast('Правки сохранены в GitHub');
     } catch (err) {
       if (err.status === 401 || err.status === 403) {
         // ghRequest уже стёр неверный токен сам — тут же переспрашиваем и,
@@ -6278,7 +6253,7 @@
     if (applied) {
       hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
       markEditDbDirty('hebrewDict');
-      showToast(`${t('Применено:')} ${applied}. ${t('Не забудьте «Сохранить в GitHub».')}`);
+      showToast(`Применено: ${applied}. Не забудьте «Сохранить в GitHub».`);
     }
     document.getElementById('missingNiqqudPanel').style.display = 'none';
   });
@@ -6699,7 +6674,7 @@
     }
     saveWords();
     exitAddMode();
-    showToast(`${t('Слово')} «${hebrewValue}» ${t('добавлено')}`);
+    showToast(`Слово «${hebrewValue}» добавлено`);
   });
 
   // ===== Массовое добавление (несколько слов сразу) =====
@@ -6866,9 +6841,9 @@
     bulkAddSubmitBtn.style.display = '';
     bulkAddStopBtn.style.display = 'none';
 
-    const summaryParts = [`${t('добавлено:')} ${added}`, `${t('обновлено:')} ${updated}`];
-    if (failed.length) summaryParts.push(`${t('не найдено:')} ${failed.length}`);
-    const toastMessage = (bulkAddAborted ? t('Остановлено') + ' — ' : '') + summaryParts.join(', ');
+    const summaryParts = [`добавлено: ${added}`, `обновлено: ${updated}`];
+    if (failed.length) summaryParts.push(`не найдено: ${failed.length}`);
+    const toastMessage = (bulkAddAborted ? 'Остановлено — ' : '') + summaryParts.join(', ');
 
     exitAddMode();
     showToast(toastMessage);
