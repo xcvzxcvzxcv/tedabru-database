@@ -546,24 +546,33 @@
     .word-row {
       grid-template-columns: 60px 95px 1fr 42px;
       column-gap: 10px;
-      padding: 9px 0;
+      padding: 9px 0 9px 15px;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
       transition: transform 0.2s ease-out;
       touch-action: pan-y; /* горизонтальный свайп обрабатываем сами, вертикальный скролл остаётся браузеру */
     }
-    /* Паддинг вокруг мета-колонки (транслит+часть речи) теперь симметричен
-       с обеих сторон (0 + column-gap:10px грида) — раньше margin-right:7px
-       делал правый зазор (перед дефиницией) заметно больше левого */
+    /* Bug #3: паддинг вокруг мета-колонки (транслит+часть речи) сокращён на 5px
+       с каждой стороны — было margin-left:5px/margin-right:12px (из десктопных
+       значений), съедало слишком много места на мобильном */
     .word-row .meta-col {
       margin-left: 0px;
-      margin-right: 0px;
+      margin-right: 7px;
     }
     /* .hebrew-word наследует margin-right:7px из десктопной вёрстки — на
        мобильном это ЛИШНЕЕ (column-gap:10px грида уже разделяет колонки),
        съедало 7px из 60px, отведённых на колонку иврита, отсюда и видимый
        зазор слева от слова (текст прижат вправо, direction:rtl) */
+    /* ===== ВРЕМЕННАЯ ДИАГНОСТИКА: направляющие колонок карточки — убрать
+       после того, как разберёмся с паддингами. outline не влияет на layout
+       (в отличие от border), так что размеры блоков не искажает. */
+    .word-row .hebrew-word { outline: 1px solid red; }
+    .word-row .meta-col { outline: 1px solid lime; }
+    .word-row .translation { outline: 1px solid deepskyblue; }
+    .word-row .row-actions-cell { outline: 1px solid magenta; }
+
     .word-row .hebrew-word {
       margin-right: 0;
+      font-size: 26px;
     }
     .word-row-swipe-wrap {
       overflow: hidden;
@@ -591,18 +600,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     .swipe-delete-btn svg { width: 20px; height: 20px; }
-    /* пункт: "транскрипция и мета — оба по 15 стандартом" — .translit уже
-       15px по умолчанию (наследует из базового правила), .pos поднимаем
-       с 12px до тех же 15px; оба теперь ещё и адаптивно ужимаются через
-       fitTextEl, если строка не влезает в колонку (95px) */
-    .word-row .pos {
-      font-size: 15px;
-    }
-    /* дефиниция — фиксированные 15px (было 16px), БЕЗ адаптивного сжатия —
-       длинные определения по-прежнему обрезаются многоточием (ellipsis) */
-    .word-row .translation {
-      font-size: 15px;
-    }
     .word-row .listen-btn,
     .word-row .row-num {
       display: none;
@@ -1037,7 +1034,6 @@
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     color: var(--muted);
-    text-align: center;
   }
 
   .translation {
@@ -1668,7 +1664,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.57 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.56 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2615,7 +2611,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.57';
+  const APP_VERSION = '0.9.56';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3343,34 +3339,18 @@
     // фиксированной колонке (105px) даже после её расширения — постепенно
     // уменьшаем кегль, пока не влезет, вместо обрезки. Не трогает разметку/
     // табличность карточек: колонка остаётся той же ширины, меняется только
-    // размер текста внутри неё. На мобильном то же самое (адаптивная строка)
-    // теперь применяется и к транскрипции/части речи, не только к ивриту.
-    const HEBREW_WORD_MAX_FONT = isMobileViewport() ? 26 : 30;
+    // размер текста внутри неё.
+    const HEBREW_WORD_MAX_FONT = 30;
     const HEBREW_WORD_MIN_FONT = 17;
-    const META_TEXT_MAX_FONT = 15;
-    const META_TEXT_MIN_FONT = 10;
-    function fitTextEl(el, maxFont, minFont) {
-      // Считаем ширину в один ряд (nowrap), чтобы поймать случай, когда
-      // отдельное слово внутри фразы шире колонки — обычный scrollWidth
-      // для элемента, которому разрешён перенос строк, не покажет overflow
-      // (перенос сам "решает" проблему переполнения по горизонтали, пряча
-      // её), поэтому измеряем принудительно в одну строку, а перенос
-      // возвращаем обратно уже после того, как кегль подобран.
-      const prevWhiteSpace = el.style.whiteSpace;
-      el.style.whiteSpace = 'nowrap';
-      el.style.fontSize = '';
-      let fontSize = maxFont;
-      while (el.scrollWidth > el.clientWidth + 1 && fontSize > minFont) {
-        fontSize -= 1;
-        el.style.fontSize = fontSize + 'px';
-      }
-      el.style.whiteSpace = prevWhiteSpace || '';
-    }
     function fitHebrewWordsInList(root) {
-      root.querySelectorAll('.hebrew-word').forEach(el => fitTextEl(el, HEBREW_WORD_MAX_FONT, HEBREW_WORD_MIN_FONT));
-      if (isMobileViewport()) {
-        root.querySelectorAll('.translit, .pos').forEach(el => fitTextEl(el, META_TEXT_MAX_FONT, META_TEXT_MIN_FONT));
-      }
+      root.querySelectorAll('.hebrew-word').forEach(el => {
+        el.style.fontSize = '';
+        let fontSize = HEBREW_WORD_MAX_FONT;
+        while (el.scrollWidth > el.clientWidth + 1 && fontSize > HEBREW_WORD_MIN_FONT) {
+          fontSize -= 1;
+          el.style.fontSize = fontSize + 'px';
+        }
+      });
     }
 
     const listEl = document.getElementById('wordList');
