@@ -1485,7 +1485,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.29 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.28 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2385,7 +2385,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.29';
+  const APP_VERSION = '0.9.28';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2649,48 +2649,6 @@
       ) || null;
     }
     return matches[0]; // без ориентира на значение — прежнее поведение
-  }
-
-  // Есть ли в личном словаре ВООБЩЕ хоть какая-то карточка с этим написанием
-  // — без учёта конкретного значения. Используется, чтобы решить: заводить
-  // ли новую карточку или объединить новое значение с уже существующей
-  function findAnyExistingWordByHebrew(hebrewText) {
-    const key = (hebrewText || '').trim().normalize('NFC');
-    if (!key) return null;
-    return words.find(w => (w.hebrew || '').trim().normalize('NFC') === key) || null;
-  }
-
-  // Разбирает текст перевода на отдельные значения — как "просто одна
-  // строка", так и уже пронумерованный "1. X; 2. Y" формат (тот же, что
-  // строит mergeCandidatesBySense в выдаче поиска)
-  function extractSenseParts(text) {
-    if (!text) return [];
-    const trimmed = text.trim();
-    if (!trimmed) return [];
-    return /^\d+\.\s/.test(trimmed)
-      ? trimmed.split(/;\s*(?=\d+\.\s)/).map(p => p.replace(/^\d+\.\s*/, '').trim()).filter(Boolean)
-      : [trimmed];
-  }
-
-  // Объединяет новое значение (или уже готовый набор значений) с тем, что
-  // уже есть на карточке — без дублей, в той же нумерованной форме, что и в
-  // объединённых карточках поиска. Работает, даже если ОБЕ стороны уже
-  // многозначны (например, слово искали сначала по одному значению, потом
-  // сразу по транскрипции, где показаны все смыслы разом)
-  function mergeSenseText(existingText, newText) {
-    const combined = extractSenseParts(existingText);
-    extractSenseParts(newText).forEach(np => {
-      if (!combined.some(p => p.toLowerCase() === np.toLowerCase())) combined.push(np);
-    });
-    if (!combined.length) return existingText;
-    return combined.length === 1 ? combined[0] : combined.map((p, i) => `${i + 1}. ${p}`).join('; ');
-  }
-
-  function mergeSenseIntoWord(existingWord, newTranslationRu, newTranslationEn) {
-    existingWord.translation = mergeSenseText(existingWord.translation, newTranslationRu);
-    if (existingWord.fromDict) {
-      existingWord.translation_en = mergeSenseText(existingWord.translation_en, newTranslationEn);
-    }
   }
 
   // ===== Рендер списка =====
@@ -4873,62 +4831,53 @@
   // так не дублируем логику выбора gloss/tr, которая и так работает верно.
   function computeBilingualFields(hebrewWord, expectedTranslation) {
     const skeleton = stripNiqqud(hebrewWord).normalize('NFC');
-    const expectedNorm = expectedTranslation ? expectedTranslation.trim() : null;
-    const dictEntries = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
-    const wordMatches = dictEntries.filter(e => e.word === hebrewWord);
-    if (wordMatches.length) return computeBilingualForEntries(wordMatches, expectedNorm, buildDictCandidate);
-    const verbEntries = (verbsDict && verbsDict[skeleton]) || [];
-    const verbWordMatches = verbEntries.filter(e => e.word === hebrewWord);
-    if (verbWordMatches.length) return computeBilingualForEntries(verbWordMatches, expectedNorm, buildVerbDictCandidate);
-    return null;
-  }
-
-  // Собирает билингвальные поля для набора "сырых" статей ОДНОГО слова.
-  // Три случая:
-  //  1) статья всего одна — тривиально, берём её;
-  //  2) искали КОНКРЕТНОЕ значение (expectedNorm точно совпал с одним из
-  //     переводов) — берём только его;
-  //  3) искали по транскрипции/ивриту напрямую, на экране была ОБЪЕДИНЁННАЯ
-  //     карточка со всеми смыслами сразу (expectedNorm не совпал ни с одним
-  //     по отдельности) — объединяем ВСЕ переводы в ту же нумерованную
-  //     строку, что и mergeCandidatesBySense в выдаче поиска, чтобы
-  //     сохранённая карточка точно соответствовала тому, что было показано
-  function computeBilingualForEntries(entries, expectedNorm, buildFn) {
     const savedLang = currentLang;
-    currentLang = 'ru';
-    const ruList = entries.map(buildFn);
-    currentLang = 'en';
-    const enList = entries.map(buildFn);
-    currentLang = savedLang;
-
-    const pick = (idx) => ({
-      ru: { translation: ruList[idx].translation, translit: ruList[idx].translit, pos: ruList[idx].grammarLabel },
-      en: { translation: enList[idx].translation, translit: enList[idx].translit, pos: enList[idx].grammarLabel },
-    });
-
-    if (entries.length === 1) return pick(0);
-
-    if (expectedNorm) {
-      const idx = ruList.findIndex((r, i) =>
-        (r.translation && r.translation.trim() === expectedNorm) ||
-        (enList[i].translation && enList[i].translation.trim() === expectedNorm)
-      );
-      if (idx !== -1) return pick(idx);
+    let result = null;
+    const expectedNorm = expectedTranslation ? expectedTranslation.trim() : null;
+    try {
+      const dictEntries = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
+      const wordMatches = dictEntries.filter(e => e.word === hebrewWord);
+      // Одно и то же написание на иврите нередко скрывает НЕСКОЛЬКО разных
+      // значений — омографы вроде אָח ("брат" / "камин" / "медсестра" /
+      // межд. "чёрт возьми"). Если знаем, какой ИМЕННО перевод человек видел
+      // на экране (карточка, которую он реально кликнул), ищем ТУ самую
+      // запись по совпадению перевода — иначе рискуем молча подставить
+      // совсем другое значение того же слова
+      let dictEntry = expectedNorm && wordMatches.length > 1
+        ? wordMatches.find(e => (e.gloss_ru && e.gloss_ru.trim() === expectedNorm) || (e.gloss && e.gloss.trim() === expectedNorm))
+        : null;
+      if (!dictEntry) dictEntry = wordMatches[0];
+      if (dictEntry) {
+        currentLang = 'ru';
+        const ru = buildDictCandidate(dictEntry);
+        currentLang = 'en';
+        const en = buildDictCandidate(dictEntry);
+        result = {
+          ru: { translation: ru.translation, translit: ru.translit, pos: ru.grammarLabel },
+          en: { translation: en.translation, translit: en.translit, pos: en.grammarLabel },
+        };
+      } else {
+        const verbEntries = (verbsDict && verbsDict[skeleton]) || [];
+        const verbWordMatches = verbEntries.filter(e => e.word === hebrewWord);
+        let verbEntry = expectedNorm && verbWordMatches.length > 1
+          ? verbWordMatches.find(e => e.translation && e.translation.trim() === expectedNorm)
+          : null;
+        if (!verbEntry) verbEntry = verbWordMatches[0];
+        if (verbEntry) {
+          currentLang = 'ru';
+          const ru = buildVerbDictCandidate(verbEntry);
+          currentLang = 'en';
+          const en = buildVerbDictCandidate(verbEntry);
+          result = {
+            ru: { translation: ru.translation, translit: ru.translit, pos: ru.grammarLabel },
+            en: { translation: en.translation, translit: en.translit, pos: en.grammarLabel },
+          };
+        }
+      }
+    } finally {
+      currentLang = savedLang;
     }
-
-    const mergeTranslations = (list) => {
-      const seen = [];
-      list.forEach(x => {
-        const tr = (x.translation || '').trim();
-        if (tr && !seen.some(s => s.toLowerCase() === tr.toLowerCase())) seen.push(tr);
-      });
-      if (!seen.length) return null;
-      return seen.length === 1 ? seen[0] : seen.map((tr, i) => `${i + 1}. ${tr}`).join('; ');
-    };
-    return {
-      ru: { translation: mergeTranslations(ruList), translit: ruList[0].translit, pos: ruList[0].grammarLabel },
-      en: { translation: mergeTranslations(enList), translit: enList[0].translit, pos: enList[0].grammarLabel },
-    };
+    return result;
   }
 
   // Что реально показывать на карточке ЛИЧНОГО словаря — учитывая язык,
@@ -6051,28 +6000,12 @@
             const posValue = (bilingual && bilingual.ru)
               ? bilingual.ru.pos
               : (grammarLabelToPosValue(posEl ? posEl.textContent : null) || 'сущ, м.р');
-            const newTranslationRu = (bilingual && bilingual.ru) ? bilingual.ru.translation : (defEl ? defEl.textContent : '');
-
-            // Другое значение ЭТОГО ЖЕ слова уже есть в личном словаре —
-            // объединяем в ту же карточку (одна карточка на слово), а не
-            // заводим дубликат с другим смыслом
-            const anyExisting = findAnyExistingWordByHebrew(hebrewText);
-            if (anyExisting) {
-              mergeSenseIntoWord(anyExisting, newTranslationRu, bilingual ? bilingual.en.translation : null);
-              saveWords();
-              row.querySelector('.search-status-icon').innerHTML = CHECK_ON_ICON;
-              showToast(t('Слово добавлено в ваш словарь'));
-              renderFilterBar();
-              renderList();
-              return;
-            }
-
             const newWord = {
               id: Date.now(),
               hebrew: hebrewText,
               translit: (bilingual && bilingual.ru) ? bilingual.ru.translit : (translitEl ? translitEl.textContent : ''),
               pos: posValue,
-              translation: newTranslationRu,
+              translation: (bilingual && bilingual.ru) ? bilingual.ru.translation : (defEl ? defEl.textContent : ''),
               favorite: false,
               collectionIds: [],
               addedAt: Date.now()
@@ -7150,24 +7083,6 @@
         });
       }
     } else {
-      // Другое значение ЭТОГО ЖЕ слова уже есть в личном словаре — если это
-      // добавление "как есть" из базы (не ручная правка), объединяем в ту
-      // же карточку, а не заводим дубликат с другим смыслом
-      const anyExisting = matchesAutofill ? findAnyExistingWordByHebrew(hebrewValue) : null;
-      if (anyExisting) {
-        const otherLang = currentLang === 'en' ? bilingual.ru : bilingual.en;
-        mergeSenseIntoWord(anyExisting, currentLang === 'en' ? otherLang.translation : typedTranslation, currentLang === 'en' ? typedTranslation : otherLang.translation);
-        if (bulkTargetCollectionIds.size) {
-          anyExisting.collectionIds = anyExisting.collectionIds || [];
-          bulkTargetCollectionIds.forEach(cid => {
-            if (!anyExisting.collectionIds.includes(cid)) anyExisting.collectionIds.push(cid);
-          });
-        }
-        saveWords();
-        exitAddMode();
-        showToast(`${t('Слово')} «${hebrewValue}» ${t('добавлено')}`);
-        return;
-      }
       const newWord = {
         id: Date.now(),
         hebrew: hebrewValue,
@@ -7352,20 +7267,6 @@
         }
         updated++;
       } else {
-        // Другое значение ЭТОГО ЖЕ слова уже есть в личном словаре —
-        // объединяем в ту же карточку, а не заводим дубликат
-        const anyExisting = findAnyExistingWordByHebrew(best.text);
-        if (anyExisting) {
-          mergeSenseIntoWord(anyExisting, translationValue, bilingual ? bilingual.en.translation : null);
-          if (bulkTargetCollectionIds.size) {
-            anyExisting.collectionIds = anyExisting.collectionIds || [];
-            bulkTargetCollectionIds.forEach(cid => {
-              if (!anyExisting.collectionIds.includes(cid)) anyExisting.collectionIds.push(cid);
-            });
-          }
-          updated++;
-          continue;
-        }
         const newWord = {
           id: Date.now() + i,
           hebrew: best.text,
