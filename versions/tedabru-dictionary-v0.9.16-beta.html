@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.17 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.16 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2365,7 +2365,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.17';
+  const APP_VERSION = '0.9.16';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4082,9 +4082,7 @@
   let hebrewDictReverseEn = null;
   let hebrewVerbForms = null;
   let verbsDict = null;
-  let verbsDictEn = null;
   let verbsReverse = null;
-  let verbsReverseEn = null;
   let translitIndex = null;
   let nounFormsIndex = null;
   let generatedVerbForms = null;
@@ -4315,12 +4313,11 @@
       fetchFresh('hebrew_dict_v3.json').then(r => { if (!r.ok) throw new Error('hebrew_dict_v3.json: ' + r.status); return r.json(); }),
       fetchFresh('hebrew_verb_forms_index.json').then(r => { if (!r.ok) throw new Error('hebrew_verb_forms_index.json: ' + r.status); return r.json(); }),
       fetchFresh('verbs_dict.json').then(r => { if (!r.ok) throw new Error('verbs_dict.json: ' + r.status); return r.json(); }),
-      fetchFresh('verbs_dict_en.json').then(r => { if (!r.ok) throw new Error('verbs_dict_en.json: ' + r.status); return r.json(); }),
       fetchFresh('translit_index.json').then(r => { if (!r.ok) throw new Error('translit_index.json: ' + r.status); return r.json(); }),
       fetchFresh('noun_forms_index.json').then(r => { if (!r.ok) throw new Error('noun_forms_index.json: ' + r.status); return r.json(); }),
       fetchFresh('generated_verb_forms.json').then(r => { if (!r.ok) throw new Error('generated_verb_forms.json: ' + r.status); return r.json(); }),
       fetchFresh('function_word_forms_index.json').then(r => { if (!r.ok) throw new Error('function_word_forms_index.json: ' + r.status); return r.json(); })
-    ]).then(([skeleton, verbForms, vDict, vDictEn, tIndex, nFormsIndex, gVerbForms, fwForms]) => {
+    ]).then(([skeleton, verbForms, vDict, tIndex, nFormsIndex, gVerbForms, fwForms]) => {
       // ключи-скелеты нормализуем по NFC на всякий случай (хотя без огласовок
       // риск расхождения диакритики уже почти нулевой)
       const normSkeleton = {};
@@ -4329,8 +4326,6 @@
       for (const key in verbForms) normVerbForms[key.normalize('NFC')] = verbForms[key];
       const normVerbsDict = {};
       for (const key in vDict) normVerbsDict[key.normalize('NFC')] = vDict[key];
-      const normVerbsDictEn = {};
-      for (const key in vDictEn) normVerbsDictEn[key.normalize('NFC')] = vDictEn[key];
       const normNounForms = {};
       for (const key in nFormsIndex) normNounForms[key.normalize('NFC')] = nFormsIndex[key];
       const normGenVerbForms = {};
@@ -4340,7 +4335,6 @@
       hebrewDictSkeleton = normSkeleton;
       hebrewVerbForms = normVerbForms;
       verbsDict = normVerbsDict;
-      verbsDictEn = normVerbsDictEn;
       translitIndex = tIndex;
       nounFormsIndex = normNounForms;
       generatedVerbForms = normGenVerbForms;
@@ -4350,7 +4344,6 @@
       hebrewDictReverse = buildReverseIndex(hebrewDictSkeleton, 'gloss_ru');
       hebrewDictReverseEn = buildReverseIndex(hebrewDictSkeleton, 'gloss');
       verbsReverse = buildReverseIndex(verbsDict, 'translation');
-      verbsReverseEn = buildReverseIndex(verbsDictEn, 'translation');
       functionWordFormsReverse = buildReverseIndex(functionWordForms, 'gloss_ru');
       functionWordFormsReverseEn = buildReverseIndex(functionWordForms, 'gloss_en');
       // карты "запись -> скелет" — нужны для редактирования базы: когда
@@ -4701,25 +4694,11 @@
     const isEn = currentLang === 'en';
     const binyan = (isEn ? BINYAN_LABELS_EN : BINYAN_LABELS)[entry.binyan] || entry.binyan;
     const verbWord = isEn ? 'verb' : 'глагол';
-    let translation = entry.translation;
-    let translit = applyStressFromEnd(niqqudToTranslit(entry.word), verbInfinitiveStressIndexFromEnd(entry.word));
-    if (isEn && verbsDictEn) {
-      // verbsDictEn построен из ОТДЕЛЬНОГО файла (verbs.csv), скелет считаем
-      // сами — сопоставляем с текущей записью по точному написанию (word),
-      // раз у скелета может быть несколько значений/омографов
-      const skeleton = stripNiqqud(entry.word).normalize('NFC');
-      const enEntries = verbsDictEn[skeleton] || [];
-      const enEntry = enEntries.find(e => e.word === entry.word) || enEntries[0];
-      if (enEntry) {
-        translation = enEntry.translation;
-        if (enEntry.tr) translit = enEntry.tr;
-      }
-    }
     return {
       text: entry.word,
-      translit: translit,
+      translit: applyStressFromEnd(niqqudToTranslit(entry.word), verbInfinitiveStressIndexFromEnd(entry.word)),
       grammarLabel: binyan ? `${verbWord}, ${binyan}` : verbWord,
-      translation: translation,
+      translation: entry.translation,
       root: entry.root || null,
       register: entry.register || null,
       source: 'dict'
@@ -4863,31 +4842,19 @@
     const lemmaEntries = (verbsDict && verbsDict[formEntry.lemma_skeleton]) || [];
     const lemmaEntry = lemmaEntries.find(e => e.word === formEntry.lemma_word) || lemmaEntries[0];
     const binyan = lemmaEntry ? ((isEn ? BINYAN_LABELS_EN : BINYAN_LABELS)[lemmaEntry.binyan] || lemmaEntry.binyan) : null;
-
-    let lemmaTranslation = lemmaEntry ? lemmaEntry.translation : null;
-    let lemmaTranslit = niqqudToTranslit(formEntry.lemma_word);
-    if (isEn && verbsDictEn && formEntry.lemma_skeleton) {
-      const enLemmaEntries = verbsDictEn[formEntry.lemma_skeleton] || [];
-      const enLemmaEntry = enLemmaEntries.find(e => e.word === formEntry.lemma_word) || enLemmaEntries[0];
-      if (enLemmaEntry) {
-        lemmaTranslation = enLemmaEntry.translation;
-        if (enLemmaEntry.tr) lemmaTranslit = enLemmaEntry.tr;
-      }
-    }
     const lemmaLine = formEntry.lemma_word
-      ? (isEn ? ` (infinitive: ${formEntry.lemma_word}, ${lemmaTranslit})` : ` (инфинитив: ${formEntry.lemma_word}, ${lemmaTranslit})`)
+      ? (isEn
+        ? ` (infinitive: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`
+        : ` (инфинитив: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`)
       : '';
     const hint = verbFormHint(formEntry.hint);
     const verbWord = isEn ? 'verb' : 'глагол';
 
     return {
       text: formEntry.form_word,
-      // ПРИМЕЧАНИЕ: у самой спрягаемой формы (в отличие от инфинитива-леммы)
-      // нет источника латинской транскрипции — только niqqudToTranslit
-      // (кириллица), даже в EN-режиме. Известный, пока не закрытый пробел.
       translit: niqqudToTranslit(formEntry.form_word),
       grammarLabel: binyan ? `${verbWord}, ${binyan} (${hint})` : `${verbWord} (${hint})`,
-      translation: lemmaTranslation ? `${lemmaTranslation}${lemmaLine}` : hint,
+      translation: lemmaEntry ? `${lemmaEntry.translation}${lemmaLine}` : hint,
       root: lemmaEntry ? lemmaEntry.root : null,
       source: 'dict'
     };
@@ -4965,8 +4932,7 @@
     const activeDictReverse = currentLang === 'en' ? hebrewDictReverseEn : hebrewDictReverse;
     const activeFunctionReverse = currentLang === 'en' ? functionWordFormsReverseEn : functionWordFormsReverse;
     const dictHit = (activeDictReverse && activeDictReverse[ruKey]) || [];
-    const activeVerbsReverse = currentLang === 'en' ? verbsReverseEn : verbsReverse;
-    const verbRuHit = (activeVerbsReverse && activeVerbsReverse[ruKey]) || [];
+    const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
     const functionFormRuHit = (activeFunctionReverse && activeFunctionReverse[ruKey]) || [];
     const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
       ? mergeCandidatesBySense([
@@ -5158,8 +5124,7 @@
     const activeDictReverse = currentLang === 'en' ? hebrewDictReverseEn : hebrewDictReverse;
     const activeFunctionReverse = currentLang === 'en' ? functionWordFormsReverseEn : functionWordFormsReverse;
     const dictHit = (activeDictReverse && activeDictReverse[ruKey]) || [];
-    const activeVerbsReverse = currentLang === 'en' ? verbsReverseEn : verbsReverse;
-    const verbRuHit = (activeVerbsReverse && activeVerbsReverse[ruKey]) || [];
+    const verbRuHit = (verbsReverse && verbsReverse[ruKey]) || [];
     const functionFormRuHit = (activeFunctionReverse && activeFunctionReverse[ruKey]) || [];
     const translationMatches = (dictHit.length || verbRuHit.length || functionFormRuHit.length)
       ? mergeCandidatesBySense([
