@@ -1571,7 +1571,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.35 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.34 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2518,7 +2518,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.35';
+  const APP_VERSION = '0.9.34';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3492,21 +3492,6 @@
       row.classList.toggle('row-has-favorite', word.favorite);
       const btn = row.querySelector('.favorite-btn');
       if (btn) btn.classList.toggle('favorite-on', word.favorite);
-      // индикатор для мобильной карточки создаётся/удаляется отдельно —
-      // renderList() строит его условно один раз при рендере, точечный патч
-      // тут его не трогает сам по себе
-      const dotsWrap = row.querySelector('.mastery-dots-wrap');
-      if (dotsWrap) {
-        let star = dotsWrap.querySelector('.favorite-star-mobile');
-        if (word.favorite && !star) {
-          star = document.createElement('span');
-          star.className = 'favorite-star-mobile';
-          star.innerHTML = STAR_ICON;
-          dotsWrap.insertBefore(star, dotsWrap.firstChild);
-        } else if (!word.favorite && star) {
-          star.remove();
-        }
-      }
     } else {
       renderList(); // строка почему-то не найдена — подстрахуемся полной перерисовкой
     }
@@ -4021,51 +4006,8 @@
     if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
   }
 
-  // ===== Жесты на мобильном: даблтап вместо панели кнопок =====
-  // Одинарный тап пока намеренно ничего не делает (зарезервирован под
-  // прослушивание/раскрытие карточки — см. обсуждение), поэтому детектор
-  // просто ждёт второй тап в том же месте в течение короткого окна.
-  const DOUBLE_TAP_MAX_DELAY = 350; // мс между тапами
-  const DOUBLE_TAP_MAX_DISTANCE = 25; // px — палец не обязан попасть идеально в одну точку
-  let _lastTapState = null; // { time, x, y, el }
-  function isSecondTapOf(e, el) {
-    const now = Date.now();
-    const isSecond = !!(_lastTapState && _lastTapState.el === el &&
-      now - _lastTapState.time < DOUBLE_TAP_MAX_DELAY &&
-      Math.abs(e.clientX - _lastTapState.x) < DOUBLE_TAP_MAX_DISTANCE &&
-      Math.abs(e.clientY - _lastTapState.y) < DOUBLE_TAP_MAX_DISTANCE);
-    if (isSecond) {
-      _lastTapState = null;
-    } else {
-      _lastTapState = { time: now, x: e.clientX, y: e.clientY, el };
-    }
-    return isSecond;
-  }
-
-  // Делегируем на сам список (не на отдельные строки) — строки пересоздаются
-  // при каждом renderList(), а этот обработчик должен жить постоянно
-  wordListEl.addEventListener('click', (e) => {
-    if (!isMobileViewport()) return;
-    const hebrewEl = e.target.closest('.hebrew-word');
-    if (hebrewEl && wordListEl.contains(hebrewEl)) {
-      const row = hebrewEl.closest('.word-row');
-      if (row && !row.classList.contains('selectable') && !row.classList.contains('row-deleting')) {
-        if (isSecondTapOf(e, hebrewEl)) toggleFavorite(parseInt(row.dataset.id));
-        return;
-      }
-    }
-    const translationEl = e.target.closest('.translation');
-    if (translationEl && wordListEl.contains(translationEl) && translationEl.closest('.word-row')) {
-      const row = translationEl.closest('.word-row');
-      if (row && !row.classList.contains('selectable') && !row.classList.contains('row-deleting') && editingWordId === null) {
-        if (isSecondTapOf(e, translationEl)) enterInlineEdit(parseInt(row.dataset.id));
-      }
-    }
-  });
-
   wordListEl.addEventListener('pointerdown', (e) => {
     if (selectionMode) return; // тут уже работает обычный обработчик выделения выше
-    if (isMobileViewport()) return; // на мобильном выбор строго через кнопку — никакого мультидрага по зажатию
     if (e.target.closest('.listen-btn') || e.target.closest('.favorite-btn') ||
         e.target.closest('.delete-btn')) return;
     const row = e.target.closest('.word-row');
@@ -6289,7 +6231,7 @@
     // найти заново. Тонкую правку определения человек внесёт уже у себя.
     const attachQuickToggleHandlers = (containerEl) => {
       containerEl.querySelectorAll('.search-result-row').forEach(row => {
-        const performQuickToggle = () => {
+        row.addEventListener('click', () => {
           const hebrewText = decodeURIComponent(row.dataset.hebrew);
           const defEl = row.querySelector('.search-definition');
           const existingWord = findExistingWordByHebrew(hebrewText, defEl ? defEl.textContent : null);
@@ -6347,14 +6289,6 @@
           }
           renderFilterBar();
           renderList();
-        };
-        row.addEventListener('click', (e) => {
-          // На мобильном одиночный тап зарезервирован (см. обсуждение жестов) —
-          // добавление/удаление срабатывает только по двойному тапу
-          if (isMobileViewport()) {
-            if (!isSecondTapOf(e, row)) return;
-          }
-          performQuickToggle();
         });
       });
     };
