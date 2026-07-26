@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.16 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.15 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2365,7 +2365,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.16';
+  const APP_VERSION = '0.9.15';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4955,12 +4955,11 @@
       if (!transcriptionMatches.length) return translationMatches;
       // приоритет: точное совпадение транскрипции → перевод → остальная
       // (нечёткая) транскрипция
-      const queryNorm = currentLang === 'en' ? stripLatinAccents(raw) : normalizeForCompare(raw);
+      const queryNorm = normalizeForCompare(raw);
       const exactTranslit = [];
       const restTranslit = [];
       transcriptionMatches.forEach(c => {
-        const cNorm = currentLang === 'en' ? stripLatinAccents(c.translit) : normalizeForCompare(c.translit);
-        (cNorm === queryNorm ? exactTranslit : restTranslit).push(c);
+        (normalizeForCompare(c.translit) === queryNorm ? exactTranslit : restTranslit).push(c);
       });
       const combined = [...exactTranslit, ...translationMatches, ...restTranslit];
       const seen = new Set();
@@ -5006,60 +5005,30 @@
   // без сети. Используется как шаг ПЕРЕД обращением к Джемини — если
   // человек ввёл "махшев", это почти наверняка совпадёт с транскрипцией
   // מַחְשֵׁב ("компьютер") уже без единого сетевого запроса.
-  // Убираем ударение с латинской транскрипции для нечёткого сравнения —
-  // человек, печатающий "makhshev", не будет ставить á/é/í/ó/ú руками
-  function stripLatinAccents(s) {
-    return (s || '').toLowerCase()
-      .replace(/[áàâ]/g, 'a').replace(/[éèê]/g, 'e').replace(/[íìî]/g, 'i')
-      .replace(/[óòô]/g, 'o').replace(/[úùû]/g, 'u').replace(/['’]/g, '');
-  }
-
   function fuzzyMatchTranslitIndex(raw) {
-    const query = currentLang === 'en' ? stripLatinAccents(raw) : normalizeForCompare(raw);
+    if (!translitIndex) return [];
+    const query = normalizeForCompare(raw);
     if (!query) return [];
     // для каждого подходящего скелета запоминаем ЛУЧШЕЕ (наименьшее)
     // расстояние среди всех ключей индекса, которые на него сослались —
     // без этого результаты шли в произвольном порядке перебора объекта,
     // и менее точное совпадение могло случайно оказаться раньше точного
     const skeletonDistance = new Map();
-    if (currentLang === 'en') {
-      // английского индекса вариантов написания (аналога translit_index.json)
-      // нет — сканируем tr-поля прямо в основном словаре. Он покрывает
-      // подавляющее большинство случаев (не глаголы/формы), для которых и
-      // задумана эта нечёткая подстраховка
-      if (!hebrewDictSkeleton) return [];
-      for (const skeleton in hebrewDictSkeleton) {
-        for (const entry of hebrewDictSkeleton[skeleton]) {
-          const key = stripLatinAccents((entry.tr || '').split(',')[0].trim());
-          if (!key) continue;
-          const dist = levenshtein(key, query);
-          const maxLen = Math.max(key.length, query.length);
-          const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
-          const isPrefixWordMatch = key.startsWith(query + ' ');
-          if (dist > allowedDistance && !isPrefixWordMatch) continue;
-          const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
-          const cur = skeletonDistance.get(skeleton);
-          if (cur === undefined || effectiveDist < cur) skeletonDistance.set(skeleton, effectiveDist);
-        }
-      }
-    } else {
-      if (!translitIndex) return [];
-      for (const key in translitIndex) {
-        const dist = levenshtein(key, query); // ключи индекса уже нормализованы при сборке
-        const maxLen = Math.max(key.length, query.length);
-        const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
-        // отдельное правило для многословных ключей: если запрос ТОЧНО совпал
-        // с первым словом фразы ("шум" для "шум давар") — обычное расстояние
-        // Левенштейна тут ни при чём не поможет (разница в длине из-за
-        // "хвоста" фразы почти всегда превысит допуск), а по факту это
-        // абсолютно естественное совпадение, которое должно находиться
-        const isPrefixWordMatch = key.startsWith(query + ' ');
-        if (dist > allowedDistance && !isPrefixWordMatch) continue;
-        const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
-        for (const entry of translitIndex[key]) {
-          const cur = skeletonDistance.get(entry.skeleton);
-          if (cur === undefined || effectiveDist < cur) skeletonDistance.set(entry.skeleton, effectiveDist);
-        }
+    for (const key in translitIndex) {
+      const dist = levenshtein(key, query); // ключи индекса уже нормализованы при сборке
+      const maxLen = Math.max(key.length, query.length);
+      const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
+      // отдельное правило для многословных ключей: если запрос ТОЧНО совпал
+      // с первым словом фразы ("шум" для "шум давар") — обычное расстояние
+      // Левенштейна тут ни при чём не поможет (разница в длине из-за
+      // "хвоста" фразы почти всегда превысит допуск), а по факту это
+      // абсолютно естественное совпадение, которое должно находиться
+      const isPrefixWordMatch = key.startsWith(query + ' ');
+      if (dist > allowedDistance && !isPrefixWordMatch) continue;
+      const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
+      for (const entry of translitIndex[key]) {
+        const cur = skeletonDistance.get(entry.skeleton);
+        if (cur === undefined || effectiveDist < cur) skeletonDistance.set(entry.skeleton, effectiveDist);
       }
     }
     if (!skeletonDistance.size) return [];
@@ -5088,7 +5057,7 @@
         // "лифнот" и לְפַנוֹת "лефанот") получают одну и ту же "лучшую" дистанцию
         // скелета и сортируются между собой произвольно, даже если запрос
         // буква-в-букву совпадает с транскрипцией только ОДНОГО из них
-        const cTranslit = currentLang === 'en' ? stripLatinAccents(c.translit) : normalizeForCompare(c.translit);
+        const cTranslit = normalizeForCompare(c.translit);
         const rawDist = levenshtein(cTranslit, query);
         // то же исключение для многословных фраз, что и при отборе скелетов
         // выше — иначе "шум давар" при сортировке всё равно проваливается
@@ -5144,12 +5113,11 @@
     // приоритет: сначала ТОЧНОЕ совпадение транскрипции (человек буквально
     // напечатал именно то, как слово звучит), затем перевод, затем остальные
     // (нечёткие) варианты транскрипции
-    const queryNorm = currentLang === 'en' ? stripLatinAccents(raw) : normalizeForCompare(raw);
+    const queryNorm = normalizeForCompare(raw);
     const exactTranslit = [];
     const restTranslit = [];
     transcriptionMatches.forEach(c => {
-      const cNorm = currentLang === 'en' ? stripLatinAccents(c.translit) : normalizeForCompare(c.translit);
-      (cNorm === queryNorm ? exactTranslit : restTranslit).push(c);
+      (normalizeForCompare(c.translit) === queryNorm ? exactTranslit : restTranslit).push(c);
     });
 
     const combined = [...exactTranslit, ...translationMatches, ...restTranslit];
