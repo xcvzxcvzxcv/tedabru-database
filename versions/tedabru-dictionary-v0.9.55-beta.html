@@ -558,22 +558,6 @@
       margin-left: 0px;
       margin-right: 7px;
     }
-    /* .hebrew-word наследует margin-right:7px из десктопной вёрстки — на
-       мобильном это ЛИШНЕЕ (column-gap:10px грида уже разделяет колонки),
-       съедало 7px из 60px, отведённых на колонку иврита, отсюда и видимый
-       зазор слева от слова (текст прижат вправо, direction:rtl) */
-    /* ===== ВРЕМЕННАЯ ДИАГНОСТИКА: направляющие колонок карточки — убрать
-       после того, как разберёмся с паддингами. outline не влияет на layout
-       (в отличие от border), так что размеры блоков не искажает. */
-    .word-row .hebrew-word { outline: 1px solid red; }
-    .word-row .meta-col { outline: 1px solid lime; }
-    .word-row .translation { outline: 1px solid deepskyblue; }
-    .word-row .row-actions-cell { outline: 1px solid magenta; }
-
-    .word-row .hebrew-word {
-      margin-right: 0;
-      font-size: 26px;
-    }
     .word-row-swipe-wrap {
       overflow: hidden;
       border-radius: 8px;
@@ -600,6 +584,9 @@
       -webkit-tap-highlight-color: transparent;
     }
     .swipe-delete-btn svg { width: 20px; height: 20px; }
+    .word-row .hebrew-word {
+      font-size: 26px;
+    }
     .word-row .listen-btn,
     .word-row .row-num {
       display: none;
@@ -642,7 +629,7 @@
       display: flex;
     }
     .app {
-      padding-bottom: 106px; /* место под нижнюю панель (реальная высота ~94-96px c safe-area) + небольшой запас, чтобы последняя карточка не пряталась под ней */
+      padding-bottom: 78px; /* место под нижнюю панель, чтобы последняя карточка не пряталась под ней */
     }
     .list {
       padding-bottom: 0; /* десктопные 100px тут не нужны — .app уже резервирует место под панель, вместе получалось лишних ~100px пустоты после последней карточки */
@@ -1664,7 +1651,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.56 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.55 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2611,7 +2598,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.56';
+  const APP_VERSION = '0.9.55';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
