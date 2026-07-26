@@ -544,7 +544,7 @@
        жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
        остаются видны в правом углу */
     .word-row {
-      grid-template-columns: 65px 85px 1fr 42px;
+      grid-template-columns: 60px 95px 1fr 42px;
       column-gap: 10px;
       padding: 9px 0;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
@@ -1668,7 +1668,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.58 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.57 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2615,7 +2615,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.58';
+  const APP_VERSION = '0.9.57';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
