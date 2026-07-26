@@ -137,19 +137,6 @@
     z-index: 500;
     -webkit-tap-highlight-color: transparent;
   }
-  .theme-toggle-btn-inline {
-    position: static;
-  }
-  .settings-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-purple);
-    font-size: 15px;
-    color: var(--text-main);
-  }
-  .settings-row:last-of-type { border-bottom: none; }
   .theme-toggle-btn svg { width: 18px; height: 18px; }
   @media (hover: hover) {
     .theme-toggle-btn:hover { color: var(--gold); }
@@ -1503,7 +1490,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.31 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.30 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1747,29 +1734,6 @@
   </div>
 </div>
 
-<div class="action-modal-overlay" id="settingsPanelOverlay">
-  <div class="action-modal">
-    <h3 data-i18n="Настройки">Настройки</h3>
-    <div class="settings-row">
-      <span data-i18n="Язык">Язык</span>
-      <button type="button" class="lang-toggle-btn" id="settingsLangToggleBtn">
-        <span class="lang-option" data-lang="ru">RU</span>
-        <span class="lang-divider">|</span>
-        <span class="lang-option" data-lang="en">EN</span>
-      </button>
-    </div>
-    <div class="settings-row">
-      <span data-i18n="Тема">Тема</span>
-      <button type="button" class="theme-toggle-btn theme-toggle-btn-inline" id="settingsThemeToggleBtn">
-        <svg id="settingsThemeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-      </button>
-    </div>
-    <div class="action-modal-buttons">
-      <button type="button" class="action-modal-btn" id="settingsCloseBtn" data-i18n="Закрыть">Закрыть</button>
-    </div>
-  </div>
-</div>
-
 <script>
   // ===== Уровень освоения слова =====
   // Раньше был ручной статус "изучается/изучено" — теперь его заменяют пять
@@ -1954,9 +1918,6 @@
     'Да': 'Yes',
     'Удалить выбранное': 'Delete selected',
     'Создать': 'Create',
-    'Настройки': 'Settings',
-    'Язык': 'Language',
-    'Тема': 'Theme',
     'Закрыть': 'Close',
     'Готово': 'Done',
     'Начать': 'Start',
@@ -2431,7 +2392,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.31';
+  const APP_VERSION = '0.9.30';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -7576,21 +7537,16 @@
 
   function applyTheme() {
     document.documentElement.setAttribute('data-theme', currentTheme);
+    const icon = document.getElementById('themeToggleIcon');
     // показываем иконку того, ЧТО получится, если нажать — солнце на тёмной
-    // теме ("включить светлую"), луна на светлой ("включить тёмную").
-    // Два экземпляра иконки — в шапке (десктоп/старое место) и в панели
-    // настроек (мобильный) — держим синхронно через общий класс
-    document.querySelectorAll('#themeToggleIcon, #settingsThemeToggleIcon').forEach(icon => {
-      icon.innerHTML = currentTheme === 'dark' ? SUN_ICON_INNER : MOON_ICON_INNER;
-    });
+    // теме ("включить светлую"), луна на светлой ("включить тёмную")
+    if (icon) icon.innerHTML = currentTheme === 'dark' ? SUN_ICON_INNER : MOON_ICON_INNER;
     localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
   }
-  function toggleTheme() {
+  document.getElementById('themeToggleBtn').addEventListener('click', () => {
     currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
     applyTheme();
-  }
-  document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
-  document.getElementById('settingsThemeToggleBtn').addEventListener('click', toggleTheme);
+  });
   applyTheme();
 
   // ===== Язык (RU/EN) =====
@@ -7599,26 +7555,16 @@
       el.classList.toggle('lang-active', el.dataset.lang === currentLang);
     });
   }
-  function toggleLanguage() {
+  document.getElementById('langToggleBtn').addEventListener('click', () => {
     currentLang = currentLang === 'ru' ? 'en' : 'ru';
     localStorage.setItem(LANG_STORAGE_KEY, currentLang);
     applyLangToggleUI();
     applyStaticTranslations();
     renderFilterBar();
     renderList();
-  }
-  document.getElementById('langToggleBtn').addEventListener('click', toggleLanguage);
-  document.getElementById('settingsLangToggleBtn').addEventListener('click', toggleLanguage);
+  });
   applyLangToggleUI();
   applyStaticTranslations();
-
-  // ===== Панель настроек (пока только язык/тема — мобильный вход появится
-  // на следующем шаге рефактора, вместе с перестройкой шапки) =====
-  const settingsPanelOverlay = document.getElementById('settingsPanelOverlay');
-  function openSettingsPanel() { settingsPanelOverlay.classList.add('open'); }
-  function closeSettingsPanel() { settingsPanelOverlay.classList.remove('open'); }
-  document.getElementById('settingsCloseBtn').addEventListener('click', closeSettingsPanel);
-  settingsPanelOverlay.addEventListener('click', (e) => { if (e.target === settingsPanelOverlay) closeSettingsPanel(); });
 
   // ===== Первичный рендер =====
   renderFilterBar();
