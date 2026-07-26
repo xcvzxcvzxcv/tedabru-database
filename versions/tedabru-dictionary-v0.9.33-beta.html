@@ -466,38 +466,22 @@
   }
 
   @media (max-width: 480px) and (hover: none) and (pointer: coarse) {
-    /* Компактная карточка под пиксельные ориентиры: 90px иврит | 95px мета |
-       гибкая дефиниция | ~42px под избранное+рейтинг, отступы 15px по краям.
-       Прослушивание/номер строки остаются скрыты (тап на иврите зарезервирован
-       под будущий жест — см. обсуждение); кнопки действий скрыты (заменяются
-       жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
-       остаются видны в правом углу */
+    /* На узком экране фиксированные 32+105+105+94+26=362px колонок не
+       оставляют места переводу вообще — отсюда и жалоба "перевод не виден
+       с телефона". Пока убираем прослушивание/номер/статус целиком (вернём
+       позже, если получится вписать компактнее). ВАЖНО: вместе со статусом
+       прячется и его кнопка-триггер — на мобильном пока нет доступа к
+       избранному/редактированию/удалению через карточку вообще, это
+       осознанный временный компромисс, не забыть вернуться к этому */
     .word-row {
-      grid-template-columns: 90px 95px 1fr 42px;
-      column-gap: 10px;
-      padding: 9px 15px;
-    }
-    .word-row .hebrew-word {
-      font-size: 26px;
+      grid-template-columns: 90px 84px 1fr;
+      gap: 6px;
     }
     .word-row .listen-btn,
+    .word-row .row-actions-cell,
     .word-row .row-num {
       display: none;
     }
-    .word-row .row-actions-buttons { display: none; }
-    .word-row .row-actions-cell { cursor: default; }
-    .word-row .mastery-dots-wrap {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .word-row .favorite-star-mobile {
-      display: flex;
-      color: var(--gold);
-      width: 14px;
-      height: 14px;
-    }
-    .word-row .favorite-star-mobile svg { width: 100%; height: 100%; }
     .search-result-row {
       grid-template-columns: 1fr 78px 90px;
       gap: 6px;
@@ -512,11 +496,6 @@
        Редактирование базы и сама многофункциональная кнопка остаются. */
     .lang-toggle-btn { display: none; }
     #trainModeBtn, #selectModeBtn { display: none; }
-
-    /* Чипы качества запоминания на мобильном не показываем вовсе — рейтинг
-       переезжает в саму карточку слова (см. mastery-dots в компактной
-       карточке на следующем шаге рефактора) */
-    #filterBar .filter-row:first-child { display: none; }
 
     .bottom-nav {
       display: flex;
@@ -850,9 +829,6 @@
   }
   .drag-ghost-badge.visible { display: flex; }
 
-  .favorite-star-mobile {
-    display: none; /* видно только на мобильном — см. медиа-запрос ниже */
-  }
   .mastery-dots {
     display: flex;
     align-items: center;
@@ -1571,7 +1547,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.34 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.33 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2518,7 +2494,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.34';
+  const APP_VERSION = '0.9.33';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3213,7 +3189,7 @@
           <div class="hebrew-word">${w.hebrew}</div>
           <div class="meta-col">
             <div class="translit">${disp.translit}</div>
-            <div class="pos">${mobileCompactPos(disp.pos)}</div>
+            <div class="pos">${disp.pos}</div>
           </div>
           <div class="translation">${disp.translation}</div>
           <div></div>
@@ -3239,7 +3215,7 @@
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
           <div class="translit">${disp.translit}</div>
-          <div class="pos">${mobileCompactPos(disp.pos)}</div>
+          <div class="pos">${disp.pos}</div>
         </div>
         ${isPendingDelete
           ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
@@ -3247,10 +3223,7 @@
             ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
             : `<div class="translation">${disp.translation}</div>`)}
         <div class="row-actions-cell" data-id="${w.id}">
-          <div class="mastery-dots-wrap">
-            ${w.favorite ? `<span class="favorite-star-mobile">${STAR_ICON}</span>` : ''}
-            ${masteryDotsHtml(w)}
-          </div>
+          <div class="mastery-dots-wrap">${masteryDotsHtml(w)}</div>
           <div class="row-actions-buttons">
             <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="${t('Избранное')}">${STAR_ICON}</button>
             <button class="icon-btn edit-def-btn" data-id="${w.id}" title="${t('Редактировать определение (только в вашем словаре)')}">${PENCIL_ICON}</button>
@@ -5139,17 +5112,6 @@
       };
     }
     return { translation: w.translation, pos: w.pos, translit: w.translit };
-  }
-
-  // На мобильном карточка компактнее — слово "глагол"/"verb" перед биньяном
-  // избыточно (сам биньян уже однозначно говорит, что это глагол), убираем
-  // его только для ОТОБРАЖЕНИЯ, не трогая хранимое значение (по нему же
-  // идёт фильтрация — оставляем "глагол, пааль" как есть в данных)
-  function mobileCompactPos(posStr) {
-    if (!isMobileViewport() || !posStr) return posStr;
-    if (posStr.startsWith('глагол, ')) return posStr.slice('глагол, '.length);
-    if (posStr.startsWith('verb, ')) return posStr.slice('verb, '.length);
-    return posStr;
   }
 
   // Слово перестаёт быть "из базы" при любом ручном редактировании —
