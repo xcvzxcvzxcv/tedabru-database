@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.14 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.13 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1828,14 +1828,6 @@
     'Помню хорошо': 'Remember well',
     'Выучено': 'Learned',
     'Избранное': 'Favorites',
-    'Прослушать': 'Listen',
-    'слов:': 'words:',
-    'подборок:': 'collections:',
-    'Выделено': 'Selected',
-    'Выделено: 0': 'Selected: 0',
-    'Редактировать определение (только в вашем словаре)': 'Edit definition (in your dictionary only)',
-    'Сначала новые': 'Newest first',
-    'По алфавиту': 'Alphabetical',
     'Добавить подборку': 'Add collection',
     'Фильтры': 'Filters',
     'Название подборки': 'Collection name',
@@ -1912,18 +1904,6 @@
     'Глагол': 'Verb',
     'Существительное': 'Noun',
     'Прилагательное': 'Adjective',
-    'Пааль': "Pa'al",
-    'Пиэль': "Pi'el",
-    'hифиль': "Hif'il",
-    'Нифъаль': "Nif'al",
-    'hитпаэль': "Hitpa'el",
-    'Прошедшее': 'Past',
-    'Настоящее': 'Present',
-    'Будущее': 'Future',
-    'Повелительное': 'Imperative',
-    'я': 'I', 'ты': 'you', 'он': 'he', 'она': 'she', 'мы': 'we', 'вы': 'you (pl.)', 'они': 'they',
-    'ед.ч.': 'sg.', 'мн.ч.': 'pl.',
-    'м.р.': 'm.', 'ж.р.': 'f.',
     'Наречие': 'Adverb',
     'Местоимение': 'Pronoun',
     'Числительное': 'Numeral',
@@ -2231,12 +2211,12 @@
   function categoryFilterSummaryLabel() {
     if (!categoryFilterActive()) return '';
     const posDef = POS_FILTER_CATEGORIES.find(c => c.key === categoryFilter.pos);
-    const parts = [posDef ? t(posDef.label) : categoryFilter.pos];
-    if (categoryFilter.binyan) parts.push(t(BINYAN_FILTER_OPTIONS.find(b => b.key === categoryFilter.binyan).label));
-    if (categoryFilter.tense) parts.push(t(TENSE_FILTER_OPTIONS.find(opt => opt.key === categoryFilter.tense).label).toLowerCase());
-    if (categoryFilter.person) parts.push(t(categoryFilter.person));
-    if (categoryFilter.number) parts.push(t(NUMBER_FILTER_OPTIONS.find(n => n.key === categoryFilter.number).label));
-    if (categoryFilter.gender) parts.push(t(GENDER_FILTER_OPTIONS.find(g => g.key === categoryFilter.gender).label));
+    const parts = [posDef ? posDef.label : categoryFilter.pos];
+    if (categoryFilter.binyan) parts.push(BINYAN_FILTER_OPTIONS.find(b => b.key === categoryFilter.binyan).label);
+    if (categoryFilter.tense) parts.push(TENSE_FILTER_OPTIONS.find(t => t.key === categoryFilter.tense).label.toLowerCase());
+    if (categoryFilter.person) parts.push(categoryFilter.person);
+    if (categoryFilter.number) parts.push(NUMBER_FILTER_OPTIONS.find(n => n.key === categoryFilter.number).label);
+    if (categoryFilter.gender) parts.push(GENDER_FILTER_OPTIONS.find(g => g.key === categoryFilter.gender).label);
     return parts.join(', ');
   }
 
@@ -2253,22 +2233,22 @@
     panel.style.display = 'block';
 
     const posChips = POS_FILTER_CATEGORIES.map(c => `
-      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.label)}</button>
+      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${c.label}</button>
     `).join('');
 
     let subRows = '';
     if (categoryFilter && categoryFilter.pos === 'verb') {
       const binyanChips = BINYAN_FILTER_OPTIONS.map(b => `
-        <button type="button" class="category-filter-chip ${categoryFilter.binyan === b.key ? 'active' : ''}" data-binyan="${b.key}">${t(b.label)}</button>
+        <button type="button" class="category-filter-chip ${categoryFilter.binyan === b.key ? 'active' : ''}" data-binyan="${b.key}">${b.label}</button>
       `).join('');
-      const tenseChips = TENSE_FILTER_OPTIONS.map(opt => `
-        <button type="button" class="category-filter-chip ${categoryFilter.tense === opt.key ? 'active' : ''}" data-tense="${opt.key}">${t(opt.label)}</button>
+      const tenseChips = TENSE_FILTER_OPTIONS.map(t => `
+        <button type="button" class="category-filter-chip ${categoryFilter.tense === t.key ? 'active' : ''}" data-tense="${t.key}">${t.label}</button>
       `).join('');
       const personChips = PERSON_FILTER_OPTIONS.map(p => `
-        <button type="button" class="category-filter-chip ${categoryFilter.person === p.key ? 'active' : ''}" data-person="${p.key}">${t(p.label)}</button>
+        <button type="button" class="category-filter-chip ${categoryFilter.person === p.key ? 'active' : ''}" data-person="${p.key}">${p.label}</button>
       `).join('');
       const numberChips = NUMBER_FILTER_OPTIONS.map(n => `
-        <button type="button" class="category-filter-chip ${categoryFilter.number === n.key ? 'active' : ''}" data-number="${n.key}">${t(n.label)}</button>
+        <button type="button" class="category-filter-chip ${categoryFilter.number === n.key ? 'active' : ''}" data-number="${n.key}">${n.label}</button>
       `).join('');
       subRows = `
         <div class="category-filter-row">${binyanChips}</div>
@@ -2278,7 +2258,7 @@
       `;
     } else if (categoryFilter && ['noun', 'adj', 'pron', 'num', 'name', 'det'].includes(categoryFilter.pos)) {
       const genderChips = GENDER_FILTER_OPTIONS.map(g => `
-        <button type="button" class="category-filter-chip ${categoryFilter.gender === g.key ? 'active' : ''}" data-gender="${g.key}">${t(g.label)}</button>
+        <button type="button" class="category-filter-chip ${categoryFilter.gender === g.key ? 'active' : ''}" data-gender="${g.key}">${g.label}</button>
       `).join('');
       subRows = `<div class="category-filter-row">${genderChips}</div>`;
     }
@@ -2286,7 +2266,7 @@
     panel.innerHTML = `
       <div class="category-filter-row">${posChips}</div>
       ${subRows}
-      ${categoryFilterActive() ? `<button type="button" class="category-filter-clear" id="categoryFilterClearBtn">${t('Сбросить фильтр')}</button>` : ''}
+      ${categoryFilterActive() ? '<button type="button" class="category-filter-clear" id="categoryFilterClearBtn">Сбросить фильтр</button>' : ''}
     `;
 
     panel.querySelectorAll('[data-pos]').forEach(btn => {
@@ -2364,7 +2344,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.14';
+  const APP_VERSION = '0.9.13';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2791,8 +2771,8 @@
         </div>
       </div>
       <select class="sort-select" id="sortSelect" style="display:none;">
-        <option value="added" ${sortMode === 'added' ? 'selected' : ''}>${t('Сначала новые')}</option>
-        <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>${t('По алфавиту')}</option>
+        <option value="added" ${sortMode === 'added' ? 'selected' : ''}>Сначала новые</option>
+        <option value="alpha" ${sortMode === 'alpha' ? 'selected' : ''}>По алфавиту</option>
       </select>
     `;
 
@@ -3016,7 +2996,7 @@
       const isPendingDelete = pendingDeleteIds.has(w.id);
       return `
       <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
-        <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
+        <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="Прослушать">${SPEAKER_ICON}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
           <div class="translit">${w.translit}</div>
@@ -3030,9 +3010,9 @@
         <div class="row-actions-cell" data-id="${w.id}">
           <div class="mastery-dots-wrap">${masteryDotsHtml(w)}</div>
           <div class="row-actions-buttons">
-            <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="${t('Избранное')}">${STAR_ICON}</button>
-            <button class="icon-btn edit-def-btn" data-id="${w.id}" title="${t('Редактировать определение (только в вашем словаре)')}">${PENCIL_ICON}</button>
-            <button class="icon-btn delete-btn" data-id="${w.id}" title="${t('Удалить')}">${TRASH_ICON}</button>
+            <button class="icon-btn favorite-btn ${w.favorite ? 'favorite-on' : ''}" data-id="${w.id}" title="Избранное">${STAR_ICON}</button>
+            <button class="icon-btn edit-def-btn" data-id="${w.id}" title="Редактировать определение (только в вашем словаре)">${PENCIL_ICON}</button>
+            <button class="icon-btn delete-btn" data-id="${w.id}" title="Удалить">${TRASH_ICON}</button>
           </div>
         </div>
         <div class="row-num">${i + 1}</div>
@@ -3397,9 +3377,9 @@
 
   function selectionHeaderText() {
     const parts = [];
-    if (selectedIds.size) parts.push(`${t('слов:')} ${selectedIds.size}`);
-    if (selectedCollectionIds.size) parts.push(`${t('подборок:')} ${selectedCollectionIds.size}`);
-    return parts.length ? `${t('Выделено')} — ${parts.join(', ')}` : t('Выделено: 0');
+    if (selectedIds.size) parts.push(`слов: ${selectedIds.size}`);
+    if (selectedCollectionIds.size) parts.push(`подборок: ${selectedCollectionIds.size}`);
+    return parts.length ? `Выделено — ${parts.join(', ')}` : 'Выделено: 0';
   }
 
   function updateHeaderForSelectionMode() {
@@ -3408,14 +3388,14 @@
       primaryActionBtn.innerHTML = TRASH_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-gold');
       primaryActionBtn.classList.add('header-icon-btn-danger');
-      primaryActionBtn.title = t('Удалить выбранное');
+      primaryActionBtn.title = 'Удалить выбранное';
       primaryActionBtn.setAttribute('data-drop-delete', '1');
     } else if (addMode) {
       headerTitleEl.textContent = t('Введите слово, которое хотите добавить');
       primaryActionBtn.innerHTML = EXIT_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = t('Отменить добавление');
+      primaryActionBtn.title = 'Отменить добавление';
       primaryActionBtn.removeAttribute('data-drop-delete');
     } else if (editDbMode) {
       headerTitleEl.textContent = 'Редактирование базы';
