@@ -1485,7 +1485,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.28 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.27 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2385,7 +2385,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.28';
+  const APP_VERSION = '0.9.27';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2630,25 +2630,10 @@
   // не консонантный скелет, потому что омографы (разные огласовки/породы у
   // одного и того же написания без никуда) — это разные слова, и не должны
   // считаться дублями друг друга
-  function findExistingWordByHebrew(hebrewText, expectedTranslation) {
+  function findExistingWordByHebrew(hebrewText) {
     const key = (hebrewText || '').trim().normalize('NFC');
     if (!key) return null;
-    const matches = words.filter(w => (w.hebrew || '').trim().normalize('NFC') === key);
-    if (!matches.length) return null;
-    if (expectedTranslation) {
-      // Одно и то же написание на иврите может скрывать НЕСКОЛЬКО разных
-      // значений (омографы вроде אָח = "брат"/"камин"/"медсестра") — если
-      // знаем, КАКОЕ ИМЕННО значение сейчас смотрим, "уже добавлено"
-      // должно означать "именно ЭТО значение уже есть", а не "есть хоть
-      // какая-то карточка с таким написанием". Другой смысл того же слова
-      // считается ещё не добавленным и может быть добавлен отдельно.
-      const expectedNorm = expectedTranslation.trim();
-      return matches.find(w =>
-        (w.translation && w.translation.trim() === expectedNorm) ||
-        (w.translation_en && w.translation_en.trim() === expectedNorm)
-      ) || null;
-    }
-    return matches[0]; // без ориентира на значение — прежнее поведение
+    return words.find(w => (w.hebrew || '').trim().normalize('NFC') === key) || null;
   }
 
   // ===== Рендер списка =====
@@ -5911,7 +5896,7 @@
     const hiddenMatches = hasGenuineTranslation ? uniqueMatches.filter(m => isJunk(m)) : [];
 
     const rowHtml = (m) => {
-      const existing = findExistingWordByHebrew(m.text, m.translation);
+      const existing = findExistingWordByHebrew(m.text);
       return `
       <button type="button" class="candidate-row ${existing ? 'already-added' : ''}">
         <div class="candidate-word">${m.text}</div>
@@ -5931,7 +5916,7 @@
     // где он сейчас — в поиске или уже в своём словаре, даже при похожем
     // визуальном языке карточек.
     const visibleRowHtml = (m, i) => {
-      const existing = findExistingWordByHebrew(m.text, m.translation);
+      const existing = findExistingWordByHebrew(m.text);
       return `
       <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
         <div class="icon-btn search-status-icon" style="pointer-events:none;">${existing ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
@@ -5983,8 +5968,7 @@
       containerEl.querySelectorAll('.search-result-row').forEach(row => {
         row.addEventListener('click', () => {
           const hebrewText = decodeURIComponent(row.dataset.hebrew);
-          const defEl = row.querySelector('.search-definition');
-          const existingWord = findExistingWordByHebrew(hebrewText, defEl ? defEl.textContent : null);
+          const existingWord = findExistingWordByHebrew(hebrewText);
           if (existingWord) {
             words = words.filter(w => w.id !== existingWord.id);
             saveWords();
@@ -5993,6 +5977,7 @@
           } else {
             const translitEl = row.querySelector('.translit');
             const posEl = row.querySelector('.pos');
+            const defEl = row.querySelector('.search-definition');
             const bilingual = computeBilingualFields(hebrewText, defEl ? defEl.textContent : null);
             // pos надёжнее брать из bilingual.ru (посчитан из сырой записи),
             // а не парсить обратно из ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue
@@ -6034,7 +6019,7 @@
           // слово уже в справочнике — из результатов поиска повторно не
           // добавляем (галочка на карточке и так всё объясняет); изменить его
           // можно только через саму карточку слова в списке справочника
-          if (findExistingWordByHebrew(m.text, m.translation)) return;
+          if (findExistingWordByHebrew(m.text)) return;
           enterAddMode(m);
         });
       });
@@ -6147,7 +6132,7 @@
       const finalCandidates = uniqueCandidates.slice(0, 5);
 
       nikkudSuggestion.innerHTML = finalCandidates.map((c, i) => {
-        const existing = findExistingWordByHebrew(c.text, c.translation);
+        const existing = findExistingWordByHebrew(c.text);
         return `
         <button type="button" class="candidate-row ${existing ? 'already-added' : ''}" data-index="${i}">
           <div class="candidate-word">${c.text}</div>
@@ -7044,10 +7029,10 @@
 
   saveBtn.addEventListener('click', () => {
     const hebrewValue = inputHebrew.value.trim();
+    const existing = findExistingWordByHebrew(hebrewValue);
     const typedTranslit = inputTranslit.value.trim();
     const typedPos = inputPos.value;
     const typedTranslation = inputTranslation.value.trim();
-    const existing = findExistingWordByHebrew(hebrewValue, typedTranslation);
 
     // Если написание совпадает с чем-то в общей базе И введённые значения
     // ТОЧНО совпадают с тем, что дала бы автоподстановка на текущем языке —
@@ -7235,7 +7220,7 @@
         continue;
       }
 
-      const existing = findExistingWordByHebrew(best.text, best.translation);
+      const existing = findExistingWordByHebrew(best.text);
       const bilingual = computeBilingualFields(best.text, best.translation);
       // pos надёжнее брать из bilingual.ru, а не парсить обратно из
       // ОТОБРАЖАЕМОЙ метки — grammarLabelToPosValue понимает только русские
