@@ -1480,7 +1480,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.22 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.21 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2380,7 +2380,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.22';
+  const APP_VERSION = '0.9.21';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2649,12 +2649,11 @@
     let list = words;
     if (searchQuery) {
       const q = normalize(searchQuery);
-      list = list.filter(w => {
-        const disp = personalWordDisplay(w);
-        return normalize(w.hebrew).includes(q) ||
-          normalize(disp.translit).includes(q) ||
-          normalize(disp.translation).includes(q);
-      });
+      list = list.filter(w =>
+        normalize(w.hebrew).includes(q) ||
+        normalize(w.translit).includes(q) ||
+        normalize(w.translation).includes(q)
+      );
     }
     if (filterMastery) list = list.filter(w => getMasteryLevel(w) === filterMastery);
     if (filterFavorite) list = list.filter(w => w.favorite);
@@ -2805,7 +2804,7 @@
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
         <div class="filter-row">
-          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
+          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${p} · ${countByPos[p] || 0}</button>`).join('')}
         </div>
       </div>
       <select class="sort-select" id="sortSelect" style="display:none;">
@@ -4469,35 +4468,6 @@
     pa: "pa'al", pi: "pi'el", hif: "hif'il", nif: "nif'al",
     pu: "pu'al", huf: "huf'al", hitp: "hitpa'el"
   };
-
-  // Личные слова хранят pos как ГОТОВУЮ русскую строку (например "сущ, м.р",
-  // "глагол, пааль") — она же используется для фильтрации, поэтому саму
-  // строку не трогаем никогда. А вот ПОКАЗЫВАТЬ её в чипах фильтра нужно на
-  // текущем языке — переводим обратным поиском по тем же POS_LABELS/
-  // BINYAN_LABELS, которыми размечена основная база.
-  const POS_LABEL_RU_TO_EN = Object.fromEntries(
-    Object.keys(POS_LABELS).map(code => [POS_LABELS[code], POS_LABELS_EN[code]])
-  );
-  const BINYAN_LABEL_RU_TO_EN = Object.fromEntries(
-    Object.keys(BINYAN_LABELS).map(code => [BINYAN_LABELS[code], BINYAN_LABELS_EN[code]])
-  );
-  function personalPosLabel(posStr) {
-    if (currentLang !== 'en' || !posStr) return posStr;
-    if (posStr.startsWith('глагол, ')) {
-      const binyanRu = posStr.slice('глагол, '.length);
-      return `verb, ${BINYAN_LABEL_RU_TO_EN[binyanRu] || binyanRu}`;
-    }
-    if (posStr === 'глагол') return 'verb';
-    const genderMatch = posStr.match(/^(.+), (м\.р|ж\.р)$/);
-    if (genderMatch) {
-      const baseRu = genderMatch[1];
-      const baseEn = baseRu === 'сущ' ? 'n.' : (POS_LABEL_RU_TO_EN[baseRu] || baseRu);
-      const genderEn = genderMatch[2] === 'м.р' ? 'm.' : 'f.';
-      return `${baseEn}, ${genderEn}`;
-    }
-    if (posStr === 'сущ') return 'n.';
-    return POS_LABEL_RU_TO_EN[posStr] || posStr;
-  }
 
   // ===== Nakdan API: получение никуда =====
   // Прямой вызов nakdan-u1-0.loadbalancer.dicta.org.il блокируется CORS —
