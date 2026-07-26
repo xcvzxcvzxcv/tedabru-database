@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.19 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.18 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2365,7 +2365,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.19';
+  const APP_VERSION = '0.9.18';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -5129,42 +5129,24 @@
     const skeletonDistance = new Map();
     if (currentLang === 'en') {
       // английского индекса вариантов написания (аналога translit_index.json)
-      // нет — сканируем tr-поля прямо в основном словаре И в английской базе
-      // глаголов (изначально забыл про вторую — отсюда и баг с поиском
-      // глаголов по транскрипции на английском)
-      if (hebrewDictSkeleton) {
-        for (const skeleton in hebrewDictSkeleton) {
-          for (const entry of hebrewDictSkeleton[skeleton]) {
-            const key = stripLatinAccents((entry.tr || '').split(',')[0].trim());
-            if (!key) continue;
-            const dist = levenshtein(key, query);
-            const maxLen = Math.max(key.length, query.length);
-            const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
-            const isPrefixWordMatch = key.startsWith(query + ' ');
-            if (dist > allowedDistance && !isPrefixWordMatch) continue;
-            const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
-            const cur = skeletonDistance.get(skeleton);
-            if (cur === undefined || effectiveDist < cur) skeletonDistance.set(skeleton, effectiveDist);
-          }
+      // нет — сканируем tr-поля прямо в основном словаре. Он покрывает
+      // подавляющее большинство случаев (не глаголы/формы), для которых и
+      // задумана эта нечёткая подстраховка
+      if (!hebrewDictSkeleton) return [];
+      for (const skeleton in hebrewDictSkeleton) {
+        for (const entry of hebrewDictSkeleton[skeleton]) {
+          const key = stripLatinAccents((entry.tr || '').split(',')[0].trim());
+          if (!key) continue;
+          const dist = levenshtein(key, query);
+          const maxLen = Math.max(key.length, query.length);
+          const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
+          const isPrefixWordMatch = key.startsWith(query + ' ');
+          if (dist > allowedDistance && !isPrefixWordMatch) continue;
+          const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
+          const cur = skeletonDistance.get(skeleton);
+          if (cur === undefined || effectiveDist < cur) skeletonDistance.set(skeleton, effectiveDist);
         }
       }
-      if (verbsDictEn) {
-        for (const skeleton in verbsDictEn) {
-          for (const entry of verbsDictEn[skeleton]) {
-            const key = stripLatinAccents((entry.tr || '').split(',')[0].trim());
-            if (!key) continue;
-            const dist = levenshtein(key, query);
-            const maxLen = Math.max(key.length, query.length);
-            const allowedDistance = maxLen <= 4 ? 1 : (maxLen <= 8 ? 2 : 3);
-            const isPrefixWordMatch = key.startsWith(query + ' ');
-            if (dist > allowedDistance && !isPrefixWordMatch) continue;
-            const effectiveDist = isPrefixWordMatch ? Math.min(dist, 1) : dist;
-            const cur = skeletonDistance.get(skeleton);
-            if (cur === undefined || effectiveDist < cur) skeletonDistance.set(skeleton, effectiveDist);
-          }
-        }
-      }
-      if (!hebrewDictSkeleton && !verbsDictEn) return [];
     } else {
       if (!translitIndex) return [];
       for (const key in translitIndex) {
