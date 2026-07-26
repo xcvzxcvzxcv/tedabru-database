@@ -472,42 +472,7 @@
     }
   }
 
-  .bottom-nav {
-    display: none; /* показывается только в мобильном медиа-запросе ниже */
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 200;
-    background: var(--card-bg);
-    border-top: 1px solid var(--border-purple);
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    justify-content: space-around;
-    align-items: stretch;
-  }
-  .bottom-nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    padding: 4px 18px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .bottom-nav-btn svg { width: 24px; height: 24px; }
-  .bottom-nav-btn.bottom-nav-btn-gold { color: var(--gold); }
-  .bottom-nav-btn.active { color: var(--gold); }
-
   @media (max-width: 480px) and (hover: none) and (pointer: coarse) {
-    /* Тема и масштаб переехали в панель настроек — старые плавающие кнопки
-       на мобильном больше не нужны (это упустили в первом заходе рефактора) */
-    #themeToggleBtn, #zoomControl { display: none; }
-
     /* Компактная карточка под пиксельные ориентиры: 90px иврит | 95px мета |
        гибкая дефиниция | ~42px под избранное+рейтинг, отступы 15px по краям.
        Прослушивание/номер строки остаются скрыты (тап на иврите зарезервирован
@@ -593,6 +558,37 @@
       padding-bottom: 78px; /* место под нижнюю панель, чтобы последняя карточка не пряталась под ней */
     }
   }
+
+  .bottom-nav {
+    display: none; /* показывается только в мобильном медиа-запросе выше */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-purple);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    justify-content: space-around;
+    align-items: stretch;
+  }
+  .bottom-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 4px 18px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav-btn svg { width: 24px; height: 24px; }
+  .bottom-nav-btn.bottom-nav-btn-gold { color: var(--gold); }
+  .bottom-nav-btn.active { color: var(--gold); }
 
   .icon-btn {
     background: none;
@@ -1608,7 +1604,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.37 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.36 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2555,7 +2551,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.37';
+  const APP_VERSION = '0.9.36';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
