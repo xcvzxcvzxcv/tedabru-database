@@ -1619,7 +1619,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.44 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.43 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2566,7 +2566,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.44';
+  const APP_VERSION = '0.9.43';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2691,14 +2691,9 @@
     if (!panel) {
       panel = document.createElement('div');
       panel.id = 'navDebugPanel';
-      panel.style.cssText = 'position:fixed;left:6px;right:6px;bottom:84px;z-index:99999;background:rgba(0,0,0,0.92);color:#7CFC7C;font-family:monospace;font-size:9.5px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.35;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;pointer-events:auto;';
+      panel.style.cssText = 'position:fixed;top:64px;left:6px;right:6px;z-index:99999;background:rgba(0,0,0,0.88);color:#7CFC7C;font-family:monospace;font-size:9.5px;padding:8px;border-radius:8px;white-space:pre-wrap;line-height:1.35;max-height:70vh;overflow:auto;pointer-events:none;';
       document.body.appendChild(panel);
     }
-    // ставим верхнюю границу сразу под шапкой (заголовок + поиск + фильтры), чтобы
-    // сам поиск и кнопка фильтров оставались кликабельны, а не перекрывались панелью
-    const headerEl = document.querySelector('.header');
-    const topOffset = headerEl ? Math.ceil(headerEl.getBoundingClientRect().bottom) + 4 : 64;
-    panel.style.top = topOffset + 'px';
     const fmt = (label, snap) => label + ':\n' + (snap ? Object.entries(snap).map(([k, v]) => `  ${k}: ${v}`).join('\n') : '  (нет данных)');
     panel.textContent = fmt('COLD (до форс-репейнта)', window.__navDebugCold)
       + '\n\n' + fmt('POST_REPAINT (после наших авто-фиксов, ~3с)', window.__navDebugPostRepaint)
