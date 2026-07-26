@@ -867,10 +867,6 @@
   }
   .translation-edit {
     position: absolute;
-    grid-column: 4; /* тот же столбец, где в норме .translation (1fr) */
-    top: 0;
-    left: 0;
-    right: 0;
     z-index: 30;
     font-family: 'Noto Serif', serif;
     font-size: 16px;
@@ -1486,7 +1482,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.25 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.24 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2386,7 +2382,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.25';
+  const APP_VERSION = '0.9.24';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -3319,18 +3315,24 @@
     editingWordId = id;
 
     const translationEl = row.querySelector('.translation');
+    // Запоминаем ТОЧНОЕ место обычного блока перевода — текстовое поле встаёт
+    // ровно туда же, но как абсолютно спозиционированный элемент (не в
+    // потоке грид-сетки), поэтому высота самой СТРОКИ вообще не меняется —
+    // раньше именно попытка анимировать высоту строки под текстовое поле
+    // (и конфликт этой анимации с анимацией сворачивания при быстром
+    // сохранении) была причиной рывков. Если текста много, текстовое поле
+    // просто визуально "наплывает" на карточки ниже, а не толкает их
+    const rowRect = row.getBoundingClientRect();
+    const rect = translationEl.getBoundingClientRect();
+
     const textarea = document.createElement('textarea');
     textarea.className = 'translation-edit';
     textarea.dataset.id = String(id);
-    textarea.rows = 1; // без этого браузер по умолчанию подставляет rows=2,
-                        // и высота "auto" всё равно не опускается ниже неё
     textarea.value = word.translation;
+    textarea.style.left = (rect.left - rowRect.left) + 'px';
+    textarea.style.top = (rect.top - rowRect.top) + 'px';
+    textarea.style.width = rect.width + 'px';
     translationEl.replaceWith(textarea);
-    // Позиционирование — через саму сетку строки (grid-column), а не через
-    // ручной пересчёт координат getBoundingClientRect: тот способ ломался в
-    // реальном браузере (карточка на иврите — вероятно, конфликт с RTL),
-    // тогда как grid-column работает надёжно в любом направлении текста,
-    // потому что браузер сам решает, где физически находится 4-я колонка
 
     // Высота — строго по содержимому, без искусственного минимума в 2
     // строки: короткое определение получает ровно одну строку
