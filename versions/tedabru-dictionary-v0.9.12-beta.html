@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.13 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.12 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -2344,7 +2344,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.13';
+  const APP_VERSION = '0.9.12';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -4373,20 +4373,10 @@
     conj: 'союз', particle: 'частица', phrase: 'фраза', proverb: 'погов.',
     det: 'местоим', article: 'артикль', root: 'корень'
   };
-  const POS_LABELS_EN = {
-    noun: 'n.', verb: 'verb', adj: 'adj.', adv: 'adv.', intj: 'interj.',
-    name: 'proper name', num: 'num.', pron: 'pron.', prep: 'prep.',
-    conj: 'conj.', particle: 'particle', phrase: 'phrase', proverb: 'proverb',
-    det: 'pron.', article: 'article', root: 'root'
-  };
 
   const BINYAN_LABELS = {
     pa: 'пааль', pi: 'пиэль', hif: 'хифиль', nif: 'нифаль',
     pu: 'пуаль', huf: 'хуфаль', hitp: 'hитпаэль'
-  };
-  const BINYAN_LABELS_EN = {
-    pa: "pa'al", pi: "pi'el", hif: "hif'il", nif: "nif'al",
-    pu: "pu'al", huf: "huf'al", hitp: "hitpa'el"
   };
 
   // ===== Nakdan API: получение никуда =====
@@ -4492,31 +4482,19 @@
   }
 
   function grammarLabelForEntry(entry) {
-    const isEn = currentLang === 'en';
-    const binyanLabels = isEn ? BINYAN_LABELS_EN : BINYAN_LABELS;
-    const posLabels = isEn ? POS_LABELS_EN : POS_LABELS;
     if (entry.pos === 'verb') {
-      const binyan = binyanLabels[entry.binyan] || entry.binyan;
-      const verbWord = isEn ? 'verb' : 'глагол';
-      return binyan ? `${verbWord}, ${binyan}` : verbWord;
+      const binyan = BINYAN_LABELS[entry.binyan] || entry.binyan;
+      return binyan ? `глагол, ${binyan}` : 'глагол';
     }
     if (entry.pos === 'noun') {
-      if (isEn) {
-        if (entry.gender === 'm') return 'n., m.';
-        if (entry.gender === 'f') return 'n., f.';
-        return 'n.';
-      }
       if (entry.gender === 'm') return 'сущ, м.р';
       if (entry.gender === 'f') return 'сущ, ж.р';
       return 'сущ';
     }
     if ((entry.pos === 'pron' || entry.pos === 'name' || entry.pos === 'det' || entry.pos === 'num') && entry.gender) {
-      const genderSuffix = isEn
-        ? (entry.gender === 'm' ? ', m.' : ', f.')
-        : (entry.gender === 'm' ? ', м.р' : ', ж.р');
-      return (posLabels[entry.pos] || entry.pos) + genderSuffix;
+      return (POS_LABELS[entry.pos] || entry.pos) + (entry.gender === 'm' ? ', м.р' : ', ж.р');
     }
-    return posLabels[entry.pos] || entry.pos;
+    return POS_LABELS[entry.pos] || entry.pos;
   }
 
   // ===== Ударение =====
@@ -4670,13 +4648,11 @@
   }
 
   function buildVerbDictCandidate(entry) {
-    const isEn = currentLang === 'en';
-    const binyan = (isEn ? BINYAN_LABELS_EN : BINYAN_LABELS)[entry.binyan] || entry.binyan;
-    const verbWord = isEn ? 'verb' : 'глагол';
+    const binyan = BINYAN_LABELS[entry.binyan] || entry.binyan;
     return {
       text: entry.word,
       translit: applyStressFromEnd(niqqudToTranslit(entry.word), verbInfinitiveStressIndexFromEnd(entry.word)),
-      grammarLabel: binyan ? `${verbWord}, ${binyan}` : verbWord,
+      grammarLabel: binyan ? `глагол, ${binyan}` : 'глагол',
       translation: entry.translation,
       root: entry.root || null,
       register: entry.register || null,
@@ -4719,9 +4695,8 @@
 
 
   function buildVerbFormCandidate(formEntry) {
-    const isEn = currentLang === 'en';
     const lemmaGloss = formEntry.lemma_gloss_ru || null;
-    const binyan = formEntry.lemma_binyan ? ((isEn ? BINYAN_LABELS_EN : BINYAN_LABELS)[formEntry.lemma_binyan] || formEntry.lemma_binyan) : null;
+    const binyan = formEntry.lemma_binyan ? (BINYAN_LABELS[formEntry.lemma_binyan] || formEntry.lemma_binyan) : null;
 
     // показываем инфинитив, если он есть в данных (редкость, ~2% глаголов) —
     // а если нет, то саму лемму (написание, под которым заведена статья),
@@ -4729,24 +4704,16 @@
     let lemmaLine = '';
     if (formEntry.lemma_word) {
       if (formEntry.lemma_inf) {
-        lemmaLine = isEn
-          ? ` (infinitive: ${formEntry.lemma_inf}, ${niqqudToTranslit(formEntry.lemma_inf)})`
-          : ` (инфинитив: ${formEntry.lemma_inf}, ${niqqudToTranslit(formEntry.lemma_inf)})`;
+        lemmaLine = ` (инфинитив: ${formEntry.lemma_inf}, ${niqqudToTranslit(formEntry.lemma_inf)})`;
       } else {
-        lemmaLine = isEn
-          ? ` (form of ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`
-          : ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`;
+        lemmaLine = ` (форма от ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`;
       }
     }
-    // ПРИМЕЧАНИЕ: formEntry.hint и lemmaGloss тут остаются на русском в любом
-    // случае — у этого (резервного, только для не-пааль биньянов) источника
-    // нет английских полей вообще, в отличие от generatedVerbForms
 
-    const verbWord = isEn ? 'verb' : 'глагол';
     return {
       text: formEntry.form_word,
       translit: niqqudToTranslit(formEntry.form_word),
-      grammarLabel: binyan ? `${verbWord}, ${binyan} (${formEntry.hint})` : `${verbWord} (${formEntry.hint})`,
+      grammarLabel: binyan ? `глагол, ${binyan} (${formEntry.hint})` : `глагол (${formEntry.hint})`,
       translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : formEntry.hint,
       root: formEntry.lemma_root || null,
       source: 'dict'
@@ -4758,32 +4725,18 @@
   // прилагательного" (батим → баит, товим → тов) — та же логика, что и для
   // глаголов: показываем саму введённую форму, но перевод берём от леммы
   // (словарной формы, ед.ч.), добавляя грамматическую подсказку.
-  const NOUN_FORM_HINT_EN = {
-    'ж.р.': 'f.', 'мн.ч.': 'pl.', 'мн.ч., ж.р.': 'pl., f.', 'мн.ч., м.р.': 'pl., m.',
-    'сопряж. состояние': 'construct state',
-  };
-  function nounFormHint(hint) {
-    if (currentLang !== 'en') return hint;
-    return NOUN_FORM_HINT_EN[hint] || hint;
-  }
-
   function buildNounFormCandidate(formEntry) {
     const lemmaEntries = (hebrewDictSkeleton && hebrewDictSkeleton[formEntry.lemma_skeleton]) || [];
     const lemmaEntry = lemmaEntries[0];
-    const lemmaGloss = lemmaEntry ? displayGloss(lemmaEntry) : null;
+    const lemmaGloss = lemmaEntry ? lemmaEntry.gloss_ru : null;
     const baseLabel = lemmaEntry ? grammarLabelForEntry(lemmaEntry) : null;
-    const hint = nounFormHint(formEntry.hint);
-    const lemmaLine = lemmaEntry
-      ? (currentLang === 'en'
-        ? ` (form of ${lemmaEntry.word}, ${niqqudToTranslit(lemmaEntry.word)})`
-        : ` (форма от ${lemmaEntry.word}, ${niqqudToTranslit(lemmaEntry.word)})`)
-      : '';
+    const lemmaLine = lemmaEntry ? ` (форма от ${lemmaEntry.word}, ${niqqudToTranslit(lemmaEntry.word)})` : '';
 
     return {
       text: formEntry.form_word,
       translit: niqqudToTranslit(formEntry.form_word),
-      grammarLabel: baseLabel ? `${baseLabel} (${hint})` : hint,
-      translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : hint,
+      grammarLabel: baseLabel ? `${baseLabel} (${formEntry.hint})` : formEntry.hint,
+      translation: lemmaGloss ? `${lemmaGloss}${lemmaLine}` : formEntry.hint,
       root: lemmaEntry ? lemmaEntry.root : null,
       source: 'dict'
     };
@@ -4793,47 +4746,17 @@
   // построенный из авторитетного списка глаголов (verbsDict), а не из
   // Wiktionary. Лемму (перевод, породу) берём из verbsDict по lemma_skeleton
   // и сверяем по lemma_word (у одного скелета может быть несколько значений).
-  // Подписи форм в generated_verb_forms.json (лицо/число/время) — конечный
-  // набор из 24 значений, переводим словарём, а не через общий t()
-  const VERB_FORM_HINT_EN = {
-    'я, прошедшее время': 'I, past', 'я, будущее время': 'I, future',
-    'ты (м.р.), прошедшее время': 'you (m.), past', 'ты (ж.р.), прошедшее время': 'you (f.), past',
-    'ты (м.р.)/она, будущее время': 'you (m.)/she, future', 'ты (ж.р.), будущее время': 'you (f.), future',
-    'он, прошедшее время': 'he, past', 'он, будущее время': 'he, future',
-    'она, прошедшее время': 'she, past',
-    'мы, прошедшее время': 'we, past', 'мы, будущее время': 'we, future',
-    'вы (м.р.), прошедшее время': 'you (pl.m.), past', 'вы (ж.р.), прошедшее время': 'you (pl.f.), past',
-    'вы, будущее время': 'you (pl.), future',
-    'они, прошедшее время': 'they, past', 'они, будущее время': 'they, future',
-    'вы/они, будущее время': 'you (pl.)/they, future',
-    'м.р., ед.ч., настоящее время': 'm., sg., present', 'ж.р., ед.ч., настоящее время': 'f., sg., present',
-    'м.р., мн.ч., настоящее время': 'm., pl., present', 'ж.р., мн.ч., настоящее время': 'f., pl., present',
-    'м.р., повелительное наклонение': 'm., imperative', 'ж.р., повелительное наклонение': 'f., imperative',
-    'м.р./ж.р., мн.ч., повелительное наклонение': 'm./f., pl., imperative',
-  };
-  function verbFormHint(hint) {
-    if (currentLang !== 'en') return hint;
-    return VERB_FORM_HINT_EN[hint] || hint;
-  }
-
   function buildGeneratedVerbFormCandidate(formEntry) {
-    const isEn = currentLang === 'en';
     const lemmaEntries = (verbsDict && verbsDict[formEntry.lemma_skeleton]) || [];
     const lemmaEntry = lemmaEntries.find(e => e.word === formEntry.lemma_word) || lemmaEntries[0];
-    const binyan = lemmaEntry ? ((isEn ? BINYAN_LABELS_EN : BINYAN_LABELS)[lemmaEntry.binyan] || lemmaEntry.binyan) : null;
-    const lemmaLine = formEntry.lemma_word
-      ? (isEn
-        ? ` (infinitive: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`
-        : ` (инфинитив: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})`)
-      : '';
-    const hint = verbFormHint(formEntry.hint);
-    const verbWord = isEn ? 'verb' : 'глагол';
+    const binyan = lemmaEntry ? (BINYAN_LABELS[lemmaEntry.binyan] || lemmaEntry.binyan) : null;
+    const lemmaLine = formEntry.lemma_word ? ` (инфинитив: ${formEntry.lemma_word}, ${niqqudToTranslit(formEntry.lemma_word)})` : '';
 
     return {
       text: formEntry.form_word,
       translit: niqqudToTranslit(formEntry.form_word),
-      grammarLabel: binyan ? `${verbWord}, ${binyan} (${hint})` : `${verbWord} (${hint})`,
-      translation: lemmaEntry ? `${lemmaEntry.translation}${lemmaLine}` : hint,
+      grammarLabel: binyan ? `глагол, ${binyan} (${formEntry.hint})` : `глагол (${formEntry.hint})`,
+      translation: lemmaEntry ? `${lemmaEntry.translation}${lemmaLine}` : formEntry.hint,
       root: lemmaEntry ? lemmaEntry.root : null,
       source: 'dict'
     };
