@@ -1481,7 +1481,7 @@
           <span class="lang-divider">|</span>
           <span class="lang-option" data-lang="en">EN</span>
         </button>
-        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.15 Beta</span></div>
+        <div class="title" id="headerTitle">Лексикариум <span class="app-version">v0.9.14 Beta</span></div>
       </div>
       <div class="header-actions">
         <button class="header-icon-btn" id="trainModeBtn" title="Тренировка">
@@ -1829,7 +1829,6 @@
     'Выучено': 'Learned',
     'Избранное': 'Favorites',
     'Прослушать': 'Listen',
-    'уже добавлено': 'already added',
     'слов:': 'words:',
     'подборок:': 'collections:',
     'Выделено': 'Selected',
@@ -2365,7 +2364,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.15';
+  const APP_VERSION = '0.9.14';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -5657,7 +5656,7 @@
         ${m.grammarLabel ? `<div class="candidate-grammar">${m.grammarLabel}</div>` : ''}
         ${registerBadgeHtml(m.register)}
         ${m.translation ? `<div class="candidate-translation">${m.translation}</div>` : ''}
-        ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>${t('уже добавлено')}</span></div>` : ''}
+        ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
       </button>
     `;
     };
@@ -5821,9 +5820,7 @@
   // слово оказалось внизу списка (см. пессимизацию в mergeCandidatesBySense)
   function registerBadgeHtml(register) {
     if (!register) return '';
-    const label = currentLang === 'en'
-      ? (register === 'biblical' ? 'bibl.' : 'archaic')
-      : (register === 'biblical' ? 'библ.' : 'уст.');
+    const label = register === 'biblical' ? 'библ.' : 'уст.';
     return `<div class="register-badge">${label}</div>`;
   }
 
@@ -5879,7 +5876,7 @@
           ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
           ${registerBadgeHtml(c.register)}
           ${c.translation ? `<div class="candidate-translation">${c.translation}</div>` : ''}
-          ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>${t('уже добавлено')}</span></div>` : ''}
+          ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>уже добавлено</span></div>` : ''}
         </button>
       `;
       }).join('') + (uniqueCandidates.length > finalCandidates.length ? `
