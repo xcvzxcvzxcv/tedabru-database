@@ -465,7 +465,7 @@
     }
   }
 
-  @media (max-width: 480px) and (hover: none) and (pointer: coarse) {
+  @media (max-width: 480px) {
     /* На узком экране фиксированные 32+105+105+94+26=362px колонок не
        оставляют места переводу вообще — отсюда и жалоба "перевод не виден
        с телефона". Пока убираем прослушивание/номер/статус целиком (вернём
@@ -490,51 +490,7 @@
     .search-result-row .row-num {
       display: none;
     }
-
-    /* Шапка: язык переехал в настройки (шестерёнка на месте "+" в состоянии
-       покоя — см. JS isMobileViewport), тренировка/выбор — в нижнюю панель.
-       Редактирование базы и сама многофункциональная кнопка остаются. */
-    .lang-toggle-btn { display: none; }
-    #trainModeBtn, #selectModeBtn { display: none; }
-
-    .bottom-nav {
-      display: flex;
-    }
-    .app {
-      padding-bottom: 78px; /* место под нижнюю панель, чтобы последняя карточка не пряталась под ней */
-    }
   }
-
-  .bottom-nav {
-    display: none; /* показывается только в мобильном медиа-запросе выше */
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 200;
-    background: var(--card-bg);
-    border-top: 1px solid var(--border-purple);
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    justify-content: space-around;
-    align-items: stretch;
-  }
-  .bottom-nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    padding: 4px 18px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .bottom-nav-btn svg { width: 24px; height: 24px; }
-  .bottom-nav-btn.bottom-nav-btn-gold { color: var(--gold); }
-  .bottom-nav-btn.active { color: var(--gold); }
 
   .icon-btn {
     background: none;
@@ -1547,7 +1503,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.32 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.31 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1813,21 +1769,6 @@
     </div>
   </div>
 </div>
-
-<nav class="bottom-nav" id="bottomNav">
-  <button type="button" class="bottom-nav-btn" id="bottomNavTrainBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
-    <span data-i18n="Тренировка">Тренировка</span>
-  </button>
-  <button type="button" class="bottom-nav-btn bottom-nav-btn-gold" id="bottomNavAddBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    <span data-i18n="Добавить">Добавить</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavSelectBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
-    <span data-i18n="Выбор">Выбор</span>
-  </button>
-</nav>
 
 <script>
   // ===== Уровень освоения слова =====
@@ -2490,7 +2431,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.32';
+  const APP_VERSION = '0.9.31';
 
   const GH_OWNER = 'xcvzxcvzxcv';
   const GH_REPO = 'tedabru-database';
@@ -2899,7 +2840,6 @@
   const MOON_ICON_INNER = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
   const TRASH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
   const PLUS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-  const GEAR_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
   const EXIT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
   const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
   const CHECK_SIMPLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9.5 17.5 20 6"/></svg>';
@@ -3648,18 +3588,12 @@
       primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
       headerTitleEl.textContent = t('Лексикариум');
-      primaryActionBtn.innerHTML = isMobileViewport() ? GEAR_ICON : PLUS_ICON;
+      primaryActionBtn.innerHTML = PLUS_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = isMobileViewport() ? t('Настройки') : 'Добавить слово';
+      primaryActionBtn.title = 'Добавить слово';
       primaryActionBtn.removeAttribute('data-drop-delete');
     }
-    const navTrainBtn = document.getElementById('bottomNavTrainBtn');
-    const navSelectBtn = document.getElementById('bottomNavSelectBtn');
-    const navAddBtn = document.getElementById('bottomNavAddBtn');
-    if (navTrainBtn) navTrainBtn.classList.toggle('active', trainMode);
-    if (navSelectBtn) navSelectBtn.classList.toggle('active', selectionMode);
-    if (navAddBtn) navAddBtn.classList.toggle('active', addMode);
   }
 
   selectModeBtn.addEventListener('click', () => {
@@ -3722,16 +3656,11 @@
   // включает встроенное добавление слова, в режиме выделения — удаляет
   // выбранное, в режиме добавления/редактирования базы/тренировки — сама же
   // из него выходит (см. updateHeaderForSelectionMode)
-  function isMobileViewport() {
-    return window.matchMedia('(max-width: 480px) and (hover: none) and (pointer: coarse)').matches;
-  }
-
   primaryActionBtn.addEventListener('click', () => {
     if (selectionMode) { performBulkDelete(); return; }
     if (addMode) { exitAddMode(); return; }
     if (editDbMode) { exitEditDbMode(); return; }
     if (trainMode) { exitTrainMode(); return; }
-    if (isMobileViewport()) { openSettingsPanel(); return; }
     enterAddMode();
   });
 
@@ -7691,26 +7620,7 @@
   document.getElementById('settingsCloseBtn').addEventListener('click', closeSettingsPanel);
   settingsPanelOverlay.addEventListener('click', (e) => { if (e.target === settingsPanelOverlay) closeSettingsPanel(); });
 
-  // ===== Нижняя панель (мобильная) — переиспользуем ту же логику, что и
-  // скрытые на мобильном кнопки шапки, просто эмулируем клик по ним, а не
-  // дублируем сами обработчики режимов =====
-  document.getElementById('bottomNavTrainBtn').addEventListener('click', () => {
-    document.getElementById('trainModeBtn').click();
-  });
-  document.getElementById('bottomNavSelectBtn').addEventListener('click', () => {
-    selectModeBtn.click();
-  });
-  document.getElementById('bottomNavAddBtn').addEventListener('click', () => {
-    if (selectionMode || editDbMode || trainMode) return; // те же ограничения, что и у десктопной кнопки "+"
-    if (addMode) { exitAddMode(); return; }
-    enterAddMode();
-  });
-
   // ===== Первичный рендер =====
-  updateHeaderForSelectionMode();
-  // на случай смены ориентации/резайза окна — держим иконку кнопки (+/⚙)
-  // в актуальном состоянии, не только при смене режима
-  window.matchMedia('(max-width: 480px) and (hover: none) and (pointer: coarse)').addEventListener('change', updateHeaderForSelectionMode);
   renderFilterBar();
   renderList();
 </script>
