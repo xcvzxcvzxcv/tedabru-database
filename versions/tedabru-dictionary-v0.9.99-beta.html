@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.100 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.99 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.100';
+  const APP_VERSION = '0.9.99';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4885,21 +4885,20 @@
   }
 
   // Зона выделения на мобильном — не сама иконка чекбокса (слишком узкая
-  // мишень), а прямоугольник вокруг неё, зеркальный относительно РЕАЛЬНОГО
-  // края экрана (window.innerWidth), а не границы самой .word-row — у неё
-  // на мобильном нет паддинга (padding: 9px 0), правый край строки уже
-  // отступает от края экрана на паддинг .app (15px), так что зеркалирование
-  // от rowRect.right было и несимметричным, и не захватывало этот отступ.
+  // мишень), а прямоугольник вокруг неё. У .word-row на мобильном нет
+  // горизонтального паддинга (padding: 9px 0) — чекбокс сидит вплотную к
+  // правому краю, поэтому "зеркальный" расчёт от расстояния чекбокс-край
+  // вырождался почти в саму иконку. Вместо этого — фиксированная,
+  // генерозная полуширина зоны.
+  const CHECKBOX_ZONE_HALF_WIDTH = 50;
   function isCheckboxSelectZone(row, clientX, clientY) {
     const checkbox = row.querySelector('.word-row-select-checkbox');
     if (!checkbox) return false;
     const rowRect = row.getBoundingClientRect();
     const cbRect = checkbox.getBoundingClientRect();
     const cbCenterX = (cbRect.left + cbRect.right) / 2;
-    const screenRight = window.innerWidth;
-    const distToScreenEdge = screenRight - cbCenterX;
-    const zoneLeft = cbCenterX - distToScreenEdge;
-    const zoneRight = screenRight;
+    const zoneLeft = Math.max(rowRect.left, cbCenterX - CHECKBOX_ZONE_HALF_WIDTH);
+    const zoneRight = rowRect.right;
     return clientX >= zoneLeft && clientX <= zoneRight && clientY >= rowRect.top && clientY <= rowRect.bottom;
   }
 
@@ -4915,10 +4914,8 @@
       const rowRect = row.getBoundingClientRect();
       const cbRect = checkbox.getBoundingClientRect();
       const cbCenterX = (cbRect.left + cbRect.right) / 2;
-      const screenRight = window.innerWidth;
-      const distToScreenEdge = screenRight - cbCenterX;
-      const zoneLeft = cbCenterX - distToScreenEdge;
-      const zoneRight = screenRight;
+      const zoneLeft = Math.max(rowRect.left, cbCenterX - CHECKBOX_ZONE_HALF_WIDTH);
+      const zoneRight = rowRect.right;
       const overlay = document.createElement('div');
       overlay.className = 'select-zone-debug';
       overlay.style.position = 'fixed';
