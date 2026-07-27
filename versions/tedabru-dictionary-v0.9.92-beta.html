@@ -8,10 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Лексикариум · Tedabru</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Inter:wght@400;500;600&family=Playpen+Sans+Hebrew:wght@400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Noto+Serif:wght@400;700&family=Inter:wght@400;500;600&display=swap');
 
   :root {
-    --hebrew-font: 'Frank Ruhl Libre'; /* переключается на 'Playpen Sans Hebrew' через html[data-hebrew-font="playpen"] — см. настройки */
     --gold: #eba64a;
     --gold-soft: #c9a15a;
     --purple: #9b5de5;
@@ -45,9 +44,6 @@
      RGB-триплет "чернил" для всех полупрозрачных подложек вида
      rgba(var(--ink-rgb), 0.05), без отдельной переменной под каждое
      значение прозрачности. */
-  html[data-hebrew-font="playpen"] {
-    --hebrew-font: 'Playpen Sans Hebrew';
-  }
   html[data-theme="light"] {
     --gold: #daa74a;
     --gold-soft: #daa74a;
@@ -152,20 +148,6 @@
   }
   .theme-toggle-btn-inline {
     position: static;
-  }
-  .hebrew-font-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    background: none;
-    border: 1px solid var(--border-purple);
-    border-radius: 20px;
-    color: var(--muted);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
   }
   .settings-row {
     display: flex;
@@ -1155,7 +1137,7 @@
     white-space: nowrap;
   }
   .drag-ghost-word {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 19px;
     direction: rtl;
     color: var(--gold);
@@ -1234,7 +1216,7 @@
   }
 
   .hebrew-word {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 30px;
     direction: rtl;
     text-align: right;
@@ -1506,7 +1488,7 @@
     direction: rtl;
   }
   .edit-db-word {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 20px;
     color: var(--gold);
   }
@@ -1573,7 +1555,7 @@
   }
   .train-manual-row:active { background: rgba(155,93,229,0.1); }
   .train-manual-hebrew {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 17px;
     color: var(--gold);
     direction: rtl;
@@ -1612,7 +1594,7 @@
     margin-bottom: 20px;
   }
   .train-card-face {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 40px;
     color: var(--gold);
     direction: rtl;
@@ -1712,7 +1694,7 @@
   .field input:focus,
   .field select:focus { border-color: var(--purple); }
   .field input[dir="rtl"] {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 18px;
     text-align: right;
   }
@@ -1754,7 +1736,7 @@
   .candidate-row:active { background: rgba(235,166,74,0.15); }
 
   .candidate-word {
-    font-family: var(--hebrew-font), serif;
+    font-family: 'Frank Ruhl Libre', serif;
     font-size: 20px;
     direction: rtl;
     color: var(--gold);
@@ -1861,7 +1843,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.93 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.92 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2134,10 +2116,6 @@
         <svg id="settingsThemeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
       </button>
     </div>
-    <div class="settings-row">
-      <span data-i18n="Шрифт иврита">Шрифт иврита</span>
-      <button type="button" class="hebrew-font-toggle-btn" id="hebrewFontToggleBtn"><span id="hebrewFontToggleLabel"></span></button>
-    </div>
     <div class="action-modal-buttons">
       <button type="button" class="action-modal-btn" id="settingsCloseBtn" data-i18n="Закрыть">Закрыть</button>
     </div>
@@ -2368,7 +2346,6 @@
     'Настройки': 'Settings',
     'Язык': 'Language',
     'Тема': 'Theme',
-    'Шрифт иврита': 'Hebrew font',
     'Закрыть': 'Close',
     'Готово': 'Done',
     'Начать': 'Start',
@@ -3283,7 +3260,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.93';
+  const APP_VERSION = '0.9.92';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -8895,24 +8872,6 @@
   document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
   document.getElementById('settingsThemeToggleBtn').addEventListener('click', toggleTheme);
   applyTheme();
-
-  // ===== Шрифт иврита (Frank Ruhl Libre / Playpen Sans Hebrew) =====
-  // Тот же паттерн, что и у темы — атрибут на <html>, CSS-переменная
-  // --hebrew-font подхватывается везде, где раньше был жёстко прописан
-  // Frank Ruhl Libre (см. :root и html[data-hebrew-font="playpen"])
-  const HEBREW_FONT_STORAGE_KEY = 'tedabru_hebrew_font';
-  let currentHebrewFont = localStorage.getItem(HEBREW_FONT_STORAGE_KEY) || 'frank-ruhl';
-  function applyHebrewFont() {
-    document.documentElement.setAttribute('data-hebrew-font', currentHebrewFont);
-    const label = document.getElementById('hebrewFontToggleLabel');
-    if (label) label.textContent = currentHebrewFont === 'frank-ruhl' ? 'Frank Ruhl' : 'Playpen';
-    localStorage.setItem(HEBREW_FONT_STORAGE_KEY, currentHebrewFont);
-  }
-  document.getElementById('hebrewFontToggleBtn').addEventListener('click', () => {
-    currentHebrewFont = currentHebrewFont === 'frank-ruhl' ? 'playpen' : 'frank-ruhl';
-    applyHebrewFont();
-  });
-  applyHebrewFont();
 
   // ===== Язык (RU/EN) =====
   function applyLangToggleUI() {
