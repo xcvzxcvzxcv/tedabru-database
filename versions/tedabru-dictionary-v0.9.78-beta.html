@@ -648,22 +648,29 @@
     .word-row .hebrew-word {
       margin-right: 0;
     }
-    /* Тумблер "часть речи ⇄ прогресс" (шаг 6 плана) — теперь только ОДИН из
-       двух блоков (мета или рейтинг) вообще присутствует в разметке за раз
-       (см. JS, showRatingInMetaSlot), вместо переключения видимости через
-       CSS поверх обоих. Поэтому у грида всегда ровно 3 реальных потомка,
-       авто-расстановка по DOM-порядку срабатывает сама — никакого явного
-       grid-column и сюрпризов с высотой строки. На мобильном .row-actions-cell
-       теперь ВСЕГДА оказывается именно в этом (втором) слоте — десктопный
-       "хвостовой" вариант рендерится только для не-мобильных (см. JS),
-       поэтому тут можно просто сделать её обычным центрированным flex-блоком,
-       как у .meta-col, без унаследованного из десктопа абсолютного
-       позиционирования вправо. */
+    /* Тумблер "часть речи ⇄ прогресс" (шаг 6 плана) — взаимоисключающе
+       показываем либо мета-колонку (транслит+часть речи), либо колонку
+       прогресса (точки мастерства+избранное) — ОБЕ в одной и той же
+       колонке сразу после иврита, освобождая третью колонку (дефиниция)
+       целиком. Класс держится на #wordList (не сбрасывается при
+       innerHTML-перерисовке строк — см. applyCardInfoModeClass).
+       ВАЖНО: display:none полностью выкидывает элемент из грида, и
+       остальные дети сдвигаются на освободившееся место (авто-расстановка
+       по DOM-порядку) — из-за этого дефиниция и рейтинг менялись местами.
+       Явно закрепляем каждую колонку за своим треком, чтобы скрытие одной
+       из них не сдвигало остальные — при этом .meta-col и .row-actions-cell
+       НАМЕРЕННО делят один и тот же трек (grid-column: 2), так как видна
+       всегда только одна из них. */
     .word-row .hebrew-word { grid-column: 1; }
+    .word-row .meta-col { grid-column: 2; }
     .word-row .translation,
     .word-row .delete-cancel-label,
     .word-row .translation-edit { grid-column: 3; }
-    .word-row .row-actions-cell {
+    .word-row .row-actions-cell { grid-column: 2; }
+    #wordList.card-info-mode-progress .word-row .meta-col {
+      display: none;
+    }
+    #wordList.card-info-mode-progress .row-actions-cell {
       position: static;
       height: auto;
       min-height: 0;
@@ -671,9 +678,12 @@
       align-items: center;
       justify-content: center;
     }
-    .word-row .mastery-dots-wrap {
+    #wordList.card-info-mode-progress .mastery-dots-wrap {
       position: static;
       transform: none;
+    }
+    #wordList.card-info-mode-meta .row-actions-cell {
+      display: none;
     }
     .word-row-swipe-wrap {
       overflow: hidden;
@@ -1778,7 +1788,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.79 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.78 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2747,7 +2757,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.79';
+  const APP_VERSION = '0.9.78';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3650,12 +3660,21 @@
     listEl.innerHTML = filtered.map((w, i) => {
       const isPendingDelete = pendingDeleteIds.has(w.id);
       const disp = personalWordDisplay(w);
-      const metaColHtml = `
+      return `
+      <div class="word-row-swipe-wrap" data-id="${w.id}">
+        <button type="button" class="swipe-delete-btn" data-id="${w.id}">${TRASH_ICON}<span>${t('Удалить')}</span></button>
+        <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
+        <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
+        <div class="hebrew-word">${w.hebrew}</div>
         <div class="meta-col">
           <div class="translit">${disp.translit}</div>
           <div class="pos">${mobileCompactPos(disp.pos)}</div>
-        </div>`;
-      const ratingColHtml = `
+        </div>
+        ${isPendingDelete
+          ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
+          : (editingWordId === w.id
+            ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
+            : `<div class="translation">${disp.translation}</div>`)}
         <div class="row-actions-cell" data-id="${w.id}">
           <div class="mastery-dots-wrap">
             ${w.favorite ? `<span class="favorite-star-mobile">${STAR_ICON}</span>` : ''}
@@ -3666,27 +3685,7 @@
             <button class="icon-btn edit-def-btn" data-id="${w.id}" title="${t('Редактировать определение (только в вашем словаре)')}">${PENCIL_ICON}</button>
             <button class="icon-btn delete-btn" data-id="${w.id}" title="${t('Удалить')}">${TRASH_ICON}</button>
           </div>
-        </div>`;
-      // На мобильном рейтинг и мета взаимоисключающи и делят ОДНО и то же
-      // место в разметке (шаг 6 плана) — рендерим только ОДИН из двух
-      // блоков за раз, а не держим оба в DOM с переключением через CSS.
-      // Три предыдущие попытки через display:none/абсолютное позиционирование
-      // ломали высоту строки (см. историю) — рендерить только нужный блок
-      // надёжнее любых CSS-трюков.
-      const showRatingInMetaSlot = isMobileViewport() && cardInfoMode === 'progress';
-      return `
-      <div class="word-row-swipe-wrap" data-id="${w.id}">
-        <button type="button" class="swipe-delete-btn" data-id="${w.id}">${TRASH_ICON}<span>${t('Удалить')}</span></button>
-        <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
-        <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
-        <div class="hebrew-word">${w.hebrew}</div>
-        ${showRatingInMetaSlot ? ratingColHtml : metaColHtml}
-        ${isPendingDelete
-          ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
-          : (editingWordId === w.id
-            ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
-            : `<div class="translation">${disp.translation}</div>`)}
-        ${isMobileViewport() ? '' : ratingColHtml}
+        </div>
         <div class="row-num">${i + 1}</div>
         ${isPendingDelete ? `<div class="delete-timer-track"><div class="delete-timer-bar" data-timerbar="${w.id}"></div></div>` : ''}
       </div>
