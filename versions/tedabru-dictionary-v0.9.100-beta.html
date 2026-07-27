@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.101 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.100 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.101';
+  const APP_VERSION = '0.9.100';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4890,35 +4890,17 @@
   // на мобильном нет паддинга (padding: 9px 0), правый край строки уже
   // отступает от края экрана на паддинг .app (15px), так что зеркалирование
   // от rowRect.right было и несимметричным, и не захватывало этот отступ.
-  // X-диапазон общий для всех строк (у них одинаковая раскладка колонок) —
-  // считаем один раз по любой попавшейся строке, а не по каждой отдельно.
-  function getCheckboxZoneXRange() {
-    const sampleRow = wordListEl.querySelector('.word-row.selectable');
-    if (!sampleRow) return null;
-    const checkbox = sampleRow.querySelector('.word-row-select-checkbox');
-    if (!checkbox) return null;
+  function isCheckboxSelectZone(row, clientX, clientY) {
+    const checkbox = row.querySelector('.word-row-select-checkbox');
+    if (!checkbox) return false;
+    const rowRect = row.getBoundingClientRect();
     const cbRect = checkbox.getBoundingClientRect();
     const cbCenterX = (cbRect.left + cbRect.right) / 2;
     const screenRight = window.innerWidth;
     const distToScreenEdge = screenRight - cbCenterX;
-    return { left: cbCenterX - distToScreenEdge, right: screenRight };
-  }
-  // Зона нарочно заходит в паддинг .app — там event.target уже не сама
-  // строка, а #wordList/.app, поэтому искать строку через
-  // e.target.closest('.word-row') в этой области бесполезно. Ищем строку
-  // по Y-координате напрямую, независимо от того, что реально под пальцем.
-  function findRowAtY(clientY) {
-    const rows = wordListEl.querySelectorAll('.word-row.selectable');
-    for (const row of rows) {
-      const rect = row.getBoundingClientRect();
-      if (clientY >= rect.top && clientY <= rect.bottom) return row;
-    }
-    return null;
-  }
-  function isInCheckboxZone(clientX, clientY) {
-    const xRange = getCheckboxZoneXRange();
-    if (!xRange || clientX < xRange.left || clientX > xRange.right) return false;
-    return !!findRowAtY(clientY);
+    const zoneLeft = cbCenterX - distToScreenEdge;
+    const zoneRight = screenRight;
+    return clientX >= zoneLeft && clientX <= zoneRight && clientY >= rowRect.top && clientY <= rowRect.bottom;
   }
 
   // ===== ВРЕМЕННЫЙ ДЕБАГ — визуализация зоны выделения (уберём после
@@ -4927,16 +4909,22 @@
   function renderSelectZoneDebugOverlays() {
     document.querySelectorAll('.select-zone-debug').forEach(el => el.remove());
     if (!DEBUG_SHOW_SELECT_ZONE || !selectionMode || !isMobileViewport()) return;
-    const xRange = getCheckboxZoneXRange();
-    if (!xRange) return;
     wordListEl.querySelectorAll('.word-row.selectable').forEach(row => {
+      const checkbox = row.querySelector('.word-row-select-checkbox');
+      if (!checkbox) return;
       const rowRect = row.getBoundingClientRect();
+      const cbRect = checkbox.getBoundingClientRect();
+      const cbCenterX = (cbRect.left + cbRect.right) / 2;
+      const screenRight = window.innerWidth;
+      const distToScreenEdge = screenRight - cbCenterX;
+      const zoneLeft = cbCenterX - distToScreenEdge;
+      const zoneRight = screenRight;
       const overlay = document.createElement('div');
       overlay.className = 'select-zone-debug';
       overlay.style.position = 'fixed';
-      overlay.style.left = xRange.left + 'px';
+      overlay.style.left = zoneLeft + 'px';
       overlay.style.top = rowRect.top + 'px';
-      overlay.style.width = (xRange.right - xRange.left) + 'px';
+      overlay.style.width = (zoneRight - zoneLeft) + 'px';
       overlay.style.height = rowRect.height + 'px';
       overlay.style.background = 'rgba(255,0,0,0.25)';
       overlay.style.border = '1px solid red';
@@ -5022,32 +5010,24 @@
 
   wordListEl.addEventListener('pointerdown', (e) => {
     if (!selectionMode) return;
-
-    if (isMobileViewport() && isInCheckboxZone(e.clientX, e.clientY)) {
-      // Зона выделения — строго только выделение, скролл тут запрещён
-      // категорически (иначе ломается сам принцип режима). Зона нарочно
-      // шире самой строки (заходит в паддинг .app), поэтому строку ищем по
-      // Y-координате, а не через e.target.closest — в паддинге target уже
-      // не сама строка, а #wordList/.app. preventDefault прямо тут, на
-      // pointerdown, а не только в pointermove — иначе touch-action:pan-y
-      // у .word-row успевает передать жест браузеру раньше, чем сработает
-      // наш JS.
-      e.preventDefault();
-      const row = findRowAtY(e.clientY);
-      if (!row) return;
-      const id = parseInt(row.dataset.id);
-      const willSelect = !selectedIds.has(id);
-      applyRowSelection(id, willSelect, row);
-      dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
-      try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
-      return;
-    }
-
     const row = e.target.closest('.word-row.selectable');
     if (!row) return;
     const id = parseInt(row.dataset.id);
 
     if (isMobileViewport()) {
+      // Тап/свайп по прямоугольной зоне вокруг чекбокса — под мультивыделение:
+      // один тап переключает саму строку, а протаскивание пальца по зоне
+      // (вниз/вверх) переключает каждую строку под пальцем — тот же
+      // 'select'-тип сессии, что и у десктопного "тянуть по строкам".
+      // Зона шире самой иконки (см. isCheckboxSelectZone) — внутри неё
+      // драг-зоны нет вообще, конфликта с драгом-на-подборку не возникает.
+      if (isCheckboxSelectZone(row, e.clientX, e.clientY)) {
+        const willSelect = !selectedIds.has(id);
+        applyRowSelection(id, willSelect, row);
+        dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
+        try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+        return;
+      }
       // Остальная часть строки — драг уже выделенных карточек на подборку.
       // Не захватываем pointer сразу на pointerdown (иначе конфликт со
       // скроллом), а "вооружаем" и проверяем направление реального движения
@@ -5103,13 +5083,7 @@
 
     if (dragSession.type === 'select') {
       const el = document.elementFromPoint(e.clientX, e.clientY);
-      let rowEl = el && el.closest && el.closest('.word-row.selectable');
-      if (!rowEl && isMobileViewport()) {
-        // мобильное мультивыделение по чекбоксам — зона нарочно заходит в
-        // паддинг .app, где elementFromPoint вернёт #wordList/.app, а не
-        // саму строку; ищем строку по Y-координате отдельно
-        rowEl = findRowAtY(e.clientY);
-      }
+      const rowEl = el && el.closest && el.closest('.word-row.selectable');
       if (rowEl) {
         if (dragSession.dropTarget) { clearDropHighlight(); dragSession.dropTarget = null; dragSession.hoveredElement = null; }
         const id = parseInt(rowEl.dataset.id);
