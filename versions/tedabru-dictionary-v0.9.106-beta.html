@@ -28,7 +28,7 @@
     --dim-text-soft: #6a5f85;
     --rating-good-text: #d6c8ff;
     --danger-text: #e08a9a;
-    --chip-active-bg: #150a26; /* было #3d3846 — теперь идентично заливке карточки (--card-bg) */
+    --chip-active-bg: #3d3846; /* было rgba(155,93,229,0.25) — слишком светло/насыщенно на тёмном фоне; теперь --bg-dark, осветлённый на 20% */
     --chip-active-border: var(--purple);
     --chip-active-text: var(--purple-dark);
     --chip-text: var(--text-secondary);
@@ -1859,14 +1859,6 @@
     cursor: pointer;
     border: 1px solid var(--border-purple);
   }
-  #trainShowAnswerBtn {
-    padding: 12px;
-    border-radius: 10px;
-    font-family: 'Noto Serif', serif;
-    font-size: 15px;
-    cursor: pointer;
-    border: 1px solid var(--border-purple);
-  }
   .btn-save {
     background: var(--gold);
     color: #2a1608;
@@ -1897,7 +1889,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.107 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.106 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3326,7 +3318,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.107';
+  const APP_VERSION = '0.9.106';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -8450,28 +8442,14 @@
   function enterTrainMode() {
     if (editDbMode) return;
     trainMode = true;
+    trainSessionActive = false;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = 'none';
     document.getElementById('editDbBtn').style.display = 'none';
     filterBarEl.style.display = 'none';
     wordListEl.style.display = 'none';
     trainPanelEl.style.display = '';
-    // Если сессия уже была начата (hasUnfinishedTrainSession, персистится
-    // через localStorage), а сами данные очереди (trainQueue и т.д.) никуда
-    // не делись при выходе — возвращаемся прямо в неё, а не сбрасываем на
-    // экран настройки. Раньше тут безусловно стояло trainSessionActive =
-    // false + showTrainSetup(), из-за чего "выход и снова вход" полностью
-    // обнулял уже начатую тренировку.
-    if (hasUnfinishedTrainSession && trainQueue.length) {
-      trainSessionActive = true;
-      trainSetupEl.style.display = 'none';
-      trainSummaryEl.style.display = 'none';
-      trainSessionEl.style.display = '';
-      renderTrainCard();
-    } else {
-      trainSessionActive = false;
-      showTrainSetup();
-    }
+    showTrainSetup();
   }
 
   function exitTrainMode() {
