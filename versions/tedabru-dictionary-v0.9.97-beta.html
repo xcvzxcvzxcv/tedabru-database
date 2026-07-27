@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.98 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.97 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.98';
+  const APP_VERSION = '0.9.97';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4881,23 +4881,6 @@
     return true;
   }
 
-  // Зона выделения на мобильном — не сама иконка чекбокса (слишком узкая
-  // мишень), а прямоугольник: вся высота строки, от чекбокса и НАЗАД в
-  // сторону дефиниции на такое же расстояние, сколько от чекбокса до
-  // правого края карточки — симметрично вокруг чекбокса. Внутри этого
-  // прямоугольника драг-зоны нет вообще — только выделение/мультивыделение.
-  function isCheckboxSelectZone(row, clientX, clientY) {
-    const checkbox = row.querySelector('.word-row-select-checkbox');
-    if (!checkbox) return false;
-    const rowRect = row.getBoundingClientRect();
-    const cbRect = checkbox.getBoundingClientRect();
-    const cbCenterX = (cbRect.left + cbRect.right) / 2;
-    const distToEdge = rowRect.right - cbCenterX;
-    const zoneLeft = cbCenterX - distToEdge;
-    const zoneRight = rowRect.right;
-    return clientX >= zoneLeft && clientX <= zoneRight && clientY >= rowRect.top && clientY <= rowRect.bottom;
-  }
-
   // Находит валидную "цель сброса" под указателем — чип конкретной подборки,
   // чип "+ новая подборка", чип "Избранное" или кнопку-корзину в шапке (она
   // помечена data-drop-delete только пока активен режим выделения)
@@ -4961,13 +4944,13 @@
     const id = parseInt(row.dataset.id);
 
     if (isMobileViewport()) {
-      // Тап/свайп по прямоугольной зоне вокруг чекбокса — под мультивыделение:
-      // один тап переключает саму строку, а протаскивание пальца по зоне
-      // (вниз/вверх) переключает каждую строку под пальцем — тот же
-      // 'select'-тип сессии, что и у десктопного "тянуть по строкам".
-      // Зона шире самой иконки (см. isCheckboxSelectZone) — внутри неё
-      // драг-зоны нет вообще, конфликта с драгом-на-подборку не возникает.
-      if (isCheckboxSelectZone(row, e.clientX, e.clientY)) {
+      // Тап/свайп по чекбоксу — узкая, выделенная зона под мультивыделение:
+      // один тап переключает саму строку, а протаскивание пальца ПО
+      // чекбоксам (вниз/вверх) переключает каждую строку под пальцем —
+      // тот же 'select'-тип сессии, что и у десктопного "тянуть по
+      // строкам", просто теперь стартует строго с чекбокса, а не с любой
+      // точки строки (иначе снова конфликт со скроллом)
+      if (e.target.closest('.word-row-select-checkbox')) {
         const willSelect = !selectedIds.has(id);
         applyRowSelection(id, willSelect, row);
         dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
