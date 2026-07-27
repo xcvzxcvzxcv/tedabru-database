@@ -540,14 +540,22 @@
        в chip "Фильтры" внутри строки подборок) — теперь верхняя строка
        чипов полностью отдана под подборки. */
     #categoryFilterToggleBtn { display: none; }
-    /* Строка поиска снова во всю ширину рабочей зоны — новая кнопка фильтров
-       сидит поверх неё (тот же приём, что был у старой воронки), а не рядом
-       отдельным блоком */
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
     .search-input {
-      padding: 12px 40px 12px 40px; /* запас справа под кнопку-оверлей, как было изначально */
+      width: auto;
+      flex: 1;
+      min-width: 0;
+      padding: 12px 14px 12px 40px; /* правый паддинг обратно нормальный — воронка больше не перекрывает поле справа */
     }
     #posFilterToggleBtn {
       display: flex;
+      position: static;
+      flex-shrink: 0;
+      transform: none;
     }
     /* Старый чип "Фильтры" внутри строки подборок больше не нужен на
        мобильном — та же функция теперь доступна через #posFilterToggleBtn
@@ -556,19 +564,6 @@
     /* Раскрывающаяся строка частей речи теперь появляется НАД строкой
        подборок (а не под ней) — именно там, где раньше стоял чип "Фильтры" */
     #filtersCollapse { order: -1; }
-    /* Тумблер часть речи/прогресс переехал в строку подборок и прилипает
-       к правому краю рабочей области — подборки уезжают под него при
-       скролле, сам тумблер всегда виден. Непрозрачный фон нужен, чтобы
-       чипы подборок реально прятались под ним, а не просвечивали; лёгкий
-       градиент слева — намёк, что там есть что проскроллить дальше */
-    #cardInfoModeToggle {
-      display: inline-flex;
-      position: sticky;
-      right: 0;
-      z-index: 2;
-      background: var(--bg-dark);
-      box-shadow: -14px 0 10px -4px var(--bg-dark);
-    }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -835,7 +830,6 @@
     color: var(--gold-soft);
     padding: 12px 20px;
   }
-  #cardInfoModeToggle { display: none; } /* мобильно-специфичная функция — показывается только в мобильном медиа-запросе */
   .chip.chip-text-only {
     border-style: dashed;
     color: var(--muted);
@@ -1784,7 +1778,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.81 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.80 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2753,7 +2747,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.81';
+  const APP_VERSION = '0.9.80';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3369,13 +3363,13 @@
           return `<button type="button" class="chip" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
         <button type="button" class="chip chip-text-only" id="filtersToggleChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg> ${t('Фильтры')}</button>
-        <button type="button" class="chip chip-text-only chip-sticky-right" id="cardInfoModeToggle" title="${t('Показывать в карточке: часть речи или прогресс изучения')}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          ${cardInfoMode === 'meta' ? t('Часть речи') : t('Прогресс')}
-        </button>
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
         <div class="filter-row">
+          <button type="button" class="chip chip-text-only" id="cardInfoModeToggle" title="${t('Показывать в карточке: часть речи или прогресс изучения')}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            ${cardInfoMode === 'meta' ? t('Часть речи') : t('Прогресс')}
+          </button>
           ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
         </div>
       </div>
