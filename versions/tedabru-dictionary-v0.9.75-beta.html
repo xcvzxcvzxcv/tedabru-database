@@ -627,7 +627,7 @@
        жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
        остаются видны в правом углу */
     .word-row {
-      grid-template-columns: 65px 85px 1fr;
+      grid-template-columns: 65px 85px 1fr 50px;
       column-gap: 10px;
       padding: 9px 0;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
@@ -650,33 +650,28 @@
     }
     /* Тумблер "часть речи ⇄ прогресс" (шаг 6 плана) — взаимоисключающе
        показываем либо мета-колонку (транслит+часть речи), либо колонку
-       прогресса (точки мастерства+избранное) — ОБЕ в одной и той же
-       колонке сразу после иврита, освобождая третью колонку (дефиниция)
-       целиком. Класс держится на #wordList (не сбрасывается при
+       прогресса (точки мастерства+избранное), освобождая место под
+       дефиницию. Класс держится на #wordList (не сбрасывается при
        innerHTML-перерисовке строк — см. applyCardInfoModeClass).
        ВАЖНО: display:none полностью выкидывает элемент из грида, и
        остальные дети сдвигаются на освободившееся место (авто-расстановка
        по DOM-порядку) — из-за этого дефиниция и рейтинг менялись местами.
        Явно закрепляем каждую колонку за своим треком, чтобы скрытие одной
-       из них не сдвигало остальные — при этом .meta-col и .row-actions-cell
-       НАМЕРЕННО делят один и тот же трек (grid-column: 2), так как видна
-       всегда только одна из них. */
+       из них не сдвигало остальные. */
     .word-row .hebrew-word { grid-column: 1; }
     .word-row .meta-col { grid-column: 2; }
     .word-row .translation,
     .word-row .delete-cancel-label,
     .word-row .translation-edit { grid-column: 3; }
-    .word-row .row-actions-cell { grid-column: 2; }
+    .word-row .row-actions-cell { grid-column: 4; }
+    #wordList.card-info-mode-progress .word-row {
+      grid-template-columns: 65px 0px 1fr 50px;
+    }
     #wordList.card-info-mode-progress .word-row .meta-col {
       display: none;
     }
-    #wordList.card-info-mode-progress .row-actions-cell {
-      justify-content: center;
-    }
-    #wordList.card-info-mode-progress .mastery-dots-wrap,
-    #wordList.card-info-mode-progress .row-actions-buttons {
-      position: static;
-      transform: none;
+    #wordList.card-info-mode-meta .word-row {
+      grid-template-columns: 65px 85px 1fr 0px;
     }
     #wordList.card-info-mode-meta .row-actions-cell {
       display: none;
@@ -1784,7 +1779,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.76 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.75 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2753,7 +2748,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.76';
+  const APP_VERSION = '0.9.75';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
