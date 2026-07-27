@@ -349,32 +349,6 @@
     padding-bottom: 10px;
     border-bottom: 1px dashed rgba(123,53,212,0.2);
   }
-  /* Вкладка "Поиск" — те же строки фильтров, но горизонтальным скроллом
-     (как строки чипов на главной), а не переносом на несколько строк —
-     экономит место под результаты */
-  .category-filter-row-scroll {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .category-filter-row-scroll::-webkit-scrollbar { display: none; }
-  .category-filter-row-scroll:not(:last-child) {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed rgba(123,53,212,0.2);
-  }
-  .category-filter-row-scroll .category-filter-chip {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  .category-filter-toggle-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .category-filter-toggle-chip svg { width: 14px; height: 14px; }
   .category-filter-chip {
     background: transparent;
     border: 1px solid var(--border-purple);
@@ -1864,7 +1838,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.87 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.86 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2578,36 +2552,34 @@
     { key: 'interrogative', label: 'Вопросительное' },
     { key: 'reflexive', label: 'Возвратное' },
   ];
-  const BINYAN_FILTER_OPTIONS = [
-    { key: 'pa', label: 'пааль' },
-    { key: 'pi', label: 'пиэль' },
-    { key: 'hif', label: 'hифиль' },
-    { key: 'nif', label: 'нифъаль' },
-    { key: 'hitp', label: 'hитпаэль' },
+  const STUB_VERB_GENDER_OPTIONS = [
+    { key: 'm', label: 'м.р.' },
+    { key: 'f', label: 'ж.р.' },
   ];
-  // Заглушки — в базе (verbsDict) пока нет ни одного глагола, размеченного
-  // этими двумя биньянами, хотя грамматически они существуют. Чипы видны и
-  // кликабельны визуально, но пока ничего не фильтруют по-настоящему.
-  const STUB_BINYAN_OPTIONS = [
-    { key: 'huf', label: 'хуфаль' },
-    { key: 'pu', label: 'пуаль' },
+  const BINYAN_FILTER_OPTIONS = [
+    { key: 'pa', label: 'Пааль' },
+    { key: 'pi', label: 'Пиэль' },
+    { key: 'hif', label: 'hифиль' },
+    { key: 'nif', label: 'Нифъаль' },
+    { key: 'hitp', label: 'hитпаэль' },
   ];
   // ключ — подстрока, которую реально ищем внутри свободного текста hint у
   // спряжённых форм (там нет отдельных структурированных полей время/лицо/
-  // число — только готовые русские формулировки)
+  // число — только 24 варианта готовых русских формулировок)
   const TENSE_FILTER_OPTIONS = [
-    { key: 'прошедшее время', label: 'прош. в.р.' },
-    { key: 'настоящее время', label: 'наст. в.р.' },
-    { key: 'будущее время', label: 'буд. в.р.' },
-    { key: 'повелительное наклонение', label: 'повел. накл.' },
+    { key: 'прошедшее время', label: 'Прошедшее' },
+    { key: 'настоящее время', label: 'Настоящее' },
+    { key: 'будущее время', label: 'Будущее' },
+    { key: 'повелительное наклонение', label: 'Повелительное' },
   ];
-  // Тумблер лица (1/2/3) — грамматическое лицо, а не перечисление местоимений
-  // (я/ты/он/... сворачиваются в 1/2/3 — гендерно-числовые уточнения это уже
-  // отдельные тумблеры рода/числа рядом, см. renderSearchTabFilterPanel)
-  const PERSON_NUMBER_OPTIONS = [
-    { key: '1', label: '1 л.' },
-    { key: '2', label: '2 л.' },
-    { key: '3', label: '3 л.' },
+  const PERSON_FILTER_OPTIONS = [
+    { key: 'я', label: 'я' },
+    { key: 'ты', label: 'ты' },
+    { key: 'он', label: 'он' },
+    { key: 'она', label: 'она' },
+    { key: 'мы', label: 'мы' },
+    { key: 'вы', label: 'вы' },
+    { key: 'они', label: 'они' },
   ];
   const NUMBER_FILTER_OPTIONS = [
     { key: 'sg', label: 'ед.ч.' },
@@ -2639,7 +2611,7 @@
         (hebrewDictSkeleton[sk] || []).forEach(e => results.push(buildDictCandidate(e)));
       });
     } else if (filter.pos === 'verb') {
-      if (filter.tense || filter.personNumber || filter.gender || filter.number) {
+      if (filter.tense || filter.person || filter.number) {
         // \b в JS не считает кириллицу "словообразующими" символами (\w по
         // умолчанию — только [A-Za-z0-9_]), так что \bя\b на русском тексте
         // не работает вообще. Разбиваем вручную по границам не-кириллических
@@ -2649,30 +2621,7 @@
         const hintMatchesFilter = (hint) => {
           const hintTokens = hint.split(/[^а-яёА-ЯЁ]+/).filter(Boolean);
           if (filter.tense && !hint.includes(filter.tense)) return false;
-          if (filter.personNumber) {
-            const PERSON1_TOKENS = ['я', 'мы'];
-            const PERSON2_TOKENS = ['ты', 'вы'];
-            const PERSON3_TOKENS = ['он', 'она', 'они'];
-            let hp = null;
-            if (hintTokens.some(t => PERSON1_TOKENS.includes(t))) hp = '1';
-            else if (hintTokens.some(t => PERSON2_TOKENS.includes(t))) hp = '2';
-            else if (hintTokens.some(t => PERSON3_TOKENS.includes(t))) hp = '3';
-            // формы без явного лица (наст. время / повелительное наклонение
-            // — в иврите они спрягаются по роду/числу, а не по лицу) —
-            // лицо неприменимо, не отсекаем такие формы
-            if (hp && hp !== filter.personNumber) return false;
-          }
-          if (filter.gender) {
-            let hg = null;
-            if (hint.includes('ж.р.') || hint.includes('(ж.)')) hg = 'f';
-            else if (hint.includes('м.р.') || hint.includes('(м.)')) hg = 'm';
-            else if (hintTokens.includes('она')) hg = 'f';
-            else if (hintTokens.includes('он')) hg = 'm';
-            // формы без выраженного рода (я/мы/вы/они без пометки — иврит
-            // их не всегда различает по роду в этих формах) — род
-            // неприменим, не отсекаем
-            if (hg && hg !== filter.gender) return false;
-          }
+          if (filter.person && !hintTokens.includes(filter.person)) return false;
           if (filter.number) {
             const SINGULAR_PERSONS = ['я', 'ты', 'он', 'она'];
             const PLURAL_PERSONS = ['мы', 'вы', 'они'];
@@ -2761,7 +2710,7 @@
     const parts = [posDef ? t(posDef.label) : categoryFilter.pos];
     if (categoryFilter.binyan) parts.push(t(BINYAN_FILTER_OPTIONS.find(b => b.key === categoryFilter.binyan).label));
     if (categoryFilter.tense) parts.push(t(TENSE_FILTER_OPTIONS.find(opt => opt.key === categoryFilter.tense).label).toLowerCase());
-    if (categoryFilter.personNumber) parts.push(t(PERSON_NUMBER_OPTIONS.find(p => p.key === categoryFilter.personNumber).label));
+    if (categoryFilter.person) parts.push(t(categoryFilter.person));
     if (categoryFilter.number) parts.push(t(NUMBER_FILTER_OPTIONS.find(n => n.key === categoryFilter.number).label));
     if (categoryFilter.gender) parts.push(t(GENDER_FILTER_OPTIONS.find(g => g.key === categoryFilter.gender).label));
     return parts.join(', ');
@@ -2791,8 +2740,8 @@
       const tenseChips = TENSE_FILTER_OPTIONS.map(opt => `
         <button type="button" class="category-filter-chip ${categoryFilter.tense === opt.key ? 'active' : ''}" data-tense="${opt.key}">${t(opt.label)}</button>
       `).join('');
-      const personChips = PERSON_NUMBER_OPTIONS.map(p => `
-        <button type="button" class="category-filter-chip ${categoryFilter.personNumber === p.key ? 'active' : ''}" data-personnumber="${p.key}">${t(p.label)}</button>
+      const personChips = PERSON_FILTER_OPTIONS.map(p => `
+        <button type="button" class="category-filter-chip ${categoryFilter.person === p.key ? 'active' : ''}" data-person="${p.key}">${t(p.label)}</button>
       `).join('');
       const numberChips = NUMBER_FILTER_OPTIONS.map(n => `
         <button type="button" class="category-filter-chip ${categoryFilter.number === n.key ? 'active' : ''}" data-number="${n.key}">${t(n.label)}</button>
@@ -2840,10 +2789,10 @@
         renderList();
       });
     });
-    panel.querySelectorAll('[data-personnumber]').forEach(btn => {
+    panel.querySelectorAll('[data-person]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const key = btn.dataset.personnumber;
-        categoryFilter.personNumber = categoryFilter.personNumber === key ? null : key;
+        const key = btn.dataset.person;
+        categoryFilter.person = categoryFilter.person === key ? null : key;
         renderCategoryFilterPanel();
         renderList();
       });
@@ -2896,44 +2845,22 @@
       <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.short)}</button>
     `).join('');
 
-    // Горизонтальный скролл вместо переноса на несколько строк (как строки
-    // чипов на главной) — экономит место под результаты
     const chipRow = (options, activeKey, dataAttr) => `
-      <div class="category-filter-row-scroll">
+      <div class="category-filter-row">
         ${options.map(o => `<button type="button" class="category-filter-chip ${activeKey === o.key ? 'active' : ''}" data-${dataAttr}="${o.key}">${t(o.label)}</button>`).join('')}
       </div>`;
-    // Реальные + заглушка-опции в ОДНОЙ строке (заглушки визуально
-    // отличаются классом stub-chip, но едут в общей ленте)
-    const chipRowWithStubs = (realOptions, activeKey, dataAttr, stubOptions, stubSet) => `
-      <div class="category-filter-row-scroll">
-        ${realOptions.map(o => `<button type="button" class="category-filter-chip ${activeKey === o.key ? 'active' : ''}" data-${dataAttr}="${o.key}">${t(o.label)}</button>`).join('')}
-        ${stubOptions.map(o => `<button type="button" class="category-filter-chip stub-chip ${stubSet.has(o.key) ? 'active' : ''}" data-stub="${o.key}">${t(o.label)}</button>`).join('')}
-      </div>`;
     const stubChipRow = (options, stateSet) => `
-      <div class="category-filter-row-scroll">
+      <div class="category-filter-row">
         ${options.map(o => `<button type="button" class="category-filter-chip stub-chip ${stateSet.has(o.key) ? 'active' : ''}" data-stub="${o.key}">${t(o.label)}</button>`).join('')}
       </div>`;
-    // Тумблер, а не строка чипов — один компактный контрол циклически
-    // переключает null → значение1 → значение2 → ... → null (с той же
-    // круговой стрелочкой, что и у чипа переключения мета/прогресс на
-    // главной) — экономит место под лицо/род/число сразу втроём в одной
-    // строке вместо трёх(-семи) отдельных чипов
-    const SWAP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
-    const cycleToggle = (dataAttr, options, currentValue) => {
-      const label = currentValue ? t(options.find(o => o.key === currentValue).label) : options.map(o => t(o.label)).join('/');
-      return `<button type="button" class="category-filter-chip category-filter-toggle-chip ${currentValue ? 'active' : ''}" data-cycle="${dataAttr}">${SWAP_ICON}${label}</button>`;
-    };
 
     let subRows = '';
     const pos = categoryFilter && categoryFilter.pos;
     if (pos === 'verb') {
-      subRows = chipRowWithStubs(BINYAN_FILTER_OPTIONS, categoryFilter.binyan, 'binyan', STUB_BINYAN_OPTIONS, searchTabStubSelections.verbBinyanStub)
+      subRows = chipRow(BINYAN_FILTER_OPTIONS, categoryFilter.binyan, 'binyan')
         + chipRow(TENSE_FILTER_OPTIONS, categoryFilter.tense, 'tense')
-        + `<div class="category-filter-row-scroll">
-             ${cycleToggle('personNumber', PERSON_NUMBER_OPTIONS, categoryFilter.personNumber)}
-             ${cycleToggle('gender', GENDER_FILTER_OPTIONS, categoryFilter.gender)}
-             ${cycleToggle('number', NUMBER_FILTER_OPTIONS, categoryFilter.number)}
-           </div>`;
+        + chipRow(PERSON_FILTER_OPTIONS, categoryFilter.person, 'person')
+        + stubChipRow(STUB_VERB_GENDER_OPTIONS, searchTabStubSelections.verbGender);
     } else if (pos === 'noun') {
       subRows = chipRow(GENDER_FILTER_OPTIONS, categoryFilter.gender, 'gender')
         + stubChipRow(STUB_EXCEPTION_OPTIONS, searchTabStubSelections.nounException);
@@ -2948,7 +2875,7 @@
     // место на экране, как и попросили
 
     panel.innerHTML = `
-      <div class="category-filter-row-scroll">${posChips}</div>
+      <div class="category-filter-row">${posChips}</div>
       ${subRows}
       ${categoryFilterActive() ? `<button type="button" class="category-filter-clear" id="searchTabFilterClearBtn">${t('Сбросить фильтр')}</button>` : ''}
     `;
@@ -2979,23 +2906,16 @@
         runSearchTabSearch();
       });
     });
-    panel.querySelectorAll('[data-gender]').forEach(btn => {
+    panel.querySelectorAll('[data-person]').forEach(btn => {
       btn.addEventListener('click', () => {
-        categoryFilter.gender = categoryFilter.gender === btn.dataset.gender ? null : btn.dataset.gender;
+        categoryFilter.person = categoryFilter.person === btn.dataset.person ? null : btn.dataset.person;
         renderSearchTabFilterPanel();
         runSearchTabSearch();
       });
     });
-    // тумблеры лицо/род/число (только для глагола) — циклический перебор
-    // null → значение1 → значение2 → ... → null
-    const CYCLE_OPTIONS_MAP = { personNumber: PERSON_NUMBER_OPTIONS, gender: GENDER_FILTER_OPTIONS, number: NUMBER_FILTER_OPTIONS };
-    panel.querySelectorAll('[data-cycle]').forEach(btn => {
+    panel.querySelectorAll('[data-gender]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const field = btn.dataset.cycle;
-        const options = CYCLE_OPTIONS_MAP[field];
-        const currentIdx = options.findIndex(o => o.key === categoryFilter[field]);
-        const nextIdx = currentIdx + 1;
-        categoryFilter[field] = nextIdx >= options.length ? null : options[nextIdx].key;
+        categoryFilter.gender = categoryFilter.gender === btn.dataset.gender ? null : btn.dataset.gender;
         renderSearchTabFilterPanel();
         runSearchTabSearch();
       });
@@ -3005,7 +2925,7 @@
     panel.querySelectorAll('[data-stub]').forEach(btn => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.stub;
-        const set = pos === 'verb' ? searchTabStubSelections.verbBinyanStub
+        const set = pos === 'verb' ? searchTabStubSelections.verbGender
           : pos === 'noun' ? searchTabStubSelections.nounException
           : pos === 'num' ? searchTabStubSelections.numeralKind
           : searchTabStubSelections.pronounType;
@@ -3026,13 +2946,13 @@
   // независимо от categoryFilter (у которого нет полей под них, раз данных
   // в базе пока нет)
   const searchTabStubSelections = {
-    verbBinyanStub: new Set(),
+    verbGender: new Set(),
     nounException: new Set(),
     numeralKind: new Set(),
     pronounType: new Set(),
   };
   function resetSearchTabStubSelections() {
-    searchTabStubSelections.verbBinyanStub.clear();
+    searchTabStubSelections.verbGender.clear();
     searchTabStubSelections.nounException.clear();
     searchTabStubSelections.numeralKind.clear();
     searchTabStubSelections.pronounType.clear();
@@ -3255,7 +3175,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.87';
+  const APP_VERSION = '0.9.86';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
