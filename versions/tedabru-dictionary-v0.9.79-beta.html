@@ -1778,7 +1778,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.80 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.79 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2747,7 +2747,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.80';
+  const APP_VERSION = '0.9.79';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3417,7 +3417,6 @@
       cardInfoModeBtn.addEventListener('click', () => {
         setCardInfoMode(cardInfoMode === 'meta' ? 'progress' : 'meta');
         renderFilterBar(); // перерисовать сам чип (сменить подпись)
-        renderList(); // САМИ карточки читают cardInfoMode при рендере — без этого список не обновится
       });
     }
 
