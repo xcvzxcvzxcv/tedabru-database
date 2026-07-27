@@ -829,6 +829,13 @@
       align-items: center;
       gap: 5px;
     }
+    .word-row .favorite-star-mobile {
+      display: flex;
+      color: var(--gold);
+      width: 14px;
+      height: 14px;
+    }
+    .word-row .favorite-star-mobile svg { width: 100%; height: 100%; }
     .search-result-row {
       grid-template-columns: 1fr 78px 90px;
       gap: 6px;
@@ -1154,6 +1161,9 @@
   }
   .drag-ghost-badge.visible { display: flex; }
 
+  .favorite-star-mobile {
+    display: none; /* видно только на мобильном — см. медиа-запрос ниже */
+  }
   .mastery-dots {
     display: flex;
     align-items: center;
@@ -1839,7 +1849,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.90 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.89 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3255,7 +3265,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.90';
+  const APP_VERSION = '0.9.89';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4188,6 +4198,7 @@
       const ratingColHtml = `
         <div class="row-actions-cell" data-id="${w.id}">
           <div class="mastery-dots-wrap">
+            ${w.favorite ? `<span class="favorite-star-mobile">${STAR_ICON}</span>` : ''}
             ${masteryDotsHtml(w)}
           </div>
           <div class="row-actions-buttons">
@@ -4433,19 +4444,19 @@
       row.classList.toggle('row-has-favorite', word.favorite);
       const btn = row.querySelector('.favorite-btn');
       if (btn) btn.classList.toggle('favorite-on', word.favorite);
-      // Звезда избранного теперь отдельным блоком у правого края карточки
-      // (.word-row-favorite-star, grid-column:4) — её больше нет внутри
-      // рейтинга/меты вообще. Создаём/удаляем точечно, чтобы появлялась
-      // сразу, без полной перерисовки списка.
-      if (isMobileViewport()) {
-        let starBlock = row.querySelector('.word-row-favorite-star');
-        if (word.favorite && !starBlock) {
-          starBlock = document.createElement('div');
-          starBlock.className = 'word-row-favorite-star';
-          starBlock.innerHTML = STAR_ICON;
-          row.appendChild(starBlock);
-        } else if (!word.favorite && starBlock) {
-          starBlock.remove();
+      // индикатор для мобильной карточки создаётся/удаляется отдельно —
+      // renderList() строит его условно один раз при рендере, точечный патч
+      // тут его не трогает сам по себе
+      const dotsWrap = row.querySelector('.mastery-dots-wrap');
+      if (dotsWrap) {
+        let star = dotsWrap.querySelector('.favorite-star-mobile');
+        if (word.favorite && !star) {
+          star = document.createElement('span');
+          star.className = 'favorite-star-mobile';
+          star.innerHTML = STAR_ICON;
+          dotsWrap.insertBefore(star, dotsWrap.firstChild);
+        } else if (!word.favorite && star) {
+          star.remove();
         }
       }
     } else {
