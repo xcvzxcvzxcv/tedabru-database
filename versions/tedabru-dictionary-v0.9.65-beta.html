@@ -651,14 +651,38 @@
        карточке на следующем шаге рефактора) */
     #filterBar > .filter-row:first-child { display: none; } /* child-комбинатор (>), а не потомок — иначе селектор ЗАОДНО прятал единственную .filter-row внутри .filters-collapse (она тоже была :first-child своего родителя), из-за чего чип 'Фильтры' раскрывался в пустоту */
 
-    .bottom-nav {
-      display: flex;
-    }
+    /* ===== Новая архитектура нижней панели (вместо position:fixed) =====
+       Раньше панель была position:fixed поверх страницы — из-за известного
+       бага WebKit (композитный слой для fixed-элементов иногда не строится
+       вовремя на холодном старте) панель периодически "плыла"/съезжала,
+       несмотря на несколько слоёв обходных путей. Настоящий фикс — вообще
+       не использовать position:fixed для неё: .app теперь строго 100dvh
+       с overflow:hidden, скроллится не вся страница, а только сам список
+       (.list), а панель — просто последний элемент флекс-колонки, всегда
+       внизу естественным образом, без отдельного композитного слоя. */
     .app {
-      padding-bottom: 106px; /* место под нижнюю панель (реальная высота ~94-96px c safe-area) + небольшой запас, чтобы последняя карточка не пряталась под ней */
+      height: 100svh; /* было 100dvh — dvh может "устаканиваться" уже после первой
+                          отрисовки в WebKit, из-за чего .app временно был выше
+                          нужного (контент казался растянутым/карточки наслаивались),
+                          а потом визуально "сжимался" до правильного размера.
+                          svh (small viewport height) — гарантированно наименьшее
+                          и стабильное значение с первого кадра, без устаканивания */
+      overflow: hidden;
+      padding-bottom: 0; /* было env(safe-area-inset-bottom) из десктопного правила — теперь панель сама внутри .app и уже резервирует safe-area своим паддингом, дублировать не нужно */
     }
     .list {
-      padding-bottom: 0; /* десктопные 100px тут не нужны — .app уже резервирует место под панель, вместе получалось лишних ~100px пустоты после последней карточки */
+      flex: 1;
+      min-height: 0; /* критично для флекс-контейнера — иначе overflow:auto
+                        внутри не сработает, потому что flex-item по
+                        умолчанию не может сжаться меньше своего контента */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 12px; /* небольшой отступ после последней карточки перед панелью, не 78-106px "на глаз" под fixed-панель — она больше не накладывается поверх контента */
+    }
+    .bottom-nav {
+      display: flex;
+      position: static; /* было fixed — панель теперь просто последний элемент .app, в обычном потоке */
+      flex-shrink: 0;
     }
   }
 
@@ -1678,7 +1702,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.66 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.65 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1904,6 +1928,31 @@
   </div>
 
   <div class="list" id="wordList"></div>
+<nav class="bottom-nav" id="bottomNav">
+  <button type="button" class="bottom-nav-btn" id="bottomNavHomeBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span data-i18n="Главная">Главная</span>
+  </button>
+  <button type="button" class="bottom-nav-btn" id="bottomNavTrainBtn">
+    <span class="nav-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
+      <span class="nav-train-badge" id="trainNavBadge" style="display:none;" title="Тренировка начата, но не закончена"></span>
+    </span>
+    <span data-i18n="Практика">Практика</span>
+  </button>
+  <button type="button" class="bottom-nav-btn" id="bottomNavAddBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span data-i18n="Добавить">Добавить</span>
+  </button>
+  <button type="button" class="bottom-nav-btn" id="bottomNavSearchBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round"/></svg>
+    <span data-i18n="Поиск">Поиск</span>
+  </button>
+  <button type="button" class="bottom-nav-btn" id="bottomNavSelectBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+    <span data-i18n="Выбор">Выбор</span>
+  </button>
+</nav>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1944,32 +1993,6 @@
     </div>
   </div>
 </div>
-
-<nav class="bottom-nav" id="bottomNav">
-  <button type="button" class="bottom-nav-btn" id="bottomNavHomeBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span data-i18n="Главная">Главная</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavTrainBtn">
-    <span class="nav-icon-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
-      <span class="nav-train-badge" id="trainNavBadge" style="display:none;" title="Тренировка начата, но не закончена"></span>
-    </span>
-    <span data-i18n="Практика">Практика</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavAddBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    <span data-i18n="Добавить">Добавить</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavSearchBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round"/></svg>
-    <span data-i18n="Поиск">Поиск</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavSelectBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
-    <span data-i18n="Выбор">Выбор</span>
-  </button>
-</nav>
 
 <script>
   // ===== Уровень освоения слова =====
@@ -2639,7 +2662,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.66';
+  const APP_VERSION = '0.9.65';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -8178,6 +8201,7 @@
       renderList();
     }
     window.scrollTo(0, 0);
+    if (wordListEl) wordListEl.scrollTop = 0; // на мобильном теперь скроллится #wordList, а не вся страница
   });
   document.getElementById('bottomNavSearchBtn').addEventListener('click', () => {
     // Временное поведение — отдельная вкладка "Поиск по всей базе" появится
@@ -8188,6 +8212,7 @@
     if (editDbMode) exitEditDbMode();
     if (trainMode) exitTrainMode();
     window.scrollTo(0, 0);
+    if (wordListEl) wordListEl.scrollTop = 0; // на мобильном теперь скроллится #wordList, а не вся страница
     const si = document.getElementById('searchInput');
     if (si) si.focus();
   });
