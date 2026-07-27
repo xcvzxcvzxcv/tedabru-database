@@ -546,7 +546,6 @@
     padding: 8px 0 max(8px, env(safe-area-inset-bottom));
     justify-content: space-around;
     align-items: stretch;
-    touch-action: none; /* у панели нет своего скролла/зума — без этого браузер иногда трактовал жест на ней как жест страницы (скролл списка карточек "просачивался" через фиксированную панель) */
   }
   .bottom-nav-btn {
     display: flex;
@@ -1889,7 +1888,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.105 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.104 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3318,7 +3317,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.105';
+  const APP_VERSION = '0.9.104';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
