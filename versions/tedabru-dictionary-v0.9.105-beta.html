@@ -1889,7 +1889,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.106 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.105 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3318,7 +3318,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.106';
+  const APP_VERSION = '0.9.105';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -9231,7 +9231,7 @@
       renderFilterBar();
       renderList();
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
   });
   document.getElementById('bottomNavSearchBtn').addEventListener('click', () => {
     if (searchTabActive) return; // уже на вкладке — тап никак её не переключает (нет режима "туда-обратно" одной кнопкой, есть Главная)
