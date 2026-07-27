@@ -1864,7 +1864,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.88 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.87 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2412,7 +2412,6 @@
     'Часть речи': 'Part of speech',
     'Прогресс': 'Progress',
     'Показывать в карточке: часть речи или прогресс изучения': 'Show in card: part of speech or study progress',
-    'инф.': 'inf.',
     // ===== Тренировка =====
     'Что тренируем': "What we're training",
     'Все слова': 'All words',
@@ -2928,14 +2927,8 @@
     let subRows = '';
     const pos = categoryFilter && categoryFilter.pos;
     if (pos === 'verb') {
-      const infActive = !categoryFilter.tense && !categoryFilter.personNumber && !categoryFilter.gender && !categoryFilter.number;
-      const tenseRow = `
-        <div class="category-filter-row-scroll">
-          <button type="button" class="category-filter-chip ${infActive ? 'active' : ''}" data-inf="1">${t('инф.')}</button>
-          ${TENSE_FILTER_OPTIONS.map(opt => `<button type="button" class="category-filter-chip ${categoryFilter.tense === opt.key ? 'active' : ''}" data-tense="${opt.key}">${t(opt.label)}</button>`).join('')}
-        </div>`;
       subRows = chipRowWithStubs(BINYAN_FILTER_OPTIONS, categoryFilter.binyan, 'binyan', STUB_BINYAN_OPTIONS, searchTabStubSelections.verbBinyanStub)
-        + tenseRow
+        + chipRow(TENSE_FILTER_OPTIONS, categoryFilter.tense, 'tense')
         + `<div class="category-filter-row-scroll">
              ${cycleToggle('personNumber', PERSON_NUMBER_OPTIONS, categoryFilter.personNumber)}
              ${cycleToggle('gender', GENDER_FILTER_OPTIONS, categoryFilter.gender)}
@@ -2982,18 +2975,6 @@
     panel.querySelectorAll('[data-tense]').forEach(btn => {
       btn.addEventListener('click', () => {
         categoryFilter.tense = categoryFilter.tense === btn.dataset.tense ? null : btn.dataset.tense;
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    panel.querySelectorAll('[data-inf]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // "инф." — просто сбрасывает все уточнения спряжения разом, назад к
-        // леммам (инфинитивам)
-        categoryFilter.tense = null;
-        categoryFilter.personNumber = null;
-        categoryFilter.gender = null;
-        categoryFilter.number = null;
         renderSearchTabFilterPanel();
         runSearchTabSearch();
       });
@@ -3095,9 +3076,8 @@
     document.getElementById('searchTabWrap').style.display = '';
     document.getElementById('searchTabResults').style.display = '';
     updateHeaderForSelectionMode();
-    searchTabFilterPanelOpen = true; // фильтры (строка частей речи) видны сразу, без лишнего тапа
-    renderSearchTabFilterPanel();
     runSearchTabSearch();
+    document.getElementById('searchTabInput').focus();
   }
 
   function exitSearchTab() {
@@ -3113,11 +3093,6 @@
     categoryFilter = null; // свежий старт при следующем входе на вкладку
     resetSearchTabStubSelections();
     updateHeaderForSelectionMode();
-    // слова, добавленные свайпом во время вкладки "Поиск", иначе не
-    // появлялись в личном словаре, пока юзер не тапнет какой-нибудь чип
-    // фильтра — .filter-bar/#wordList рендерились со старыми данными
-    renderFilterBar();
-    renderList();
   }
 
   document.getElementById('searchTabInput').addEventListener('input', (e) => {
@@ -3280,7 +3255,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.88';
+  const APP_VERSION = '0.9.87';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -7335,6 +7310,7 @@
         <div class="translation search-definition">${registerBadgeHtml(m.register)}${m.translation || ''}</div>
         <div class="meta-col">
           <div class="translit">${m.translit}</div>
+          ${m.grammarLabel ? `<div class="pos">${m.grammarLabel}</div>` : ''}
         </div>
         <div class="hebrew-word">${m.text}</div>
         <div class="row-num">${i + 1}</div>
