@@ -1080,7 +1080,7 @@
   .word-row.selectable {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    touch-action: pan-y; /* было none — блокировало скролл целиком в режиме выбора; вертикальный скролл остаётся браузеру, горизонтальный драг обрабатываем сами (см. JS, тот же паттерн, что и у свайпа-удаления) */
+    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
   }
@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.96 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.95 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.96';
+  const APP_VERSION = '0.9.95';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4866,7 +4866,7 @@
     if (shouldSelect) selectedIds.add(id); else selectedIds.delete(id);
     if (row) {
       row.classList.toggle('row-selected', shouldSelect);
-      const iconEl = row.querySelector('.word-row-select-checkbox');
+      const iconEl = row.querySelector('.icon-btn');
       if (iconEl) iconEl.innerHTML = shouldSelect ? CHECK_ON_ICON : CHECK_OFF_ICON;
     }
     if (selectionMode) headerTitleEl.textContent = selectionHeaderText();
@@ -4935,29 +4935,12 @@
     });
   }
 
-  let dragArmState = null; // мобильный драг ещё не подтверждён — ждём реального горизонтального движения (см. pointermove)
-
   wordListEl.addEventListener('pointerdown', (e) => {
     if (!selectionMode) return;
     const row = e.target.closest('.word-row.selectable');
     if (!row) return;
     const id = parseInt(row.dataset.id);
 
-    if (isMobileViewport()) {
-      // На мобильном тап переключает выделение только через сам чекбокс (см.
-      // отдельный click-обработчик ниже) — "тянуть по строкам" мышью тут
-      // неприменимо, палец конфликтует со скроллом. Драг уже выделенных
-      // карточек на подборку — не захватываем pointer сразу на pointerdown
-      // (иначе опять конфликт со скроллом), а "вооружаем" и проверяем
-      // направление реального движения в pointermove — тот же приём, что и
-      // у свайпа-удаления (dx против dy)
-      if (isDragZone(e.target) && selectedIds.has(id)) {
-        dragArmState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, row, active: false };
-      }
-      return;
-    }
-
-    // ===== Десктоп — как было, мышь не конфликтует со скроллом =====
     if (isDragZone(e.target)) {
       // зона перетаскивания реагирует ТОЛЬКО на уже выделённые карточки —
       // если карточка не выделена, ничего не происходит вовсе: остальное
@@ -4976,35 +4959,7 @@
     try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
   });
 
-  // Мобильный чекбокс — единственный способ переключить выделение на
-  // тач-устройстве (простой тап, без драга и без конфликта со скроллом)
-  wordListEl.addEventListener('click', (e) => {
-    if (!selectionMode || !isMobileViewport()) return;
-    const checkbox = e.target.closest('.word-row-select-checkbox');
-    if (!checkbox) return;
-    const row = checkbox.closest('.word-row.selectable');
-    if (!row) return;
-    const id = parseInt(row.dataset.id);
-    applyRowSelection(id, !selectedIds.has(id), row);
-  });
-
   wordListEl.addEventListener('pointermove', (e) => {
-    // мобильный драг ещё не подтверждён — решаем, это скролл или реальный
-    // горизонтальный драг (тот же порог/логика, что у свайпа-удаления)
-    if (dragArmState && dragArmState.pointerId === e.pointerId && !dragArmState.active) {
-      const dx = e.clientX - dragArmState.startX;
-      const dy = e.clientY - dragArmState.startY;
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return; // ещё рано решать
-      if (Math.abs(dy) > Math.abs(dx)) { dragArmState = null; return; } // это скролл, не наш жест — отдаём браузеру
-      dragArmState.active = true;
-      const { row, id } = dragArmState;
-      dragSession = { pointerId: e.pointerId, type: 'move', dropTarget: null, hoveredElement: null };
-      document.body.style.cursor = 'grabbing';
-      setDraggingSourceRows(true);
-      showDragGhost(row.querySelector('.hebrew-word').textContent, selectedIds.size, e.clientX, e.clientY);
-      try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
-    }
-
     if (!dragSession || dragSession.pointerId !== e.pointerId) return;
     e.preventDefault(); // не даём странице скроллиться во время жеста
 
@@ -5039,7 +4994,6 @@
   });
 
   function endDragSession(e) {
-    if (dragArmState && dragArmState.pointerId === e.pointerId) dragArmState = null; // так и не активировался — просто тап/скролл
     if (!dragSession || dragSession.pointerId !== e.pointerId) return;
     const wasMove = dragSession.type === 'move';
     const target = dragSession.dropTarget;
