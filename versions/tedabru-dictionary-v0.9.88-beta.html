@@ -678,7 +678,7 @@
        жестами), но САМИ индикаторы (точки прогресса, звезда избранного)
        остаются видны в правом углу */
     .word-row {
-      grid-template-columns: 65px 85px 1fr auto;
+      grid-template-columns: 65px 85px 1fr;
       column-gap: 10px;
       padding: 9px 0;
       background: var(--bg-dark); /* непрозрачный фон — иначе кнопка удаления под карточкой просвечивала бы до свайпа */
@@ -712,6 +712,7 @@
        позиционирования вправо. */
     .word-row .hebrew-word { grid-column: 1; }
     .word-row .translation,
+    .word-row .delete-cancel-label,
     .word-row .translation-edit { grid-column: 3; }
     .word-row .row-actions-cell {
       position: static;
@@ -724,28 +725,6 @@
     .word-row .mastery-dots-wrap {
       position: static;
       transform: none;
-    }
-    /* Квадратный блок звёздочки избранного у правого края — отдельная,
-       всегда актуальная колонка (grid-column:4, auto-ширина), не связанная
-       с тумблером часть речи/прогресс. Занимает место только у избранных
-       строк — .word-row без этого блока просто не имеет 4-й колонки вовсе. */
-    .word-row-favorite-star {
-      grid-column: 4;
-      width: 34px;
-      height: 34px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--gold);
-    }
-    .word-row-favorite-star svg { width: 18px; height: 18px; }
-    /* избранное слово — весь текст карточки золотым */
-    .word-row.row-has-favorite .hebrew-word,
-    .word-row.row-has-favorite .translit,
-    .word-row.row-has-favorite .pos,
-    .word-row.row-has-favorite .translation {
-      color: var(--gold);
     }
     .word-row-swipe-wrap {
       overflow: hidden;
@@ -765,8 +744,8 @@
       top: 0;
       height: 100%;
       width: 80px;
-      background: #e53935; /* красный вместо золотого — визуально отличается от обычных акцентов */
-      color: #fff;
+      background: var(--gold);
+      color: #2a1608;
       border: none;
       font-family: 'Inter', sans-serif;
       font-size: 11px;
@@ -1288,6 +1267,42 @@
     font-size: 15px;
     color: var(--muted);
     text-align: right;
+  }
+
+  .word-row.row-deleting {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .word-row.row-deleting .listen-btn,
+  .word-row.row-deleting .hebrew-word,
+  .word-row.row-deleting .meta-col,
+  .word-row.row-deleting .row-num,
+  .word-row.row-deleting .mastery-dots-wrap {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .delete-cancel-label {
+    font-family: 'Noto Serif', serif;
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+  /* пока слово удаляется — избранное/редактирование/удаление принудительно
+     недоступны и не нужны */
+  .word-row.row-deleting .row-actions-buttons .icon-btn {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  .delete-timer-track {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: rgba(var(--ink-rgb),0.06);
+  }
+  .delete-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--gold);
+    transition: width 3s linear;
   }
 
   .row-dimmed .hebrew-word,
@@ -1849,7 +1864,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.89 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.88 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3265,7 +3280,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.89';
+  const APP_VERSION = '0.9.88';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3612,8 +3627,14 @@
   let selectedCollectionIds = new Set(); // подборки, выделенные кликом в том же режиме выделения
   let sortMode = 'added';        // 'added' | 'alpha'
 
+  // ===== Отложенное удаление слова (с возможностью отмены) =====
+  let pendingDeleteIds = new Set();          // id слов, для которых сейчас идёт 3-секундный обратный отсчёт
   let editingWordId = null; // id слова, чьё определение сейчас редактируется прямо в карточке (только личный словарь, не база)
   let revealedRowId = null; // id слова, у которого сейчас показаны кнопки редактирования/удаления вместо рейтинга (тап на тач-экране; на десктопе это же делает :hover)
+  const pendingDeleteTimers = new Map();     // id -> таймер, который реально удалит слово
+  const pendingDeleteStartedAt = new Map();  // id -> момент старта отсчёта (Date.now()) — нужно, чтобы
+                                              // при перерендере (например, из-за удаления ДРУГОГО слова)
+                                              // полоска не начинала отсчёт заново, а продолжала с того же места
 
   // Ищет уже сохранённое слово по ТОЧНОМУ написанию (с огласовками) — это, а
   // не консонантный скелет, потому что омографы (разные огласовки/породы у
@@ -4189,6 +4210,7 @@
     }
 
     listEl.innerHTML = filtered.map((w, i) => {
+      const isPendingDelete = pendingDeleteIds.has(w.id);
       const disp = personalWordDisplay(w);
       const metaColHtml = `
         <div class="meta-col">
@@ -4214,24 +4236,21 @@
       // ломали высоту строки (см. историю) — рендерить только нужный блок
       // надёжнее любых CSS-трюков.
       const showRatingInMetaSlot = isMobileViewport() && cardInfoMode === 'progress';
-      // Квадратный блок звёздочки у правого края — виден только у избранных
-      // слов, "забирает" часть ширины у дефиниции (grid-column:4, auto-width
-      // — не занимает места вообще, если блока нет в разметке для этой
-      // строки, каждая .word-row — свой независимый грид)
-      const favoriteStarHtml = (isMobileViewport() && w.favorite) ? `<div class="word-row-favorite-star">${STAR_ICON}</div>` : '';
       return `
       <div class="word-row-swipe-wrap" data-id="${w.id}">
         <button type="button" class="swipe-delete-btn" data-id="${w.id}">${TRASH_ICON}<span>${t('Удалить')}</span></button>
-        <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
+        <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${isPendingDelete ? 'row-deleting' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
         <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
         <div class="hebrew-word">${w.hebrew}</div>
         ${showRatingInMetaSlot ? ratingColHtml : metaColHtml}
-        ${editingWordId === w.id
+        ${isPendingDelete
+          ? `<div class="delete-cancel-label">${t('Нажмите, чтобы отменить')}</div>`
+          : (editingWordId === w.id
             ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
-            : `<div class="translation">${disp.translation}</div>`}
+            : `<div class="translation">${disp.translation}</div>`)}
         ${isMobileViewport() ? '' : ratingColHtml}
-        ${favoriteStarHtml}
         <div class="row-num">${i + 1}</div>
+        ${isPendingDelete ? `<div class="delete-timer-track"><div class="delete-timer-bar" data-timerbar="${w.id}"></div></div>` : ''}
       </div>
       </div>
     `;
@@ -4294,6 +4313,28 @@
       // подключаем ту же логику сохранения к свежему textarea. Анимация тут
       // уже не проиграется (элемент новый), но сама функция останется рабочей
       wireInlineEditTextarea(textarea, parseInt(textarea.dataset.id));
+    });
+    listEl.querySelectorAll('.word-row.row-deleting').forEach(row => {
+      row.addEventListener('click', () => cancelPendingDelete(parseInt(row.dataset.id)));
+    });
+    // Анимация полоски обратного отсчёта — считаем СКОЛЬКО РЕАЛЬНО осталось
+    // относительно момента запуска удаления (pendingDeleteStartedAt), а не
+    // всегда проигрываем заново все 3 секунды. Без этого при удалении
+    // ВТОРОГО слова renderList() пересобирает DOM у ВСЕХ строк разом — и
+    // полоска уже удаляемого первого слова визуально "сбрасывалась" обратно
+    // на 100%, хотя реальный таймер (setTimeout) продолжал идти как надо.
+    listEl.querySelectorAll('[data-timerbar]').forEach(bar => {
+      const id = parseInt(bar.dataset.timerbar);
+      const startedAt = pendingDeleteStartedAt.get(id) || Date.now();
+      const elapsed = Date.now() - startedAt;
+      const remaining = Math.max(0, 3000 - elapsed);
+      const remainingPct = (remaining / 3000) * 100;
+      bar.style.transition = 'none';
+      bar.style.width = remainingPct + '%';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        bar.style.transition = `width ${remaining}ms linear`;
+        bar.style.width = '0%';
+      }));
     });
     attachGlobalSearchHandler();
   }
@@ -4565,30 +4606,33 @@
     textarea.addEventListener('blur', () => finish(true));
   }
 
-  // Удаление — без подтверждения и без отсрочки (см. обсуждение: слово
-  // случайно удалить почти невозможно, а вернуть — пара кликов). Вместо
-  // 3-секундного таймера — короткая анимация схлопывания строки, чтобы
-  // список не "дёргался" резко.
   function deleteWord(id) {
-    const swipeWrap = document.querySelector(`.word-row-swipe-wrap[data-id="${id}"]`);
-    if (swipeWrap && isMobileViewport()) {
-      const h = swipeWrap.getBoundingClientRect().height;
-      swipeWrap.style.height = h + 'px';
-      swipeWrap.style.overflow = 'hidden';
-      swipeWrap.offsetHeight; // форсируем reflow — иначе transition не подхватит стартовую высоту
-      swipeWrap.style.transition = 'height 0.22s ease-in, opacity 0.22s ease-in, margin 0.22s ease-in';
-      swipeWrap.style.height = '0px';
-      swipeWrap.style.opacity = '0';
-      setTimeout(() => finalizeDelete(id), 230);
-    } else {
-      finalizeDelete(id);
-    }
+    if (pendingDeleteIds.has(id)) return; // уже удаляется
+    const word = words.find(w => w.id === id);
+    if (!word) return;
+    pendingDeleteIds.add(id);
+    pendingDeleteStartedAt.set(id, Date.now());
+    renderList();
+    const timer = setTimeout(() => finalizeDelete(id), 3000);
+    pendingDeleteTimers.set(id, timer);
   }
 
   function finalizeDelete(id) {
+    pendingDeleteTimers.delete(id);
+    pendingDeleteIds.delete(id);
+    pendingDeleteStartedAt.delete(id);
     words = words.filter(w => w.id !== id);
     saveWords();
     renderFilterBar();
+    renderList();
+  }
+
+  function cancelPendingDelete(id) {
+    const timer = pendingDeleteTimers.get(id);
+    if (timer) clearTimeout(timer);
+    pendingDeleteTimers.delete(id);
+    pendingDeleteIds.delete(id);
+    pendingDeleteStartedAt.delete(id);
     renderList();
   }
 
