@@ -561,7 +561,7 @@
        скролле, сам тумблер всегда виден. Непрозрачный фон нужен, чтобы
        чипы подборок реально прятались под ним, а не просвечивали; лёгкий
        градиент слева — намёк, что там есть что проскроллить дальше */
-    .filter-row #cardInfoModeToggle {
+    #cardInfoModeToggle {
       display: inline-flex;
       position: sticky;
       right: 0;
@@ -1784,7 +1784,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.82 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.81 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2753,7 +2753,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.82';
+  const APP_VERSION = '0.9.81';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
