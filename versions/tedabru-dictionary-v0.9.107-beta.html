@@ -28,7 +28,7 @@
     --dim-text-soft: #6a5f85;
     --rating-good-text: #d6c8ff;
     --danger-text: #e08a9a;
-    --chip-active-bg: rgba(123,53,212,0.12); /* было #150a26 (в цвет карточки) — теперь как дефолтная заливка кнопки редактирования базы (--header-icon-bg) */
+    --chip-active-bg: #150a26; /* было #3d3846 — теперь идентично заливке карточки (--card-bg) */
     --chip-active-border: var(--purple);
     --chip-active-text: var(--purple-dark);
     --chip-text: var(--text-secondary);
@@ -1322,7 +1322,7 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 10; /* ниже .header (20) и .bottom-nav (200), но выше .list (1) — иначе зона выделения перехватывала тапы по кнопкам шапки/панели, если строка визуально оказывалась под ними */
+    z-index: 150; /* ниже .bottom-nav (200) — иначе зона выделения перехватывала тапы по нижней панели, если строка визуально оказывалась под ней */
   }
   .checkbox-select-zone {
     position: absolute;
@@ -1897,7 +1897,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.108 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.107 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3326,7 +3326,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.108';
+  const APP_VERSION = '0.9.107';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
