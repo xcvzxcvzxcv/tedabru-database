@@ -1717,7 +1717,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.72 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.71 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2169,8 +2169,6 @@
     'Остановлено': 'Stopped',
     'Слово удалено из вашего словаря': 'Word removed from your dictionary',
     'Искать среди всех слов': 'Search all words',
-    'Поиск по всей базе': 'Search entire database',
-    'Ищу...': 'Searching...',
     'Ищу среди вариантов написания...': 'Searching alternate spellings...',
     'Не удалось получить никуд автоматически': 'Could not auto-generate niqqud',
     'Возможно, сервер блокирует прямые запросы из браузера (CORS) — введите слово и транскрипцию вручную.':
@@ -2680,7 +2678,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.72';
+  const APP_VERSION = '0.9.71';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3127,24 +3125,14 @@
 
   function globalSearchBlockHtml() {
     if (!searchQuery.trim() && !categoryFilterActive()) return '';
-    if (categoryFilterActive()) {
-      // Просмотр по категории (воронка фильтров) — юзер уже явно попросил
-      // браузинг всей базы, тут инстант-поиск остаётся автоматическим
-      return `<div id="instantDictResults"></div>`;
-    }
-    // Обычный текстовый поиск по строке — базу больше НЕ дёргаем
-    // автоматически на каждое нажатие клавиши. Кнопка видна сразу
-    // (независимо от того, есть личные результаты или нет), сам поиск по
-    // словарю запускается только по явному тапу.
     return `
-      <button type="button" class="global-search-btn" id="globalSearchTriggerBtn">
-        ${t('Поиск по всей базе')} «${searchQuery}»
-      </button>
       <div id="instantDictResults"></div>
+      ${categoryFilterActive() ? '' : `
       <button type="button" class="global-search-btn" id="globalSearchBtn" style="display:none;">
         ${t('Искать среди всех слов')} «${searchQuery}»
       </button>
       <div id="globalSearchResults"></div>
+      `}
     `;
   }
 
@@ -3180,23 +3168,12 @@
   }
 
   function attachGlobalSearchHandler() {
-    if (categoryFilterActive()) {
-      runInstantDictSearch(searchQuery.trim());
-      return;
+    const btn = document.getElementById('globalSearchBtn');
+    if (btn && searchQuery.trim() && !categoryFilterActive()) {
+      btn.addEventListener('click', () => runGlobalTranscriptionSearch(searchQuery.trim(), btn));
     }
-    const q = searchQuery.trim();
-    if (!q) return;
-    const deepBtn = document.getElementById('globalSearchBtn');
-    if (deepBtn) deepBtn.addEventListener('click', () => runGlobalTranscriptionSearch(q, deepBtn));
-    const triggerBtn = document.getElementById('globalSearchTriggerBtn');
-    if (triggerBtn) {
-      triggerBtn.addEventListener('click', () => {
-        triggerBtn.disabled = true;
-        triggerBtn.textContent = t('Ищу...');
-        runInstantDictSearch(q).then(() => {
-          triggerBtn.style.display = 'none'; // результаты уже показаны — кнопка своё дело сделала
-        });
-      }, { once: true });
+    if (searchQuery.trim() || categoryFilterActive()) {
+      runInstantDictSearch(searchQuery.trim());
     }
   }
 
