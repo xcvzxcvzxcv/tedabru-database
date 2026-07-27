@@ -85,7 +85,7 @@
        иногда попадал точно в этот переходный момент. Оверфлоу, похоже, не
        просто чинит позицию панели, а ещё и стабилизирует этот момент по
        времени. v0.9.52 (с ним) была полностью чистой — возвращаем. */
-    min-height: calc(100dvh + 1px); /* плейсхолдер-карточки не помогли, убрали; возвращаем оверфлоу-трюк, пробуем 1px */
+    min-height: 100dvh; /* оверфлоу-трюк убран — реальные пустые карточки в конце списка (см. JS) обеспечивают скроллящуюся страницу надёжнее, чем искусственный запас высоты */
     overscroll-behavior-y: none;
     font-family: 'Noto Serif', serif;
     color: var(--text-main);
@@ -530,6 +530,13 @@
     /* Тема и масштаб переехали в панель настроек — старые плавающие кнопки
        на мобильном больше не нужны (это упустили в первом заходе рефактора) */
     #themeToggleBtn, #zoomControl { display: none; }
+
+    .scroll-placeholder-row {
+      height: 56px;
+      flex-shrink: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -1717,7 +1724,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.71 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.70 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2678,7 +2685,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.71';
+  const APP_VERSION = '0.9.70';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3426,6 +3433,25 @@
     row.style.webkitMaskImage = gradient;
   }
 
+  // ===== Гарантируем реальную скроллящуюся страницу =====
+  // Замечено на устройстве: баг с "плывущей" нижней панелью проявляется
+  // ТОЛЬКО когда карточек мало и они не заполняют весь скролл — если
+  // контента достаточно, чтобы страница была реально скроллящейся, панель
+  // всегда встаёт на место сразу, без танцев. Вместо искусственного
+  // оверфлоу на уровне страницы (calc(100dvh+Npx), пробовали — помогало
+  // частично) добавляем 10 невидимых карточек-заглушек прямо в конец
+  // настоящего списка — это гарантирует реальную прокручиваемость без
+  // побочных эффектов на позицию/паддинги видимого контента.
+  function ensureScrollablePlaceholders(root) {
+    if (!isMobileViewport()) return;
+    for (let i = 0; i < 15; i++) {
+      const ph = document.createElement('div');
+      ph.className = 'scroll-placeholder-row';
+      ph.setAttribute('aria-hidden', 'true');
+      root.appendChild(ph);
+    }
+  }
+
   function renderList() {
     // Safeguard для длинных слов/словосочетаний на иврите, которым тесно в
     // фиксированной колонке (105px) даже после её расширения — постепенно
@@ -3496,6 +3522,7 @@
       `;
       }).join('');
       fitHebrewWordsInList(listEl);
+      ensureScrollablePlaceholders(listEl);
       // клики/протаскивание в режиме выделения обрабатываются один раз при
       // инициализации (см. attachSelectionDragHandlers) через делегирование
       // на #wordList, а не тут — строки пересоздаются на каждый renderList(),
@@ -3540,6 +3567,7 @@
     `;
     }).join('') + `<div class="search-results-wrapper">${globalSearchBlockHtml()}</div>`;
     fitHebrewWordsInList(listEl);
+    ensureScrollablePlaceholders(listEl);
 
     if (!hasDoneInitialDictCascade) {
       applyCascadeAnimation(listEl, '.word-row');
