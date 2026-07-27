@@ -330,7 +330,6 @@
     pointer-events: none;
   }
   .filter-toggle-btn.active { color: var(--gold); }
-  #posFilterToggleBtn { display: none; } /* показывается только на мобильном — см. медиа-запрос ниже */
 
   .category-filter-panel {
     background: rgba(var(--ink-rgb),0.02);
@@ -1768,7 +1767,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.74 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.73 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1799,7 +1798,7 @@
       <button type="button" class="filter-toggle-btn" id="categoryFilterToggleBtn" title="Фильтры по части речи">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
       </button>
-      <button type="button" class="filter-toggle-btn" id="posFilterToggleBtn" title="Фильтры по вашей коллекции">
+      <button type="button" class="filter-toggle-btn" id="posFilterToggleBtn" title="Фильтры по вашей коллекции" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
       </button>
     </div>
@@ -2737,7 +2736,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.74';
+  const APP_VERSION = '0.9.73';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
