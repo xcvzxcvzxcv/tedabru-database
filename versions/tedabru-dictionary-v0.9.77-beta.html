@@ -671,16 +671,13 @@
       display: none;
     }
     #wordList.card-info-mode-progress .row-actions-cell {
-      position: static;
-      height: auto;
-      min-height: 0;
-      display: flex;
-      align-items: center;
       justify-content: center;
     }
-    #wordList.card-info-mode-progress .mastery-dots-wrap {
-      position: static;
-      transform: none;
+    #wordList.card-info-mode-progress .mastery-dots-wrap,
+    #wordList.card-info-mode-progress .row-actions-buttons {
+      left: 50%;
+      right: auto;
+      transform: translate(-50%, -50%);
     }
     #wordList.card-info-mode-meta .row-actions-cell {
       display: none;
@@ -1788,7 +1785,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.78 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.77 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2757,7 +2754,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.78';
+  const APP_VERSION = '0.9.77';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
