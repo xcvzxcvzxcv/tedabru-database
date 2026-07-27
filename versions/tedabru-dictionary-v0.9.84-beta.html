@@ -576,13 +576,13 @@
       top: 0;
       z-index: 3;
       width: 38px;
-      height: 42px; /* запасное значение — точная высота подгоняется через JS под реальный чип "Все", см. syncCardInfoToggleHeight() */
-      padding: 0;
+      padding: 10px 0; /* та же вертикальная набивка, что у обычных чипов — высота совпадает естественно, а не растяжением top/bottom */
+      box-sizing: border-box;
       align-items: center;
       justify-content: center;
       background: var(--bg-dark);
     }
-    #cardInfoModeToggle.chip-overlay-left svg { width: 24px; height: 24px; }
+    .chip-overlay-left svg { width: 24px; height: 24px; }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -1798,7 +1798,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.85 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.84 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2767,7 +2767,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.85';
+  const APP_VERSION = '0.9.84';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3585,20 +3585,6 @@
       updateFadeMask(row);
       row.addEventListener('scroll', () => updateFadeMask(row));
     });
-
-    syncCardInfoToggleHeight();
-  }
-
-  function syncCardInfoToggleHeight() {
-    // высота через CSS (padding/line-height) ненадёжна — уже дважды не
-    // совпадала из-за конкурирующих правил (.chip.chip-icon-only и т.п.).
-    // Меряем реальную высоту чипа "Все" и присваиваем впрямую — inline-стиль
-    // всегда побеждает любое правило из таблицы стилей, гарантированно точно.
-    const toggleBtn = document.getElementById('cardInfoModeToggle');
-    const referenceChip = document.getElementById('allChip');
-    if (toggleBtn && referenceChip) {
-      toggleBtn.style.height = referenceChip.offsetHeight + 'px';
-    }
   }
 
   function updateFadeMask(row) {
