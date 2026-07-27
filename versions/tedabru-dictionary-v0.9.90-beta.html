@@ -768,7 +768,6 @@
       background: #e53935; /* красный вместо золотого — визуально отличается от обычных акцентов */
       color: #fff;
       border: none;
-      border-radius: 0 8px 8px 0; /* совпадает со скруглением .word-row-swipe-wrap — иначе на стыке композитных слоёв (transform у .word-row) виден субпиксельный артефакт квадратного угла в тёмной теме */
       font-family: 'Inter', sans-serif;
       font-size: 11px;
       -webkit-tap-highlight-color: transparent;
@@ -795,7 +794,6 @@
       background: #4caf50; /* зелёная — противоположность золотой "Удалить"; потом настроим точнее */
       color: #fff;
       border: none;
-      border-radius: 0 8px 8px 0; /* см. .swipe-delete-btn — тот же фикс субпиксельного артефакта на стыке композитных слоёв */
       font-family: 'Inter', sans-serif;
       font-size: 11px;
       -webkit-tap-highlight-color: transparent;
@@ -930,9 +928,6 @@
     border-color: var(--gold-soft);
     color: var(--gold-soft);
     padding: 12px 20px;
-    width: 130px;
-    box-sizing: border-box;
-    text-align: center;
   }
   #cardInfoModeToggle { display: none; } /* мобильно-специфичная функция — показывается только в мобильном медиа-запросе */
   .chip.chip-text-only {
@@ -967,13 +962,14 @@
   .chip.chip-icon-only svg { width: 14px; height: 14px; }
 
   .chip.chip-input {
-    width: 130px;
+    width: 150px;
     background: rgba(var(--ink-rgb),0.03);
     color: var(--text-main);
     outline: none;
   }
   .chip.chip-input:focus { border-color: var(--purple); }
   #newCollectionInlineInput {
+    width: 200px;
     border-color: var(--gold-soft);
   }
   #newCollectionInlineInput:focus { border-color: var(--gold-soft); }
@@ -1843,7 +1839,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.91 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.90 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2278,7 +2274,6 @@
     'Подборка': 'Collection',
     'Фильтры': 'Filters',
     'Название подборки': 'Collection name',
-    'Название': 'Name',
     'Новая подборка': 'New collection',
     'Останавливаю после текущего слова…': 'Stopping after the current word…',
     'Обрабатываю': 'Processing',
@@ -3260,7 +3255,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.91';
+  const APP_VERSION = '0.9.90';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3809,13 +3804,11 @@
 
   function renderFilterBar() {
     const el = document.getElementById('filterBar');
-    // сохраняем скролл строки подборок И строки частей речи ДО перерисовки —
-    // иначе он каждый раз сбрасывается в 0, и список "прыгает" при любом
-    // переключении фильтра/подборки
+    // сохраняем скролл строки подборок ДО перерисовки — иначе он каждый раз
+    // сбрасывается в 0, и список подборок "прыгает" при любом переключении
+    // фильтра/подборки
     const prevCollectionsRow = el.querySelector('.filter-row-wrap .filter-row');
     const savedCollectionsScrollLeft = prevCollectionsRow ? prevCollectionsRow.scrollLeft : 0;
-    const prevPosRow = el.querySelector('#filtersCollapse .filter-row');
-    const savedPosScrollLeft = prevPosRow ? prevPosRow.scrollLeft : 0;
     if (categoryFilterPanelOpen || categoryFilterActive()) {
       el.innerHTML = '';
       return;
@@ -3857,7 +3850,7 @@
         })()}
         ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="${t('Избранное')}">★ ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
-          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="${t('Название')}" />`
+          ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="${t('Название подборки')}" />`
           : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${isMobileViewport() ? t('Подборка') : t('Добавить подборку')} +</button>`}
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
@@ -4064,15 +4057,10 @@
 
     // затухание слева/справа — только там, где реально есть что докрутить;
     // в естественном (нескролленном) положении левый край всегда чёткий
-    // восстанавливаем сохранённый скролл строк подборок и частей речи ДО
-    // расчёта fade-маски
+    // восстанавливаем сохранённый скролл строки подборок ДО расчёта fade-маски
     const newCollectionsRow = el.querySelector('.filter-row-wrap .filter-row');
     if (newCollectionsRow && savedCollectionsScrollLeft) {
       newCollectionsRow.scrollLeft = savedCollectionsScrollLeft;
-    }
-    const newPosRow = el.querySelector('#filtersCollapse .filter-row');
-    if (newPosRow && savedPosScrollLeft) {
-      newPosRow.scrollLeft = savedPosScrollLeft;
     }
 
     el.querySelectorAll('.filter-row').forEach(row => {
@@ -8530,7 +8518,7 @@
       `<button type="button" class="chip ${bulkTargetCollectionIds.has(c.id) ? 'chip-selected' : ''}" data-bulk-coll="${c.id}">${c.name}</button>`
     ).join('') + (
       bulkCreatingCollectionInline
-        ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="${t('Название')}" />`
+        ? `<input type="text" class="chip chip-input" id="bulkNewCollectionInput" placeholder="${t('Название подборки')}" />`
         : `<button type="button" class="chip chip-icon-only" id="bulkNewCollectionChip" title="${t('Новая подборка')}">${PLUS_ICON}</button>`
     );
 
