@@ -531,39 +531,6 @@
        на мобильном больше не нужны (это упустили в первом заходе рефактора) */
     #themeToggleBtn, #zoomControl { display: none; }
 
-    /* ===== Разделение поиска, шаг 3-6 =====
-       Глобальная воронка (просмотр всей базы по части речи) уезжает на
-       будущую отдельную вкладку "Поиск" — на главной её больше нет.
-       Вместо неё справа от (укороченной) строки поиска встаёт переключатель
-       фильтров ПО ЛИЧНОЙ КОЛЛЕКЦИИ (те же чипы частей речи, что раньше жили
-       в chip "Фильтры" внутри строки подборок) — теперь верхняя строка
-       чипов полностью отдана под подборки. */
-    #categoryFilterToggleBtn { display: none; }
-    .search-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .search-input {
-      width: auto;
-      flex: 1;
-      min-width: 0;
-      padding: 12px 14px 12px 40px; /* правый паддинг обратно нормальный — воронка больше не перекрывает поле справа */
-    }
-    #posFilterToggleBtn {
-      display: flex;
-      position: static;
-      flex-shrink: 0;
-      transform: none;
-    }
-    /* Старый чип "Фильтры" внутри строки подборок больше не нужен на
-       мобильном — та же функция теперь доступна через #posFilterToggleBtn
-       у строки поиска */
-    #filtersToggleChip { display: none; }
-    /* Раскрывающаяся строка частей речи теперь появляется НАД строкой
-       подборок (а не под ней) — именно там, где раньше стоял чип "Фильтры" */
-    #filtersCollapse { order: -1; }
-
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
        несколько визуально нестабильных кадров (карточки временно в
@@ -646,23 +613,6 @@
        зазор слева от слова (текст прижат вправо, direction:rtl) */
     .word-row .hebrew-word {
       margin-right: 0;
-    }
-    /* Тумблер "часть речи ⇄ прогресс" (шаг 6 плана) — взаимоисключающе
-       показываем либо мета-колонку (транслит+часть речи), либо колонку
-       прогресса (точки мастерства+избранное), освобождая место под
-       дефиницию. Класс держится на #wordList (не сбрасывается при
-       innerHTML-перерисовке строк — см. applyCardInfoModeClass). */
-    #wordList.card-info-mode-progress .word-row {
-      grid-template-columns: 65px 0px 1fr 50px;
-    }
-    #wordList.card-info-mode-progress .word-row .meta-col {
-      display: none;
-    }
-    #wordList.card-info-mode-meta .word-row {
-      grid-template-columns: 65px 85px 1fr 0px;
-    }
-    #wordList.card-info-mode-meta .row-actions-cell {
-      display: none;
     }
     .word-row-swipe-wrap {
       overflow: hidden;
@@ -1767,7 +1717,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.73 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.72 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1796,9 +1746,6 @@
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input class="search-input" id="searchInput" placeholder="Ищите по слову, переводу или транскрипции" />
       <button type="button" class="filter-toggle-btn" id="categoryFilterToggleBtn" title="Фильтры по части речи">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
-      </button>
-      <button type="button" class="filter-toggle-btn" id="posFilterToggleBtn" title="Фильтры по вашей коллекции" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
       </button>
     </div>
@@ -2190,7 +2137,6 @@
     'Сначала новые': 'Newest first',
     'По алфавиту': 'Alphabetical',
     'Добавить подборку': 'Add collection',
-    'Подборка': 'Collection',
     'Фильтры': 'Filters',
     'Название подборки': 'Collection name',
     'Новая подборка': 'New collection',
@@ -2302,8 +2248,6 @@
     'Устойчивое выражение': 'Set phrase',
     'Вопросительное слово': 'Question word',
     'Часть речи': 'Part of speech',
-    'Прогресс': 'Progress',
-    'Показывать в карточке: часть речи или прогресс изучения': 'Show in card: part of speech or study progress',
     // ===== Тренировка =====
     'Что тренируем': "What we're training",
     'Все слова': 'All words',
@@ -2736,7 +2680,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.73';
+  const APP_VERSION = '0.9.72';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3029,23 +2973,6 @@
   let filterCollectionId = null; // null | id подборки
   let creatingCollectionInline = false; // чип "+" превращён в текстовый инпут для ввода имени
   let filtersExpanded = false; // строка "часть речи" скрыта по умолчанию, раскрывается по клику на "Фильтры"
-  // Тумблер "что показывать в карточке слова": транскрипция+часть речи, ИЛИ
-  // прогресс изучения (точки мастерства + избранное) — взаимоисключающе,
-  // освобождает место под дефиницию. Персистентно между сессиями.
-  let cardInfoMode = (function() {
-    try { return localStorage.getItem('tedabru_card_info_mode') === 'progress' ? 'progress' : 'meta'; } catch (e) { return 'meta'; }
-  })();
-  function applyCardInfoModeClass() {
-    const listEl = document.getElementById('wordList');
-    if (!listEl) return;
-    listEl.classList.remove('card-info-mode-meta', 'card-info-mode-progress');
-    listEl.classList.add('card-info-mode-' + cardInfoMode);
-  }
-  function setCardInfoMode(mode) {
-    cardInfoMode = mode;
-    try { localStorage.setItem('tedabru_card_info_mode', mode); } catch (e) {}
-    applyCardInfoModeClass();
-  }
   let renamingCollectionId = null; // id подборки, чей чип сейчас превращён в поле переименования
 
   // ===== Режим выбора (для массового добавления в подборку) =====
@@ -3327,7 +3254,7 @@
         ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="${t('Избранное')}">★ ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="${t('Название подборки')}" />`
-          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${isMobileViewport() ? t('Подборка') : t('Добавить подборку')} +</button>`}
+          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${t('Добавить подборку')} +</button>`}
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
@@ -3355,10 +3282,6 @@
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
         <div class="filter-row">
-          <button type="button" class="chip chip-text-only" id="cardInfoModeToggle" title="${t('Показывать в карточке: часть речи или прогресс изучения')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            ${cardInfoMode === 'meta' ? t('Часть речи') : t('Прогресс')}
-          </button>
           ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
         </div>
       </div>
@@ -3368,46 +3291,14 @@
       </select>
     `;
 
-    function togglePersonalFiltersCollapse() {
+    document.getElementById('filtersToggleChip').addEventListener('click', () => {
       // трогаем класс НАПРЯМУЮ, а не через renderFilterBar() — иначе элемент
       // пересоздаётся с уже применённым классом, и transition просто нечего
       // будет анимировать (нет "до"-состояния внутри одного и того же узла)
       filtersExpanded = !filtersExpanded;
       const collapseEl = document.getElementById('filtersCollapse');
       if (collapseEl) collapseEl.classList.toggle('expanded', filtersExpanded);
-      const posBtn = document.getElementById('posFilterToggleBtn');
-      if (posBtn) posBtn.classList.toggle('active', filtersExpanded || !!filterPos);
-    }
-    function handlePosFilterToggleBtnClick() {
-      // унаследовано от старой воронки — на мобильном с непустым поиском
-      // это крестик очистки, не переключатель фильтров (иначе стало бы
-      // нечем очищать строку поиска, раз воронка глобальных фильтров уехала)
-      if (isMobileViewport() && searchQuery.trim()) {
-        const inputEl = document.getElementById('searchInput');
-        inputEl.value = '';
-        searchQuery = '';
-        updateMobileFilterToggleIcon();
-        renderList();
-        return;
-      }
-      togglePersonalFiltersCollapse();
-    }
-    document.getElementById('filtersToggleChip').addEventListener('click', togglePersonalFiltersCollapse);
-    const posFilterBtn = document.getElementById('posFilterToggleBtn');
-    if (posFilterBtn) {
-      posFilterBtn.classList.toggle('active', filtersExpanded || !!filterPos);
-      if (!posFilterBtn.dataset.bound) {
-        posFilterBtn.dataset.bound = '1'; // кнопка статична (не пересоздаётся при каждом renderFilterBar) — вешаем слушатель один раз
-        posFilterBtn.addEventListener('click', handlePosFilterToggleBtnClick);
-      }
-    }
-    const cardInfoModeBtn = document.getElementById('cardInfoModeToggle');
-    if (cardInfoModeBtn) {
-      cardInfoModeBtn.addEventListener('click', () => {
-        setCardInfoMode(cardInfoMode === 'meta' ? 'progress' : 'meta');
-        renderFilterBar(); // перерисовать сам чип (сменить подпись)
-      });
-    }
+    });
 
     if (renamingCollectionId) {
       const renameInput = el.querySelector('.chip-rename-input');
@@ -4066,14 +3957,14 @@
   const FILTER_CLEAR_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
   function updateMobileFilterToggleIcon() {
     if (!isMobileViewport()) return;
-    const btn = document.getElementById('posFilterToggleBtn');
+    const btn = document.getElementById('categoryFilterToggleBtn');
     if (!btn) return;
     if (searchQuery.trim()) {
       btn.innerHTML = FILTER_CLEAR_ICON;
       btn.title = t('Очистить поиск');
     } else {
       btn.innerHTML = FILTER_FUNNEL_ICON;
-      btn.title = t('Фильтры по вашей коллекции');
+      btn.title = t('Фильтры по части речи');
     }
   }
 
@@ -8383,7 +8274,6 @@
     updateMobileFilterToggleIcon();
   });
   updateMobileFilterToggleIcon();
-  applyCardInfoModeClass();
   renderFilterBar();
   renderList();
 </script>
