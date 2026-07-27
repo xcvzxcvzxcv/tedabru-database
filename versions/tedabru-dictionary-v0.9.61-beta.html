@@ -1667,7 +1667,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.62 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.61 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2625,7 +2625,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.62';
+  const APP_VERSION = '0.9.61';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3930,20 +3930,13 @@
     const navTrainBtn = document.getElementById('bottomNavTrainBtn');
     const navSelectBtn = document.getElementById('bottomNavSelectBtn');
     const navAddBtn = document.getElementById('bottomNavAddBtn');
-    const navHomeBtn = document.getElementById('bottomNavHomeBtn');
     if (navTrainBtn) navTrainBtn.classList.toggle('active', trainMode);
     if (navSelectBtn) navSelectBtn.classList.toggle('active', selectionMode);
     if (navAddBtn) navAddBtn.classList.toggle('active', addMode);
-    if (navHomeBtn) navHomeBtn.classList.toggle('active', !trainMode && !selectionMode && !addMode && !editDbMode);
   }
 
   selectModeBtn.addEventListener('click', () => {
-    if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
-    if (addMode) exitAddMode();
-    if (trainMode) {
-      if (trainSessionActive) { exitTrainMode(); return; } // покажет модалку подтверждения — юзер сам решит и тапнет ещё раз
-      exitTrainMode();
-    }
+    if (addMode || editDbMode || trainMode) return; // нельзя одновременно выделять и добавлять/редактировать базу/тренироваться
     selectionMode = !selectionMode;
     selectedIds = new Set();
     selectedCollectionIds = new Set();
@@ -6812,12 +6805,7 @@
   // же формат, что и у кандидата из поиска: используется, когда входим в
   // режим добавления кликом по ещё не сохранённому слову в результатах поиска
   function enterAddMode(prefill) {
-    if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
-    if (selectionMode) exitSelectionMode();
-    if (trainMode) {
-      if (trainSessionActive) { exitTrainMode(); return; } // покажет модалку подтверждения — юзер сам решит и тапнет ещё раз
-      exitTrainMode();
-    }
+    if (selectionMode || editDbMode || trainMode) return; // не пересекаемся с другими режимами
     addMode = true;
     updateHeaderForSelectionMode();
     selectModeBtn.style.display = 'none';
@@ -7394,15 +7382,13 @@
   const trainSummaryEl = document.getElementById('trainSummary');
 
   document.getElementById('trainModeBtn').addEventListener('click', () => {
-    if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
+    if (selectionMode || addMode || editDbMode) return;
     if (trainMode) { exitTrainMode(); return; }
-    if (selectionMode) exitSelectionMode();
-    if (addMode) exitAddMode();
     enterTrainMode();
   });
 
   function enterTrainMode() {
-    if (editDbMode) return;
+    if (selectionMode || addMode || editDbMode) return;
     trainMode = true;
     trainSessionActive = false;
     updateHeaderForSelectionMode();
@@ -8147,7 +8133,7 @@
     selectModeBtn.click();
   });
   document.getElementById('bottomNavAddBtn').addEventListener('click', () => {
-    if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
+    if (selectionMode || editDbMode || trainMode) return; // те же ограничения, что и у десктопной кнопки "+"
     if (addMode) { exitAddMode(); return; }
     enterAddMode();
   });
@@ -8156,10 +8142,7 @@
     if (selectionMode) exitSelectionMode();
     if (addMode) exitAddMode();
     if (editDbMode) exitEditDbMode();
-    if (trainMode) {
-      if (trainSessionActive) { exitTrainMode(); return; } // покажет модалку подтверждения — юзер сам решит
-      exitTrainMode();
-    }
+    if (trainMode) exitTrainMode();
     if (categoryFilterPanelOpen) {
       categoryFilterPanelOpen = false;
       renderCategoryFilterPanel();
@@ -8175,10 +8158,7 @@
     if (selectionMode) exitSelectionMode();
     if (addMode) exitAddMode();
     if (editDbMode) exitEditDbMode();
-    if (trainMode) {
-      if (trainSessionActive) { exitTrainMode(); return; } // покажет модалку подтверждения — юзер сам решит
-      exitTrainMode();
-    }
+    if (trainMode) exitTrainMode();
     window.scrollTo(0, 0);
     const si = document.getElementById('searchInput');
     if (si) si.focus();
