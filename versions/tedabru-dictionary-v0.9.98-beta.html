@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.99 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.98 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.99';
+  const APP_VERSION = '0.9.98';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4233,7 +4233,6 @@
       `;
       }).join('');
       fitHebrewWordsInList(listEl);
-      requestAnimationFrame(renderSelectZoneDebugOverlays); // ждём, пока раскладка реально применится
       // клики/протаскивание в режиме выделения обрабатываются один раз при
       // инициализации (см. attachSelectionDragHandlers) через делегирование
       // на #wordList, а не тут — строки пересоздаются на каждый renderList(),
@@ -4751,7 +4750,6 @@
 
   selectModeBtn.addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
-    cancelActiveSelectionGesture();
     if (searchTabActive) exitSearchTab();
     if (addMode) exitAddMode();
     if (trainMode) exitTrainMode();
@@ -4765,7 +4763,6 @@
   });
 
   function exitSelectionMode() {
-    cancelActiveSelectionGesture();
     selectionMode = false;
     selectedIds = new Set();
     selectedCollectionIds = new Set();
@@ -4885,68 +4882,20 @@
   }
 
   // Зона выделения на мобильном — не сама иконка чекбокса (слишком узкая
-  // мишень), а прямоугольник вокруг неё. У .word-row на мобильном нет
-  // горизонтального паддинга (padding: 9px 0) — чекбокс сидит вплотную к
-  // правому краю, поэтому "зеркальный" расчёт от расстояния чекбокс-край
-  // вырождался почти в саму иконку. Вместо этого — фиксированная,
-  // генерозная полуширина зоны.
-  const CHECKBOX_ZONE_HALF_WIDTH = 50;
+  // мишень), а прямоугольник: вся высота строки, от чекбокса и НАЗАД в
+  // сторону дефиниции на такое же расстояние, сколько от чекбокса до
+  // правого края карточки — симметрично вокруг чекбокса. Внутри этого
+  // прямоугольника драг-зоны нет вообще — только выделение/мультивыделение.
   function isCheckboxSelectZone(row, clientX, clientY) {
     const checkbox = row.querySelector('.word-row-select-checkbox');
     if (!checkbox) return false;
     const rowRect = row.getBoundingClientRect();
     const cbRect = checkbox.getBoundingClientRect();
     const cbCenterX = (cbRect.left + cbRect.right) / 2;
-    const zoneLeft = Math.max(rowRect.left, cbCenterX - CHECKBOX_ZONE_HALF_WIDTH);
+    const distToEdge = rowRect.right - cbCenterX;
+    const zoneLeft = cbCenterX - distToEdge;
     const zoneRight = rowRect.right;
     return clientX >= zoneLeft && clientX <= zoneRight && clientY >= rowRect.top && clientY <= rowRect.bottom;
-  }
-
-  // ===== ВРЕМЕННЫЙ ДЕБАГ — визуализация зоны выделения (уберём после
-  // проверки) =====
-  const DEBUG_SHOW_SELECT_ZONE = true;
-  function renderSelectZoneDebugOverlays() {
-    document.querySelectorAll('.select-zone-debug').forEach(el => el.remove());
-    if (!DEBUG_SHOW_SELECT_ZONE || !selectionMode || !isMobileViewport()) return;
-    wordListEl.querySelectorAll('.word-row.selectable').forEach(row => {
-      const checkbox = row.querySelector('.word-row-select-checkbox');
-      if (!checkbox) return;
-      const rowRect = row.getBoundingClientRect();
-      const cbRect = checkbox.getBoundingClientRect();
-      const cbCenterX = (cbRect.left + cbRect.right) / 2;
-      const zoneLeft = Math.max(rowRect.left, cbCenterX - CHECKBOX_ZONE_HALF_WIDTH);
-      const zoneRight = rowRect.right;
-      const overlay = document.createElement('div');
-      overlay.className = 'select-zone-debug';
-      overlay.style.position = 'fixed';
-      overlay.style.left = zoneLeft + 'px';
-      overlay.style.top = rowRect.top + 'px';
-      overlay.style.width = (zoneRight - zoneLeft) + 'px';
-      overlay.style.height = rowRect.height + 'px';
-      overlay.style.background = 'rgba(255,0,0,0.25)';
-      overlay.style.border = '1px solid red';
-      overlay.style.pointerEvents = 'none';
-      overlay.style.zIndex = '999';
-      document.body.appendChild(overlay);
-    });
-  }
-  window.addEventListener('scroll', renderSelectZoneDebugOverlays, true);
-
-  // Защитная очистка "залипшего" состояния драга/выделения — вызываем при
-  // выходе из режима выбора или переходе по нижней панели, чтобы
-  // releasePointerCapture гарантированно случился, даже если обычный путь
-  // (pointerup/pointercancel) почему-то не сработал — подозреваемая причина
-  // хаотичного скролла при тапе по нижней панели
-  function cancelActiveSelectionGesture() {
-    dragArmState = null;
-    if (dragSession) {
-      try { wordListEl.releasePointerCapture(dragSession.pointerId); } catch (err) { /* не критично */ }
-      clearDropHighlight();
-      document.body.style.cursor = '';
-      setDraggingSourceRows(false);
-      hideDragGhost();
-      dragSession = null;
-    }
   }
 
   // Находит валидную "цель сброса" под указателем — чип конкретной подборки,
