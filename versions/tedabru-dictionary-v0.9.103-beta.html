@@ -1321,7 +1321,7 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 150; /* ниже .bottom-nav (200) — иначе зона выделения перехватывала тапы по нижней панели, если строка визуально оказывалась под ней */
+    z-index: 998;
   }
   .checkbox-select-zone {
     position: absolute;
@@ -1888,7 +1888,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.104 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.103 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3317,7 +3317,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.104';
+  const APP_VERSION = '0.9.103';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4963,19 +4963,11 @@
     try { selectZoneContainer.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
   });
 
-  function findZoneAtY(clientY) {
-    const zones = selectZoneContainer.querySelectorAll('.checkbox-select-zone');
-    for (const zone of zones) {
-      const rect = zone.getBoundingClientRect();
-      if (clientY >= rect.top && clientY <= rect.bottom) return zone;
-    }
-    return null;
-  }
-
   selectZoneContainer.addEventListener('pointermove', (e) => {
     if (!selectZoneDragSession || selectZoneDragSession.pointerId !== e.pointerId) return;
     e.preventDefault();
-    const zoneEl = findZoneAtY(e.clientY);
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const zoneEl = el && el.closest && el.closest('.checkbox-select-zone');
     if (!zoneEl) return;
     const id = parseInt(zoneEl.dataset.id);
     if (id !== selectZoneDragSession.lastId) {
