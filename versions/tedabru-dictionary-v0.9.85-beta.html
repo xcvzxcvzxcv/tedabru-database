@@ -403,12 +403,6 @@
   .swipe-delete-btn {
     display: none; /* включается только в мобильном медиа-запросе ниже */
   }
-  .search-result-row-swipe-wrap {
-    position: relative;
-  }
-  .swipe-add-btn {
-    display: none; /* включается только в мобильном медиа-запросе ниже — зеркало .swipe-delete-btn */
-  }
 
   .word-row {
     position: relative;
@@ -726,40 +720,6 @@
       -webkit-tap-highlight-color: transparent;
     }
     .swipe-delete-btn svg { width: 20px; height: 20px; }
-    .search-result-row-swipe-wrap {
-      overflow: hidden;
-      border-radius: 8px;
-    }
-    .search-result-row {
-      background: var(--bg-dark); /* непрозрачный — иначе кнопка "Добавить" под карточкой просвечивала бы до свайпа (зеркало .word-row) */
-    }
-    .swipe-add-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      height: 100%;
-      width: 80px;
-      background: #4caf50; /* зелёная — противоположность золотой "Удалить"; потом настроим точнее */
-      color: #fff;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .swipe-add-btn svg { width: 20px; height: 20px; }
-    /* уже добавленные в личный словарь слова — текст карточки зелёным
-       (временный цвет, "потом настроим точнее" — см. обсуждение) */
-    .search-result-row.search-result-row-added .hebrew-word,
-    .search-result-row.search-result-row-added .translit,
-    .search-result-row.search-result-row-added .pos,
-    .search-result-row.search-result-row-added .search-definition {
-      color: #4caf50;
-    }
     /* мета (транскрипция+часть речи) — 12px стандартом, адаптивно ужимается
        через fitTextEl, если строка не влезает в колонку (85px) */
     .word-row .translit,
@@ -1838,7 +1798,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.86 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.85 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1863,7 +1823,7 @@
         </button>
       </div>
     </div>
-    <div class="search-wrap" id="mainSearchWrap">
+    <div class="search-wrap">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input class="search-input" id="searchInput" placeholder="Ищите по слову, переводу или транскрипции" />
       <button type="button" class="filter-toggle-btn" id="categoryFilterToggleBtn" title="Фильтры по части речи">
@@ -1875,14 +1835,6 @@
     </div>
     <div class="category-filter-panel" id="categoryFilterPanel" style="display:none;"></div>
     <div class="filter-bar" id="filterBar"></div>
-    <div class="search-wrap" id="searchTabWrap" style="display:none;">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input class="search-input" id="searchTabInput" placeholder="Слово, перевод или транскрипция" />
-      <button type="button" class="filter-toggle-btn" id="searchTabFilterToggleBtn" title="Фильтры">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg>
-      </button>
-    </div>
-    <div class="category-filter-panel" id="searchTabFilterPanel" style="display:none;"></div>
   </div>
 
   <div class="add-word-panel" id="addWordPanel" style="display:none;">
@@ -2075,7 +2027,6 @@
   </div>
 
   <div class="list" id="wordList"></div>
-  <div class="list" id="searchTabResults" style="display:none;"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2288,7 +2239,6 @@
     'Скрытые результаты': 'Hidden results',
     'Нажмите, чтобы отменить': 'Tap to undo',
     'Слово добавлено в ваш словарь': 'Word added to your dictionary',
-    'Слово уже в вашем словаре': 'Word is already in your dictionary',
     'Не удалось воспроизвести слово': 'Failed to play the word',
     'Пустые подборки удалены': 'Empty collections removed',
     'Пустая подборка удалена': 'Empty collection removed',
@@ -2323,7 +2273,6 @@
     'Отменить добавление': 'Cancel adding',
     // ===== Общие кнопки/действия =====
     'Лексикариум': 'Lexicarium',
-    'Поиск по базе': 'Dictionary search',
     'Добавить': 'Add',
     'Отмена': 'Cancel',
     'Сохранить': 'Save',
@@ -2517,44 +2466,22 @@
   // ===== Браузинг всей базы иврита по части речи (не касается личного словаря) =====
   let categoryFilterPanelOpen = false;
   let categoryFilter = null; // { pos, binyan, tense, person, number, gender } — null, если фильтр выключен
-  let searchTabActive = false; // отдельная вкладка "Поиск" (шаг 7 плана) — полноценный поиск по всей базе с чипами глобальных фильтров
-  let searchTabQuery = ''; // своя строка поиска, НЕ связана с searchQuery личной коллекции
-  let searchTabFilterPanelOpen = false;
 
   const POS_FILTER_CATEGORIES = [
-    { key: 'verb', label: 'Глагол', short: 'глаг' },
-    { key: 'noun', label: 'Существительное', short: 'сущ' },
-    { key: 'adj', label: 'Прилагательное', short: 'прил' },
-    { key: 'adv', label: 'Наречие', short: 'нареч' },
-    { key: 'pron', label: 'Местоимение', short: 'местоим' },
-    { key: 'num', label: 'Числительное', short: 'числ' },
-    { key: 'name', label: 'Имя собственное', short: 'имя собств' },
-    { key: 'det', label: 'Определитель', short: 'опред' },
-    { key: 'conj', label: 'Союз', short: 'союз' },
-    { key: 'prep', label: 'Предлог', short: 'предл' },
-    { key: 'particle', label: 'Частица', short: 'част' },
-    { key: 'intj', label: 'Междометие', short: 'межд' },
-    { key: 'phrase', label: 'Устойчивое выражение', short: 'выраж' },
-    { key: 'question', label: 'Вопросительное слово', short: 'вопрос' },
-  ];
-  // Заглушки для категорий, по которым в базе пока нет структурированных
-  // данных (см. обсуждение) — чипы видны и кликабельны визуально, но пока
-  // ничего не фильтруют по-настоящему. Разберёмся со словарной базой позже.
-  const STUB_EXCEPTION_OPTIONS = [{ key: 'exceptions', label: 'Исключения' }];
-  const STUB_NUMERAL_KIND_OPTIONS = [
-    { key: 'cardinal', label: 'Количественное' },
-    { key: 'ordinal', label: 'Порядковое' },
-  ];
-  const STUB_PRONOUN_TYPE_OPTIONS = [
-    { key: 'personal', label: 'Личное' },
-    { key: 'demonstrative', label: 'Указательное' },
-    { key: 'possessive', label: 'Притяжательное' },
-    { key: 'interrogative', label: 'Вопросительное' },
-    { key: 'reflexive', label: 'Возвратное' },
-  ];
-  const STUB_VERB_GENDER_OPTIONS = [
-    { key: 'm', label: 'м.р.' },
-    { key: 'f', label: 'ж.р.' },
+    { key: 'verb', label: 'Глагол' },
+    { key: 'noun', label: 'Существительное' },
+    { key: 'adj', label: 'Прилагательное' },
+    { key: 'adv', label: 'Наречие' },
+    { key: 'pron', label: 'Местоимение' },
+    { key: 'num', label: 'Числительное' },
+    { key: 'name', label: 'Имя собственное' },
+    { key: 'det', label: 'Определитель' },
+    { key: 'conj', label: 'Союз' },
+    { key: 'prep', label: 'Предлог' },
+    { key: 'particle', label: 'Частица' },
+    { key: 'intj', label: 'Междометие' },
+    { key: 'phrase', label: 'Устойчивое выражение' },
+    { key: 'question', label: 'Вопросительное слово' },
   ];
   const BINYAN_FILTER_OPTIONS = [
     { key: 'pa', label: 'Пааль' },
@@ -2821,341 +2748,6 @@
     });
   }
 
-  // ===== Вкладка "Поиск" (шаг 7 плана) — своя, компактная версия панели
-  // фильтров: сокращённые подписи частей речи, подфильтры показываются
-  // только для тех категорий, где они реально осмысленны, и переключение
-  // части речи всегда сбрасывает подфильтры предыдущей (см. clearOnPosChange
-  // ниже — та же семантика, что уже была у обычной панели, просто теперь
-  // подряд идут РАЗНЫЕ наборы строк в зависимости от pos). Заглушки
-  // (STUB_*) визуально кликабельны, но пока ничего не фильтруют по-настоящему
-  // — данных в базе для них ещё нет (см. обсуждение).
-  function renderSearchTabFilterPanel() {
-    const toggleBtn = document.getElementById('searchTabFilterToggleBtn');
-    if (toggleBtn) toggleBtn.classList.toggle('active', searchTabFilterPanelOpen || categoryFilterActive());
-    const panel = document.getElementById('searchTabFilterPanel');
-    if (!panel) return;
-    if (!searchTabFilterPanelOpen) {
-      panel.style.display = 'none';
-      panel.innerHTML = '';
-      return;
-    }
-    panel.style.display = 'block';
-
-    const posChips = POS_FILTER_CATEGORIES.map(c => `
-      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.short)}</button>
-    `).join('');
-
-    const chipRow = (options, activeKey, dataAttr) => `
-      <div class="category-filter-row">
-        ${options.map(o => `<button type="button" class="category-filter-chip ${activeKey === o.key ? 'active' : ''}" data-${dataAttr}="${o.key}">${t(o.label)}</button>`).join('')}
-      </div>`;
-    const stubChipRow = (options, stateSet) => `
-      <div class="category-filter-row">
-        ${options.map(o => `<button type="button" class="category-filter-chip stub-chip ${stateSet.has(o.key) ? 'active' : ''}" data-stub="${o.key}">${t(o.label)}</button>`).join('')}
-      </div>`;
-
-    let subRows = '';
-    const pos = categoryFilter && categoryFilter.pos;
-    if (pos === 'verb') {
-      subRows = chipRow(BINYAN_FILTER_OPTIONS, categoryFilter.binyan, 'binyan')
-        + chipRow(TENSE_FILTER_OPTIONS, categoryFilter.tense, 'tense')
-        + chipRow(PERSON_FILTER_OPTIONS, categoryFilter.person, 'person')
-        + stubChipRow(STUB_VERB_GENDER_OPTIONS, searchTabStubSelections.verbGender);
-    } else if (pos === 'noun') {
-      subRows = chipRow(GENDER_FILTER_OPTIONS, categoryFilter.gender, 'gender')
-        + stubChipRow(STUB_EXCEPTION_OPTIONS, searchTabStubSelections.nounException);
-    } else if (pos === 'num') {
-      subRows = chipRow(GENDER_FILTER_OPTIONS, categoryFilter.gender, 'gender')
-        + stubChipRow(STUB_NUMERAL_KIND_OPTIONS, searchTabStubSelections.numeralKind);
-    } else if (pos === 'pron') {
-      subRows = stubChipRow(STUB_PRONOUN_TYPE_OPTIONS, searchTabStubSelections.pronounType);
-    }
-    // остальные части речи (прил, нареч, союз, предлог, частица, межд,
-    // выраж, вопрос, имя собств, опред) — без подфильтров вообще, экономим
-    // место на экране, как и попросили
-
-    panel.innerHTML = `
-      <div class="category-filter-row">${posChips}</div>
-      ${subRows}
-      ${categoryFilterActive() ? `<button type="button" class="category-filter-clear" id="searchTabFilterClearBtn">${t('Сбросить фильтр')}</button>` : ''}
-    `;
-
-    panel.querySelectorAll('[data-pos]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.pos;
-        // смена части речи ВСЕГДА сбрасывает подфильтры предыдущей — и
-        // настоящие (categoryFilter пересоздаётся целиком), и визуальные
-        // заглушки (см. resetSearchTabStubSelections)
-        categoryFilter = (categoryFilter && categoryFilter.pos === key) ? null : { pos: key };
-        resetSearchTabStubSelections();
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    panel.querySelectorAll('[data-binyan]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        categoryFilter.binyan = categoryFilter.binyan === btn.dataset.binyan ? null : btn.dataset.binyan;
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    panel.querySelectorAll('[data-tense]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        categoryFilter.tense = categoryFilter.tense === btn.dataset.tense ? null : btn.dataset.tense;
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    panel.querySelectorAll('[data-person]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        categoryFilter.person = categoryFilter.person === btn.dataset.person ? null : btn.dataset.person;
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    panel.querySelectorAll('[data-gender]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        categoryFilter.gender = categoryFilter.gender === btn.dataset.gender ? null : btn.dataset.gender;
-        renderSearchTabFilterPanel();
-        runSearchTabSearch();
-      });
-    });
-    // заглушки — только визуальное состояние (набор ключей в
-    // searchTabStubSelections.*), результаты поиска НЕ трогают
-    panel.querySelectorAll('[data-stub]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.stub;
-        const set = pos === 'verb' ? searchTabStubSelections.verbGender
-          : pos === 'noun' ? searchTabStubSelections.nounException
-          : pos === 'num' ? searchTabStubSelections.numeralKind
-          : searchTabStubSelections.pronounType;
-        if (set.has(key)) set.delete(key); else set.add(key);
-        renderSearchTabFilterPanel();
-      });
-    });
-    const clearBtn = document.getElementById('searchTabFilterClearBtn');
-    if (clearBtn) clearBtn.addEventListener('click', () => {
-      categoryFilter = null;
-      resetSearchTabStubSelections();
-      renderSearchTabFilterPanel();
-      runSearchTabSearch();
-    });
-  }
-
-  // визуальное состояние чипов-заглушек — по одному Set на категорию,
-  // независимо от categoryFilter (у которого нет полей под них, раз данных
-  // в базе пока нет)
-  const searchTabStubSelections = {
-    verbGender: new Set(),
-    nounException: new Set(),
-    numeralKind: new Set(),
-    pronounType: new Set(),
-  };
-  function resetSearchTabStubSelections() {
-    searchTabStubSelections.verbGender.clear();
-    searchTabStubSelections.nounException.clear();
-    searchTabStubSelections.numeralKind.clear();
-    searchTabStubSelections.pronounType.clear();
-  }
-
-  // Результаты на вкладке "Поиск" подгружаются МОМЕНТАЛЬНО (без кнопки-
-  // гейта, в отличие от строки поиска на главной) — это её прямое назначение.
-  let searchTabSearchGeneration = 0;
-  async function runSearchTabSearch() {
-    const resultsEl = document.getElementById('searchTabResults');
-    if (!resultsEl || !searchTabActive) return;
-    if (categoryFilterActive()) {
-      // просмотр по категории — уже готовая синхронная функция, ждать нечего
-      const { candidates, total } = computeCategoryBrowseCandidates(categoryFilter);
-      renderCandidatesInto(resultsEl, candidates, total, true);
-      return;
-    }
-    const q = searchTabQuery.trim();
-    if (!q) {
-      resultsEl.innerHTML = '';
-      return;
-    }
-    const myGeneration = ++searchTabSearchGeneration;
-    const candidates = await resolveCandidatesDictOnly(q);
-    if (myGeneration !== searchTabSearchGeneration) return; // устарело — стартовал более новый запрос
-    if (!searchTabActive) return; // юзер успел уйти с вкладки, пока ждали загрузку словаря
-    renderCandidatesInto(resultsEl, candidates, undefined, true);
-  }
-
-  function enterSearchTab() {
-    if (selectionMode) exitSelectionMode();
-    if (addMode) exitAddMode();
-    if (editDbMode) exitEditDbMode();
-    if (trainMode) exitTrainMode();
-    if (categoryFilterPanelOpen) { categoryFilterPanelOpen = false; renderCategoryFilterPanel(); } // воронка на главной, если вдруг была открыта
-    searchTabActive = true;
-    document.getElementById('mainSearchWrap').style.display = 'none';
-    document.getElementById('categoryFilterPanel').style.display = 'none';
-    document.getElementById('filterBar').style.display = 'none';
-    document.getElementById('wordList').style.display = 'none';
-    document.getElementById('searchTabWrap').style.display = '';
-    document.getElementById('searchTabResults').style.display = '';
-    updateHeaderForSelectionMode();
-    runSearchTabSearch();
-    document.getElementById('searchTabInput').focus();
-  }
-
-  function exitSearchTab() {
-    if (!searchTabActive) return;
-    searchTabActive = false;
-    document.getElementById('mainSearchWrap').style.display = '';
-    document.getElementById('filterBar').style.display = '';
-    document.getElementById('wordList').style.display = '';
-    document.getElementById('searchTabWrap').style.display = 'none';
-    document.getElementById('searchTabFilterPanel').style.display = 'none';
-    document.getElementById('searchTabResults').style.display = 'none';
-    searchTabFilterPanelOpen = false;
-    categoryFilter = null; // свежий старт при следующем входе на вкладку
-    resetSearchTabStubSelections();
-    updateHeaderForSelectionMode();
-  }
-
-  document.getElementById('searchTabInput').addEventListener('input', (e) => {
-    searchTabQuery = e.target.value;
-    runSearchTabSearch();
-  });
-
-  document.getElementById('searchTabFilterToggleBtn').addEventListener('click', () => {
-    searchTabFilterPanelOpen = !searchTabFilterPanelOpen;
-    renderSearchTabFilterPanel();
-  });
-
-  // ===== Свайп влево — "Добавить" на вкладке "Поиск" (зеркало свайпа
-  // "Удалить" в личном словаре) — делегирование на #searchTabResults,
-  // вешается один раз, работает независимо от того, сколько раз внутри
-  // перерисовывались результаты */
-  const SEARCH_TAB_SWIPE_REVEAL_WIDTH = 80;
-  const SEARCH_TAB_SWIPE_OPEN_THRESHOLD = SEARCH_TAB_SWIPE_REVEAL_WIDTH / 2;
-  let searchTabSwipeState = null;
-  let searchTabOpenSwipeRow = null;
-  const searchTabResultsEl = document.getElementById('searchTabResults');
-
-  function closeSearchTabSwipeRow(row) {
-    if (!row) return;
-    row.style.transition = '';
-    row.style.transform = '';
-    row.classList.remove('swipe-open');
-    if (searchTabOpenSwipeRow === row) searchTabOpenSwipeRow = null;
-  }
-
-  searchTabResultsEl.addEventListener('pointerdown', (e) => {
-    if (!isMobileViewport()) return;
-    const row = e.target.closest('.search-result-row');
-    if (!row || !searchTabResultsEl.contains(row)) return;
-    if (e.target.closest('.swipe-add-btn')) return;
-    if (searchTabOpenSwipeRow && searchTabOpenSwipeRow !== row) closeSearchTabSwipeRow(searchTabOpenSwipeRow);
-    searchTabSwipeState = { row, startX: e.clientX, startY: e.clientY, currentX: 0, active: false, wasOpen: row.classList.contains('swipe-open') };
-  }, { passive: true });
-
-  searchTabResultsEl.addEventListener('pointermove', (e) => {
-    if (!searchTabSwipeState || !isMobileViewport()) return;
-    const dx = e.clientX - searchTabSwipeState.startX;
-    const dy = e.clientY - searchTabSwipeState.startY;
-    if (!searchTabSwipeState.active) {
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-      if (Math.abs(dy) > Math.abs(dx)) { searchTabSwipeState = null; return; }
-      searchTabSwipeState.active = true;
-      searchTabSwipeState.row.style.transition = 'none';
-    }
-    const base = searchTabSwipeState.wasOpen ? -SEARCH_TAB_SWIPE_REVEAL_WIDTH : 0;
-    const raw = base + dx;
-    searchTabSwipeState.currentX = Math.max(-SEARCH_TAB_SWIPE_REVEAL_WIDTH, Math.min(0, raw));
-    searchTabSwipeState.row.style.transform = `translateX(${searchTabSwipeState.currentX}px)`;
-  }, { passive: true });
-
-  function finishSearchTabSwipe() {
-    if (!searchTabSwipeState) return;
-    const { row, active, currentX } = searchTabSwipeState;
-    if (active) {
-      row.style.transition = 'transform 0.2s ease-out';
-      const shouldOpen = currentX <= -SEARCH_TAB_SWIPE_OPEN_THRESHOLD;
-      row.style.transform = shouldOpen ? `translateX(-${SEARCH_TAB_SWIPE_REVEAL_WIDTH}px)` : '';
-      row.classList.toggle('swipe-open', shouldOpen);
-      searchTabOpenSwipeRow = shouldOpen ? row : (searchTabOpenSwipeRow === row ? null : searchTabOpenSwipeRow);
-    }
-    searchTabSwipeState = null;
-  }
-  searchTabResultsEl.addEventListener('pointerup', finishSearchTabSwipe);
-  searchTabResultsEl.addEventListener('pointercancel', finishSearchTabSwipe);
-
-  document.addEventListener('click', (e) => {
-    if (!searchTabOpenSwipeRow) return;
-    if (e.target.closest('.swipe-add-btn')) return;
-    if (!searchTabOpenSwipeRow.contains(e.target)) closeSearchTabSwipeRow(searchTabOpenSwipeRow);
-  });
-
-  searchTabResultsEl.addEventListener('click', (e) => {
-    const addBtn = e.target.closest('.swipe-add-btn');
-    if (!addBtn) return;
-    const row = addBtn.closest('.search-result-row-swipe-wrap').querySelector('.search-result-row');
-    closeSearchTabSwipeRow(row);
-    addWordFromSearchTabRow(row);
-  });
-
-  // Логика добавления зеркалит "else"-ветку performQuickToggle (личный
-  // словарь, обычный поиск на главной) — тут только сам ADD, без toggle-
-  // удаления: свайп "Добавить" на уже добавленном слове просто сообщает,
-  // что оно уже есть, вместо удаления (случайное удаление через результаты
-  // поиска — плохая идея, для этого есть личный словарь)
-  function addWordFromSearchTabRow(row) {
-    const hebrewText = decodeURIComponent(row.dataset.hebrew);
-    const defEl = row.querySelector('.search-definition');
-    const existingWord = findExistingWordByHebrew(hebrewText, defEl ? defEl.textContent : null);
-    if (existingWord) {
-      showToast(t('Слово уже в вашем словаре'));
-      return;
-    }
-    const translitEl = row.querySelector('.translit');
-    const posEl = row.querySelector('.pos');
-    const bilingual = computeBilingualFields(hebrewText, defEl ? defEl.textContent : null);
-    const posValue = (bilingual && bilingual.ru)
-      ? bilingual.ru.pos
-      : (grammarLabelToPosValue(posEl ? posEl.textContent : null) || 'сущ, м.р');
-    const newTranslationRu = (bilingual && bilingual.ru) ? bilingual.ru.translation : (defEl ? defEl.textContent : '');
-
-    // Другое значение ЭТОГО ЖЕ слова уже есть в личном словаре — объединяем
-    // в ту же карточку, а не заводим дубликат (та же логика, что и в
-    // обычном добавлении из поиска на главной)
-    const anyExisting = findAnyExistingWordByHebrew(hebrewText);
-    if (anyExisting) {
-      mergeSenseIntoWord(anyExisting, newTranslationRu, bilingual ? bilingual.en.translation : null);
-      saveWords();
-      const iconEl = row.querySelector('.search-status-icon');
-      if (iconEl) iconEl.innerHTML = CHECK_ON_ICON;
-      row.classList.add('search-result-row-added');
-      showToast(t('Слово добавлено в ваш словарь'));
-      return;
-    }
-
-    const newWord = {
-      id: Date.now(),
-      hebrew: hebrewText,
-      translit: (bilingual && bilingual.ru) ? bilingual.ru.translit : (translitEl ? translitEl.textContent : ''),
-      pos: posValue,
-      translation: newTranslationRu,
-      favorite: false,
-      collectionIds: [],
-      addedAt: Date.now()
-    };
-    if (bilingual) {
-      newWord.fromDict = true;
-      newWord.translation_en = bilingual.en.translation;
-      newWord.translit_en = bilingual.en.translit;
-      newWord.pos_en = bilingual.en.pos;
-    }
-    words.unshift(newWord);
-    saveWords();
-    const iconEl = row.querySelector('.search-status-icon');
-    if (iconEl) iconEl.innerHTML = CHECK_ON_ICON;
-    row.classList.add('search-result-row-added');
-    showToast(t('Слово добавлено в ваш словарь'));
-  }
-
   // ===== Универсальная модалка — замена confirm()/prompt() =====
   // ===== Тост-уведомление (не модалка) — держится 2 секунды, потом фейд-аут =====
   const toastEl = document.getElementById('toast');
@@ -3175,7 +2767,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.86';
+  const APP_VERSION = '0.9.85';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4608,13 +4200,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = t('Выйти из тренировки');
       primaryActionBtn.removeAttribute('data-drop-delete');
-    } else if (searchTabActive) {
-      headerTitleEl.textContent = t('Поиск по базе');
-      primaryActionBtn.innerHTML = isMobileViewport() ? GEAR_ICON : PLUS_ICON;
-      primaryActionBtn.classList.remove('header-icon-btn-danger');
-      primaryActionBtn.classList.add('header-icon-btn-gold');
-      primaryActionBtn.title = isMobileViewport() ? t('Настройки') : 'Добавить слово';
-      primaryActionBtn.removeAttribute('data-drop-delete');
     } else {
       headerTitleEl.textContent = t('Лексикариум');
       primaryActionBtn.innerHTML = isMobileViewport() ? GEAR_ICON : PLUS_ICON;
@@ -4627,17 +4212,14 @@
     const navSelectBtn = document.getElementById('bottomNavSelectBtn');
     const navAddBtn = document.getElementById('bottomNavAddBtn');
     const navHomeBtn = document.getElementById('bottomNavHomeBtn');
-    const navSearchBtn = document.getElementById('bottomNavSearchBtn');
     if (navTrainBtn) navTrainBtn.classList.toggle('active', trainMode);
     if (navSelectBtn) navSelectBtn.classList.toggle('active', selectionMode);
     if (navAddBtn) navAddBtn.classList.toggle('active', addMode);
-    if (navSearchBtn) navSearchBtn.classList.toggle('active', searchTabActive);
-    if (navHomeBtn) navHomeBtn.classList.toggle('active', !trainMode && !selectionMode && !addMode && !editDbMode && !searchTabActive);
+    if (navHomeBtn) navHomeBtn.classList.toggle('active', !trainMode && !selectionMode && !addMode && !editDbMode);
   }
 
   selectModeBtn.addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
-    if (searchTabActive) exitSearchTab();
     if (addMode) exitAddMode();
     if (trainMode) exitTrainMode();
     selectionMode = !selectionMode;
@@ -7155,7 +6737,7 @@
   // Общая логика обработки и отрисовки кандидатов — используется и мгновенным
   // словарным поиском (при вводе), и поиском через сеть (по кнопке). Отдельно
   // вынесено, чтобы не дублировать дедупликацию/фильтр мусора/рендер дважды.
-  function renderCandidatesInto(resultsEl, rawCandidates, total, swipeToAdd) {
+  function renderCandidatesInto(resultsEl, rawCandidates, total) {
     if (!rawCandidates.length) {
       resultsEl.innerHTML = categoryFilterActive()
         ? `<div class="search-results-count" id="searchResultsCountEl">${t('Результаты поиска')} (0)</div><div class="sugg-note">${t('Ничего не найдено по этому фильтру.')}</div>`
@@ -7224,8 +6806,8 @@
     // визуальном языке карточек.
     const visibleRowHtml = (m, i) => {
       const existing = findExistingWordByHebrew(m.text, m.translation);
-      const rowInner = `
-      <button type="button" class="search-result-row ${existing ? 'search-result-row-added' : ''}" data-hebrew="${encodeURIComponent(m.text)}">
+      return `
+      <button type="button" class="search-result-row" data-hebrew="${encodeURIComponent(m.text)}">
         <div class="icon-btn search-status-icon" style="pointer-events:none;">${existing ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
         <div class="translation search-definition">${registerBadgeHtml(m.register)}${m.translation || ''}</div>
         <div class="meta-col">
@@ -7235,15 +6817,6 @@
         <div class="hebrew-word">${m.text}</div>
         <div class="row-num">${i + 1}</div>
       </button>
-    `;
-      if (!swipeToAdd) return rowInner;
-      // Вкладка "Поиск": вместо клика/двойного тапа — свайп влево открывает
-      // "Добавить" (зеркально свайпу "Удалить" в личном словаре)
-      return `
-      <div class="search-result-row-swipe-wrap" data-hebrew="${encodeURIComponent(m.text)}">
-        <button type="button" class="swipe-add-btn" data-hebrew="${encodeURIComponent(m.text)}">${PLUS_ICON}<span>${t('Добавить')}</span></button>
-        ${rowInner}
-      </div>
     `;
     };
 
@@ -7361,13 +6934,7 @@
       });
     };
 
-    if (!swipeToAdd) {
-      attachQuickToggleHandlers(resultsEl);
-    }
-    // swipeToAdd === true (вкладка "Поиск"): свайп обрабатывается через
-    // делегирование на #searchTabResults (см. ниже, вешается один раз при
-    // инициализации, не при каждом рендере — тот же паттерн, что и у
-    // свайпа-удаления в личном словаре)
+    attachQuickToggleHandlers(resultsEl);
 
     if (hiddenMatches.length) {
       document.getElementById('showHiddenBtn').addEventListener('click', (e) => {
@@ -8106,7 +7673,6 @@
   document.getElementById('trainModeBtn').addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
     if (trainMode) { exitTrainMode(); return; }
-    if (searchTabActive) exitSearchTab();
     if (selectionMode) exitSelectionMode();
     if (addMode) exitAddMode();
     enterTrainMode();
@@ -8850,13 +8416,11 @@
   });
   document.getElementById('bottomNavAddBtn').addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
-    if (searchTabActive) exitSearchTab();
     if (addMode) { exitAddMode(); return; }
     enterAddMode();
   });
   document.getElementById('bottomNavHomeBtn').addEventListener('click', () => {
     // выходим из любого активного режима обратно к обычному списку
-    if (searchTabActive) exitSearchTab();
     if (selectionMode) exitSelectionMode();
     if (addMode) exitAddMode();
     if (editDbMode) exitEditDbMode();
@@ -8870,13 +8434,16 @@
     window.scrollTo(0, 0);
   });
   document.getElementById('bottomNavSearchBtn').addEventListener('click', () => {
-    if (searchTabActive) return; // уже на вкладке — тап никак её не переключает (нет режима "туда-обратно" одной кнопкой, есть Главная)
+    // Временное поведение — отдельная вкладка "Поиск по всей базе" появится
+    // на следующем шаге рефактора; пока просто выводим на поле поиска по
+    // своей коллекции и фокусируемся на нём.
     if (selectionMode) exitSelectionMode();
     if (addMode) exitAddMode();
     if (editDbMode) exitEditDbMode();
     if (trainMode) exitTrainMode();
     window.scrollTo(0, 0);
-    enterSearchTab();
+    const si = document.getElementById('searchInput');
+    if (si) si.focus();
   });
 
   // ===== Первичный рендер =====
