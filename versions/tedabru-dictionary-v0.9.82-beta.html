@@ -556,33 +556,19 @@
     /* Раскрывающаяся строка частей речи теперь появляется НАД строкой
        подборок (а не под ней) — именно там, где раньше стоял чип "Фильтры" */
     #filtersCollapse { order: -1; }
-    /* Тумблер часть речи/прогресс — теперь НЕ внутри .filter-row (там он
-       участвовал в скролле/растяжении при доскролле до края и подпадал
-       под fade-маску строки — см. updateFadeMask). Это отдельный элемент
-       поверх строки, в .filter-row-wrap (position:relative), абсолютно
-       позиционированный у левого края — полностью вне скролла и маски.
-       Фиксированная ширина + иконки вместо текста — раньше "Прогресс"/
-       "Часть речи" были разной длины, и чип скакал по ширине. */
-    .filter-row-wrap {
-      position: relative;
-    }
-    .filter-row-wrap .filter-row {
-      padding-left: 46px; /* место под оверлей слева, чтобы "Все" не пряталась под ним */
-    }
-    #cardInfoModeToggle.chip-overlay-left {
-      display: flex;
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      z-index: 3;
-      width: 38px;
-      padding: 0;
-      align-items: center;
-      justify-content: center;
+    /* Тумблер часть речи/прогресс переехал в строку подборок и прилипает
+       к правому краю рабочей области — подборки уезжают под него при
+       скролле, сам тумблер всегда виден. Непрозрачный фон нужен, чтобы
+       чипы подборок реально прятались под ним, а не просвечивали; лёгкий
+       градиент слева — намёк, что там есть что проскроллить дальше */
+    .filter-row #cardInfoModeToggle {
+      display: inline-flex;
+      position: sticky;
+      right: 0;
+      z-index: 2;
       background: var(--bg-dark);
+      box-shadow: -14px 0 10px -4px var(--bg-dark);
     }
-    .chip-overlay-left svg { width: 18px; height: 18px; }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -1798,7 +1784,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.83 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.82 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2767,7 +2753,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.83';
+  const APP_VERSION = '0.9.82';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3315,8 +3301,6 @@
   const GEAR_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
   const EXIT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
   const PENCIL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
-  const LIPS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.3 10.6c2-2.3 4.3-3.4 6.3-1.3 1.3 1.3 2.8 1.3 4.1 0 2-2.1 4.3-1 6.3 1.3 0 0-1.8 7-8.5 8.7C4.5 17.6 3.3 10.6 3.3 10.6z"/><path d="M4.2 11.2c2.6 0.9 4.8 1.1 7.5 1.1s5-0.2 7.5-1.1"/></svg>';
-  const PROGRESS_PIE_ICON = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3 A9 9 0 0 1 20.2 16.5 L12 12 Z" fill="currentColor"/><circle cx="12" cy="12" r="3.5" fill="var(--bg-dark)"/></svg>';
   const CHECK_SIMPLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9.5 17.5 20 6"/></svg>';
   const FOLDER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>';
 
@@ -3352,11 +3336,7 @@
           `<button type="button" class="chip ${filterMastery === m.key ? 'active' : ''}" data-mastery="${m.key}">${t(m.label)} · ${countByMastery[m.key] || 0}</button>`
         ).join('')}
       </div>
-      <div class="filter-row-wrap">
-        <button type="button" class="chip chip-icon-only chip-overlay-left" id="cardInfoModeToggle" title="${t('Показывать в карточке: часть речи или прогресс изучения')}">
-          ${cardInfoMode === 'meta' ? LIPS_ICON : PROGRESS_PIE_ICON}
-        </button>
-        <div class="filter-row">
+      <div class="filter-row">
         ${(() => {
           const isAllActive = !filterMastery && !filterCollectionId && !filterFavorite && !filterPos;
           return `<button type="button" class="chip ${isAllActive ? 'active' : ''}" id="allChip">${t('Все')} · ${words.length}</button>`;
@@ -3389,7 +3369,10 @@
           return `<button type="button" class="chip" data-coll="${c.id}">${c.name} · ${countByCollection[c.id] || 0}</button>`;
         }).join('')}
         <button type="button" class="chip chip-text-only" id="filtersToggleChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="4 4 20 4 14 12 14 19 10 19 10 12 4 4"/></svg> ${t('Фильтры')}</button>
-        </div>
+        <button type="button" class="chip chip-text-only chip-sticky-right" id="cardInfoModeToggle" title="${t('Показывать в карточке: часть речи или прогресс изучения')}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          ${cardInfoMode === 'meta' ? t('Часть речи') : t('Прогресс')}
+        </button>
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
         <div class="filter-row">
