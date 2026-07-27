@@ -661,12 +661,7 @@
        (.list), а панель — просто последний элемент флекс-колонки, всегда
        внизу естественным образом, без отдельного композитного слоя. */
     .app {
-      height: 100svh; /* было 100dvh — dvh может "устаканиваться" уже после первой
-                          отрисовки в WebKit, из-за чего .app временно был выше
-                          нужного (контент казался растянутым/карточки наслаивались),
-                          а потом визуально "сжимался" до правильного размера.
-                          svh (small viewport height) — гарантированно наименьшее
-                          и стабильное значение с первого кадра, без устаканивания */
+      height: 100dvh;
       overflow: hidden;
       padding-bottom: 0; /* было env(safe-area-inset-bottom) из десктопного правила — теперь панель сама внутри .app и уже резервирует safe-area своим паддингом, дублировать не нужно */
     }
@@ -1702,7 +1697,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.65 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.64 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2662,7 +2657,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.65';
+  const APP_VERSION = '0.9.64';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
