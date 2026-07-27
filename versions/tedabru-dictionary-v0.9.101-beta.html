@@ -1317,20 +1317,6 @@
     text-align: right;
   }
 
-  #selectZoneOverlayContainer {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 998;
-  }
-  .checkbox-select-zone {
-    position: absolute;
-    touch-action: none; /* авторитетный запрет скролла в зоне — оценивается браузером по реальному элементу под пальцем, а не наследуется/перебивается через JS */
-    pointer-events: auto;
-    background: rgba(255,0,0,0.25); /* временный дебаг-цвет, уберём после проверки */
-    border: 1px solid red;
-  }
-
   .row-dimmed .hebrew-word,
   .row-dimmed .translation { color: var(--dim-text); }
   .row-dimmed .translit { color: var(--dim-text-soft); }
@@ -1890,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.102 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.101 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3319,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.102';
+  const APP_VERSION = '0.9.101';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4247,7 +4233,7 @@
       `;
       }).join('');
       fitHebrewWordsInList(listEl);
-      requestAnimationFrame(renderSelectZoneOverlays); // ждём, пока раскладка реально применится
+      requestAnimationFrame(renderSelectZoneDebugOverlays); // ждём, пока раскладка реально применится
       // клики/протаскивание в режиме выделения обрабатываются один раз при
       // инициализации (см. attachSelectionDragHandlers) через делегирование
       // на #wordList, а не тут — строки пересоздаются на каждый renderList(),
@@ -4785,7 +4771,6 @@
     selectedCollectionIds = new Set();
     selectModeBtn.classList.remove('active');
     updateHeaderForSelectionMode();
-    if (typeof selectZoneContainer !== 'undefined') selectZoneContainer.innerHTML = '';
   }
 
   // Esc — закрывает открытую модалку, потом режим редактирования базы или
@@ -4899,23 +4884,14 @@
     return true;
   }
 
-  // ===== Зона выделения на мобильном — настоящие интерактивные DOM-элементы
-  // (не координатная математика поверх #wordList/.word-row) =====
-  // Два отдельных бага заставили пересмотреть подход:
-  // 1. #wordList физически НЕ включает паддинг .app в свой бокс (у .list
-  //    нет горизонтального паддинга/margin) — значит события в этой зоне
-  //    никогда не долетали до обработчика на wordListEl (bubbling идёт
-  //    только вверх по предкам, а .app — предок #wordList, а не наоборот).
-  // 2. touch-action оценивается браузером по РЕАЛЬНОМУ элементу под пальцем
-  //    в момент касания — preventDefault() в JS не всегда успевает
-  //    перебить touch-action:pan-y, унаследованный от .word-row.
-  // Решение — настоящие позиционированные div'ы поверх зоны, с
-  // touch-action:none, повешенные в отдельный стабильный контейнер (не
-  // пересоздаётся при каждом renderList(), в отличие от самих строк).
-  const selectZoneContainer = document.createElement('div');
-  selectZoneContainer.id = 'selectZoneOverlayContainer';
-  document.body.appendChild(selectZoneContainer);
-
+  // Зона выделения на мобильном — не сама иконка чекбокса (слишком узкая
+  // мишень), а прямоугольник вокруг неё, зеркальный относительно РЕАЛЬНОГО
+  // края экрана (window.innerWidth), а не границы самой .word-row — у неё
+  // на мобильном нет паддинга (padding: 9px 0), правый край строки уже
+  // отступает от края экрана на паддинг .app (15px), так что зеркалирование
+  // от rowRect.right было и несимметричным, и не захватывало этот отступ.
+  // X-диапазон общий для всех строк (у них одинаковая раскладка колонок) —
+  // считаем один раз по любой попавшейся строке, а не по каждой отдельно.
   function getCheckboxZoneXRange() {
     const sampleRow = wordListEl.querySelector('.word-row.selectable');
     if (!sampleRow) return null;
@@ -4927,66 +4903,49 @@
     const distToScreenEdge = screenRight - cbCenterX;
     return { left: cbCenterX - distToScreenEdge, right: screenRight };
   }
+  // Зона нарочно заходит в паддинг .app — там event.target уже не сама
+  // строка, а #wordList/.app, поэтому искать строку через
+  // e.target.closest('.word-row') в этой области бесполезно. Ищем строку
+  // по Y-координате напрямую, независимо от того, что реально под пальцем.
+  function findRowAtY(clientY) {
+    const rows = wordListEl.querySelectorAll('.word-row.selectable');
+    for (const row of rows) {
+      const rect = row.getBoundingClientRect();
+      if (clientY >= rect.top && clientY <= rect.bottom) return row;
+    }
+    return null;
+  }
+  function isInCheckboxZone(clientX, clientY) {
+    const xRange = getCheckboxZoneXRange();
+    if (!xRange || clientX < xRange.left || clientX > xRange.right) return false;
+    return !!findRowAtY(clientY);
+  }
 
-  function renderSelectZoneOverlays() {
-    selectZoneContainer.innerHTML = '';
-    if (!selectionMode || !isMobileViewport()) return;
+  // ===== ВРЕМЕННЫЙ ДЕБАГ — визуализация зоны выделения (уберём после
+  // проверки) =====
+  const DEBUG_SHOW_SELECT_ZONE = true;
+  function renderSelectZoneDebugOverlays() {
+    document.querySelectorAll('.select-zone-debug').forEach(el => el.remove());
+    if (!DEBUG_SHOW_SELECT_ZONE || !selectionMode || !isMobileViewport()) return;
     const xRange = getCheckboxZoneXRange();
     if (!xRange) return;
     wordListEl.querySelectorAll('.word-row.selectable').forEach(row => {
       const rowRect = row.getBoundingClientRect();
       const overlay = document.createElement('div');
-      overlay.className = 'checkbox-select-zone';
-      overlay.dataset.id = row.dataset.id;
+      overlay.className = 'select-zone-debug';
+      overlay.style.position = 'fixed';
       overlay.style.left = xRange.left + 'px';
       overlay.style.top = rowRect.top + 'px';
       overlay.style.width = (xRange.right - xRange.left) + 'px';
       overlay.style.height = rowRect.height + 'px';
-      selectZoneContainer.appendChild(overlay);
+      overlay.style.background = 'rgba(255,0,0,0.25)';
+      overlay.style.border = '1px solid red';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = '999';
+      document.body.appendChild(overlay);
     });
   }
-  window.addEventListener('scroll', renderSelectZoneOverlays, true);
-
-  // Отдельная, полностью изолированная драг-сессия — не пересекается с
-  // dragSession/dragArmState (та система остаётся только за драг уже
-  // выделенных карточек на подборку из остальной части строки)
-  let selectZoneDragSession = null;
-
-  selectZoneContainer.addEventListener('pointerdown', (e) => {
-    const zoneEl = e.target.closest('.checkbox-select-zone');
-    if (!zoneEl) return;
-    e.preventDefault();
-    const id = parseInt(zoneEl.dataset.id);
-    const row = wordListEl.querySelector(`.word-row.selectable[data-id="${id}"]`);
-    if (!row) return;
-    const willSelect = !selectedIds.has(id);
-    applyRowSelection(id, willSelect, row);
-    selectZoneDragSession = { pointerId: e.pointerId, mode: willSelect, lastId: id };
-    try { selectZoneContainer.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
-  });
-
-  selectZoneContainer.addEventListener('pointermove', (e) => {
-    if (!selectZoneDragSession || selectZoneDragSession.pointerId !== e.pointerId) return;
-    e.preventDefault();
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    const zoneEl = el && el.closest && el.closest('.checkbox-select-zone');
-    if (!zoneEl) return;
-    const id = parseInt(zoneEl.dataset.id);
-    if (id !== selectZoneDragSession.lastId) {
-      selectZoneDragSession.lastId = id;
-      const row = wordListEl.querySelector(`.word-row.selectable[data-id="${id}"]`);
-      if (row) applyRowSelection(id, selectZoneDragSession.mode, row);
-    }
-  });
-
-  function endSelectZoneDrag(e) {
-    if (!selectZoneDragSession || selectZoneDragSession.pointerId !== e.pointerId) return;
-    try { selectZoneContainer.releasePointerCapture(e.pointerId); } catch (err) { /* не критично */ }
-    selectZoneDragSession = null;
-  }
-  selectZoneContainer.addEventListener('pointerup', endSelectZoneDrag);
-  selectZoneContainer.addEventListener('pointercancel', endSelectZoneDrag);
-
+  window.addEventListener('scroll', renderSelectZoneDebugOverlays, true);
 
   // Защитная очистка "залипшего" состояния драга/выделения — вызываем при
   // выходе из режима выбора или переходе по нижней панели, чтобы
@@ -4995,7 +4954,6 @@
   // хаотичного скролла при тапе по нижней панели
   function cancelActiveSelectionGesture() {
     dragArmState = null;
-    if (typeof selectZoneDragSession !== 'undefined') selectZoneDragSession = null;
     if (dragSession) {
       try { wordListEl.releasePointerCapture(dragSession.pointerId); } catch (err) { /* не критично */ }
       clearDropHighlight();
@@ -5065,14 +5023,32 @@
   wordListEl.addEventListener('pointerdown', (e) => {
     if (!selectionMode) return;
 
+    if (isMobileViewport() && isInCheckboxZone(e.clientX, e.clientY)) {
+      // Зона выделения — строго только выделение, скролл тут запрещён
+      // категорически (иначе ломается сам принцип режима). Зона нарочно
+      // шире самой строки (заходит в паддинг .app), поэтому строку ищем по
+      // Y-координате, а не через e.target.closest — в паддинге target уже
+      // не сама строка, а #wordList/.app. preventDefault прямо тут, на
+      // pointerdown, а не только в pointermove — иначе touch-action:pan-y
+      // у .word-row успевает передать жест браузеру раньше, чем сработает
+      // наш JS.
+      e.preventDefault();
+      const row = findRowAtY(e.clientY);
+      if (!row) return;
+      const id = parseInt(row.dataset.id);
+      const willSelect = !selectedIds.has(id);
+      applyRowSelection(id, willSelect, row);
+      dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
+      try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+      return;
+    }
+
     const row = e.target.closest('.word-row.selectable');
     if (!row) return;
     const id = parseInt(row.dataset.id);
 
     if (isMobileViewport()) {
-      // Выделение (тап/мультивыделение по чекбоксам) теперь целиком в
-      // отдельной, изолированной системе — см. selectZoneContainer выше.
-      // Тут остаётся только драг уже выделенных карточек на подборку.
+      // Остальная часть строки — драг уже выделенных карточек на подборку.
       // Не захватываем pointer сразу на pointerdown (иначе конфликт со
       // скроллом), а "вооружаем" и проверяем направление реального движения
       // в pointermove — тот же приём, что и у свайпа-удаления (dx против dy)
