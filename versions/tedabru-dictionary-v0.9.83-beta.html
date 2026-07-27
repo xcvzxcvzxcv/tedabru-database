@@ -574,15 +574,15 @@
       position: absolute;
       left: 0;
       top: 0;
+      bottom: 0;
       z-index: 3;
       width: 38px;
-      padding: 10px 0; /* та же вертикальная набивка, что у обычных чипов — высота совпадает естественно, а не растяжением top/bottom */
-      box-sizing: border-box;
+      padding: 0;
       align-items: center;
       justify-content: center;
       background: var(--bg-dark);
     }
-    .chip-overlay-left svg { width: 24px; height: 24px; }
+    .chip-overlay-left svg { width: 18px; height: 18px; }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -1798,7 +1798,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.84 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.83 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2767,7 +2767,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.84';
+  const APP_VERSION = '0.9.83';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3044,7 +3044,7 @@
         { label: t('Создать'), variant: 'primary', action: (name) => {
             if (!name) return;
             const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
-            collections.unshift(nc); // новая подборка — первая в списке, чтобы не потерялась среди старых
+            collections.push(nc);
             saveCollections();
             renderFilterBar();
             if (onCreated) onCreated(nc);
@@ -3322,11 +3322,6 @@
 
   function renderFilterBar() {
     const el = document.getElementById('filterBar');
-    // сохраняем скролл строки подборок ДО перерисовки — иначе он каждый раз
-    // сбрасывается в 0, и список подборок "прыгает" при любом переключении
-    // фильтра/подборки
-    const prevCollectionsRow = el.querySelector('.filter-row-wrap .filter-row');
-    const savedCollectionsScrollLeft = prevCollectionsRow ? prevCollectionsRow.scrollLeft : 0;
     if (categoryFilterPanelOpen || categoryFilterActive()) {
       el.innerHTML = '';
       return;
@@ -3547,7 +3542,7 @@
         if (commit) {
           const name = inlineInput.value.trim();
           if (name) {
-            collections.unshift({ id: 'c' + Date.now(), name: uniqueCollectionName(name) }); // новая подборка — первая в списке
+            collections.push({ id: 'c' + Date.now(), name: uniqueCollectionName(name) });
             saveCollections();
           }
         }
@@ -3575,12 +3570,6 @@
 
     // затухание слева/справа — только там, где реально есть что докрутить;
     // в естественном (нескролленном) положении левый край всегда чёткий
-    // восстанавливаем сохранённый скролл строки подборок ДО расчёта fade-маски
-    const newCollectionsRow = el.querySelector('.filter-row-wrap .filter-row');
-    if (newCollectionsRow && savedCollectionsScrollLeft) {
-      newCollectionsRow.scrollLeft = savedCollectionsScrollLeft;
-    }
-
     el.querySelectorAll('.filter-row').forEach(row => {
       updateFadeMask(row);
       row.addEventListener('scroll', () => updateFadeMask(row));
@@ -4675,7 +4664,6 @@
   // визуально "раздвигается" под наведением.
   const filterBarEl = document.getElementById('filterBar');
   const COLLECTION_DRAG_MOVE_THRESHOLD = 10; // px — сдвиг больше этого сразу запускает драг
-  const COLLECTION_DRAG_ENABLED = false; // временно отключено — конфликтовало с горизонтальным скроллом строки чипов подборок; нужен другой способ объединения/удаления подборок
   let collectionDragArmedChip = null; // чип, за который держимся, пока не подтвердилось — драг это или просто клик
   let collectionDragArmedPointerId = null;
   let collectionDragArmedStartX = 0, collectionDragArmedStartY = 0;
@@ -4863,7 +4851,6 @@
   }
 
   filterBarEl.addEventListener('pointerdown', (e) => {
-    if (!COLLECTION_DRAG_ENABLED) return; // временно отключено — конфликтовало с горизонтальным скроллом строки чипов
     const chip = e.target.closest('[data-coll]');
     if (!chip || !chip.dataset.coll) return;
     if (selectionMode) {
@@ -8043,7 +8030,7 @@
           const name = inlineInput.value.trim();
           if (name) {
             const nc = { id: 'c' + Date.now(), name: uniqueCollectionName(name) };
-            collections.unshift(nc); // новая подборка — первая в списке
+            collections.push(nc);
             saveCollections();
             bulkTargetCollectionIds.add(nc.id); // сразу добавляем только что созданную к выбору
           }
