@@ -1876,7 +1876,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.97 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.96 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3305,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.97';
+  const APP_VERSION = '0.9.96';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4944,23 +4944,13 @@
     const id = parseInt(row.dataset.id);
 
     if (isMobileViewport()) {
-      // Тап/свайп по чекбоксу — узкая, выделенная зона под мультивыделение:
-      // один тап переключает саму строку, а протаскивание пальца ПО
-      // чекбоксам (вниз/вверх) переключает каждую строку под пальцем —
-      // тот же 'select'-тип сессии, что и у десктопного "тянуть по
-      // строкам", просто теперь стартует строго с чекбокса, а не с любой
-      // точки строки (иначе снова конфликт со скроллом)
-      if (e.target.closest('.word-row-select-checkbox')) {
-        const willSelect = !selectedIds.has(id);
-        applyRowSelection(id, willSelect, row);
-        dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
-        try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
-        return;
-      }
-      // Остальная часть строки — драг уже выделенных карточек на подборку.
-      // Не захватываем pointer сразу на pointerdown (иначе конфликт со
-      // скроллом), а "вооружаем" и проверяем направление реального движения
-      // в pointermove — тот же приём, что и у свайпа-удаления (dx против dy)
+      // На мобильном тап переключает выделение только через сам чекбокс (см.
+      // отдельный click-обработчик ниже) — "тянуть по строкам" мышью тут
+      // неприменимо, палец конфликтует со скроллом. Драг уже выделенных
+      // карточек на подборку — не захватываем pointer сразу на pointerdown
+      // (иначе опять конфликт со скроллом), а "вооружаем" и проверяем
+      // направление реального движения в pointermove — тот же приём, что и
+      // у свайпа-удаления (dx против dy)
       if (isDragZone(e.target) && selectedIds.has(id)) {
         dragArmState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, row, active: false };
       }
@@ -4984,6 +4974,18 @@
       dragSession = { pointerId: e.pointerId, type: 'select', mode: willSelect, lastRowId: id, dropTarget: null, hoveredElement: null };
     }
     try { wordListEl.setPointerCapture(e.pointerId); } catch (err) { /* не критично */ }
+  });
+
+  // Мобильный чекбокс — единственный способ переключить выделение на
+  // тач-устройстве (простой тап, без драга и без конфликта со скроллом)
+  wordListEl.addEventListener('click', (e) => {
+    if (!selectionMode || !isMobileViewport()) return;
+    const checkbox = e.target.closest('.word-row-select-checkbox');
+    if (!checkbox) return;
+    const row = checkbox.closest('.word-row.selectable');
+    if (!row) return;
+    const id = parseInt(row.dataset.id);
+    applyRowSelection(id, !selectedIds.has(id), row);
   });
 
   wordListEl.addEventListener('pointermove', (e) => {
