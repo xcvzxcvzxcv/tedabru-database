@@ -28,7 +28,7 @@
     --dim-text-soft: #6a5f85;
     --rating-good-text: #d6c8ff;
     --danger-text: #e08a9a;
-    --chip-active-bg: #3d3846; /* было rgba(155,93,229,0.25) — слишком светло/насыщенно на тёмном фоне; теперь --bg-dark, осветлённый на 20% */
+    --chip-active-bg: rgba(155,93,229,0.25);
     --chip-active-border: var(--purple);
     --chip-active-text: var(--purple-dark);
     --chip-text: var(--text-secondary);
@@ -765,21 +765,6 @@
     .word-row.row-has-favorite .translation {
       color: var(--gold);
     }
-    /* Режим выбора — чекбокс занимает ту же колонку (grid-column:4), что и
-       звезда избранного в обычном режиме; тут он всегда присутствует
-       (не только у избранных), потому колонка всегда резервирует место */
-    .word-row-select-checkbox {
-      grid-column: 4;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-    }
-    .word-row-select-checkbox svg { width: 22px; height: 22px; }
-    .word-row.row-selected .word-row-select-checkbox { color: var(--gold); }
     .word-row-swipe-wrap {
       overflow: hidden;
       border-radius: 8px;
@@ -1876,7 +1861,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.95 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.94 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3305,7 +3290,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.95';
+  const APP_VERSION = '0.9.94';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4218,16 +4203,16 @@
     if (selectionMode) {
       listEl.innerHTML = filtered.map((w, i) => {
         const disp = personalWordDisplay(w);
-        const isSelected = selectedIds.has(w.id);
         return `
-        <div class="word-row selectable ${isSelected ? 'row-selected' : ''}" data-id="${w.id}">
+        <div class="word-row selectable ${selectedIds.has(w.id) ? 'row-selected' : ''}" data-id="${w.id}">
+          <div class="icon-btn">${selectedIds.has(w.id) ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
           <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
           <div class="meta-col">
             <div class="translit">${disp.translit}</div>
             <div class="pos">${mobileCompactPos(disp.pos)}</div>
           </div>
           <div class="translation">${disp.translation}</div>
-          <div class="word-row-select-checkbox">${isSelected ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
+          <div></div>
           <div class="row-num">${i + 1}</div>
         </div>
       `;
@@ -4877,7 +4862,7 @@
   // между ними) — по умолчанию это зона перетаскивания, а не наоборот, иначе
   // клики по пустым ячейкам-заполнителям ошибочно засчитывались как "выделение"
   function isDragZone(target) {
-    if (target.closest('.icon-btn') || target.closest('.hebrew-word') || target.closest('.meta-col') || target.closest('.word-row-select-checkbox')) return false;
+    if (target.closest('.icon-btn') || target.closest('.hebrew-word') || target.closest('.meta-col')) return false;
     return true;
   }
 
@@ -7630,14 +7615,13 @@
       nikkudSuggestion.innerHTML = finalCandidates.map((c, i) => {
         const existing = findExistingWordByHebrew(c.text, c.translation);
         return `
-        <button type="button" class="search-result-row ${existing ? 'search-result-row-added' : ''}" data-index="${i}">
-          <div class="icon-btn search-status-icon" style="pointer-events:none;">${existing ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
-          <div class="translation search-definition">${registerBadgeHtml(c.register)}${c.translation || ''}</div>
-          <div class="meta-col">
-            <div class="translit">${c.translit}</div>
-          </div>
-          <div class="hebrew-word">${hebrewDisplay(c.text)}</div>
-          <div class="row-num">${i + 1}</div>
+        <button type="button" class="candidate-row ${existing ? 'already-added' : ''}" data-index="${i}">
+          <div class="candidate-word">${hebrewDisplay(c.text)}</div>
+          <div class="candidate-translit">${c.translit}</div>
+          ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
+          ${registerBadgeHtml(c.register)}
+          ${c.translation ? `<div class="candidate-translation">${c.translation}</div>` : ''}
+          ${existing ? `<div class="already-added-badge">${CHECK_ON_ICON}<span>${t('уже добавлено')}</span></div>` : ''}
         </button>
       `;
       }).join('') + (uniqueCandidates.length > finalCandidates.length ? `
@@ -7645,7 +7629,7 @@
       ` : '');
       nikkudSuggestion.classList.add('visible');
 
-      nikkudSuggestion.querySelectorAll('.search-result-row').forEach((row, i) => {
+      nikkudSuggestion.querySelectorAll('.candidate-row').forEach((row, i) => {
         row.addEventListener('click', () => {
           const c = finalCandidates[i];
           inputHebrew.value = c.text;
