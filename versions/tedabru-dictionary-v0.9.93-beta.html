@@ -1861,7 +1861,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.94 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.93 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2138,10 +2138,6 @@
       <span data-i18n="Шрифт иврита">Шрифт иврита</span>
       <button type="button" class="hebrew-font-toggle-btn" id="hebrewFontToggleBtn"><span id="hebrewFontToggleLabel"></span></button>
     </div>
-    <div class="settings-row">
-      <span data-i18n="Никуды">Никуды</span>
-      <button type="button" class="hebrew-font-toggle-btn" id="nikudToggleBtn"><span id="nikudToggleLabel"></span></button>
-    </div>
     <div class="action-modal-buttons">
       <button type="button" class="action-modal-btn" id="settingsCloseBtn" data-i18n="Закрыть">Закрыть</button>
     </div>
@@ -2373,9 +2369,6 @@
     'Язык': 'Language',
     'Тема': 'Theme',
     'Шрифт иврита': 'Hebrew font',
-    'Никуды': 'Niqqud',
-    'С никудами': 'With niqqud',
-    'Без никудов': 'Without niqqud',
     'Закрыть': 'Close',
     'Готово': 'Done',
     'Начать': 'Start',
@@ -3290,7 +3283,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.94';
+  const APP_VERSION = '0.9.93';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3600,12 +3593,6 @@
     try { localStorage.setItem('tedabru_card_info_mode', mode); } catch (e) {}
     applyCardInfoModeClass();
   }
-  // Тумблер "показывать никуды" — 'with' (как хранится в базе) | 'without'
-  // (снято, с правильным ктив мале — см. hebrewDisplay/toKtivMale выше по
-  // файлу). Персистентно между сессиями, как и остальные подобные тумблеры.
-  let nikudMode = (function() {
-    try { return localStorage.getItem('tedabru_nikud_mode') === 'without' ? 'without' : 'with'; } catch (e) { return 'with'; }
-  })();
   let renamingCollectionId = null; // id подборки, чей чип сейчас превращён в поле переименования
 
   // ===== Режим выбора (для массового добавления в подборку) =====
@@ -4206,7 +4193,7 @@
         return `
         <div class="word-row selectable ${selectedIds.has(w.id) ? 'row-selected' : ''}" data-id="${w.id}">
           <div class="icon-btn">${selectedIds.has(w.id) ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
-          <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
+          <div class="hebrew-word">${w.hebrew}</div>
           <div class="meta-col">
             <div class="translit">${disp.translit}</div>
             <div class="pos">${mobileCompactPos(disp.pos)}</div>
@@ -4261,7 +4248,7 @@
         <button type="button" class="swipe-delete-btn" data-id="${w.id}">${TRASH_ICON}<span>${t('Удалить')}</span></button>
         <div class="word-row ${getMasteryLevel(w) === 'mastered' ? 'row-dimmed' : ''} ${revealedRowId === w.id ? 'row-actions-revealed' : ''} ${w.favorite ? 'row-has-favorite' : ''}" data-id="${w.id}">
         <button class="icon-btn listen-btn" data-hebrew="${encodeURIComponent(w.hebrew)}" title="${t('Прослушать')}">${SPEAKER_ICON}</button>
-        <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
+        <div class="hebrew-word">${w.hebrew}</div>
         ${showRatingInMetaSlot ? ratingColHtml : metaColHtml}
         ${editingWordId === w.id
             ? `<textarea class="translation-edit" data-id="${w.id}">${w.translation}</textarea>`
@@ -5585,48 +5572,6 @@
     return (word || '').replace(/[\u0591-\u05C7]/g, '').replace(/\|/g, '');
   }
 
-  // ===== Тумблер "показывать никуды" — снятие огласовок с правильной
-  // орфографией (ктив мале), а не просто механическое стирание точек =====
-  // Два случая реально требуют вставки/замены буквы (проверено на реальной
-  // базе — см. обсуждение, ~7% слов):
-  //   1. Холам БЕЗ вав (ֹ прямо на согласной, не וֹ) — при снятии огласовок
-  //      "о" пропадёт совсем, если не вставить вав: רֹב → רוֹב (потом ֹ
-  //      снимается вместе со всеми остальными, вав остаётся настоящей буквой)
-  //   2. Кубуц (ֻ) — заменяется на шурук: вав с дагешем ПОСЛЕ согласной,
-  //      сам кубуц с согласной убирается: קֻפָּה → קוּפָּה
-  // После этих двух вставок все никуды (включая только что добавленные
-  // холам/дагеш) снимаются обычным stripNiqqud — вставленные буквы вав
-  // остаются как настоящие согласные, а не диакритика.
-  const NIQQUD_HOLAM = '\u05B9';
-  const NIQQUD_KUBUTZ = '\u05BB';
-  const NIQQUD_DAGESH = '\u05BC';
-  const LETTER_VAV = '\u05D5';
-  function toKtivMale(word) {
-    if (!word) return word;
-    let result = '';
-    for (let i = 0; i < word.length; i++) {
-      const ch = word[i];
-      if (ch === NIQQUD_HOLAM) {
-        const prevResultChar = result[result.length - 1];
-        if (prevResultChar !== LETTER_VAV) {
-          result += LETTER_VAV; // холам хасер — вставляем вав, чтобы огласовка не потерялась при снятии никуда
-        }
-        result += ch;
-      } else if (ch === NIQQUD_KUBUTZ) {
-        result += LETTER_VAV + NIQQUD_DAGESH; // кубуц -> шурук (вав+дагеш), сам кубуц не переносим
-      } else {
-        result += ch;
-      }
-    }
-    return result;
-  }
-  // Единая точка входа для ВИДИМОГО текста ивритского слова — везде, где
-  // человек ЧИТАЕТ слово (не редактирует, не использует как ключ для
-  // TTS/поиска — там нужна настоящая огласованная форма без изменений)
-  function hebrewDisplay(word) {
-    if (nikudMode !== 'without') return word;
-    return stripNiqqud(toKtivMale(word));
-  }
   // ===== Варианты "краткого" (ktiv-chaser) написания из "полного" (ktiv-male) =====
   //
   // Формы в наших индексах строятся снятием никуда с ОГЛАСОВАННОГО слова, а
@@ -7346,7 +7291,7 @@
       const existing = findExistingWordByHebrew(m.text, m.translation);
       return `
       <button type="button" class="candidate-row ${existing ? 'already-added' : ''}">
-        <div class="candidate-word">${hebrewDisplay(m.text)}</div>
+        <div class="candidate-word">${m.text}</div>
         <div class="candidate-translit">${m.translit}</div>
         ${m.grammarLabel ? `<div class="candidate-grammar">${m.grammarLabel}</div>` : ''}
         ${registerBadgeHtml(m.register)}
@@ -7371,7 +7316,7 @@
         <div class="meta-col">
           <div class="translit">${m.translit}</div>
         </div>
-        <div class="hebrew-word">${hebrewDisplay(m.text)}</div>
+        <div class="hebrew-word">${m.text}</div>
         <div class="row-num">${i + 1}</div>
       </button>
     `;
@@ -7616,7 +7561,7 @@
         const existing = findExistingWordByHebrew(c.text, c.translation);
         return `
         <button type="button" class="candidate-row ${existing ? 'already-added' : ''}" data-index="${i}">
-          <div class="candidate-word">${hebrewDisplay(c.text)}</div>
+          <div class="candidate-word">${c.text}</div>
           <div class="candidate-translit">${c.translit}</div>
           ${c.grammarLabel ? `<div class="candidate-grammar">${c.grammarLabel}</div>` : ''}
           ${registerBadgeHtml(c.register)}
@@ -8326,7 +8271,7 @@
       el.innerHTML = words.map(w => `
         <label class="train-manual-row">
           <input type="checkbox" data-train-manual="${w.id}" ${trainManualSelectedIds.has(w.id) ? 'checked' : ''} />
-          <span class="train-manual-hebrew">${hebrewDisplay(w.hebrew)}</span>
+          <span class="train-manual-hebrew">${w.hebrew}</span>
           <span class="train-manual-translation">${w.translation}</span>
         </label>
       `).join('');
@@ -8968,25 +8913,6 @@
     applyHebrewFont();
   });
   applyHebrewFont();
-
-  // ===== Никуды (показывать/снимать с правильной орфографией) =====
-  // nikudMode и hebrewDisplay()/toKtivMale() объявлены выше по файлу (рядом
-  // со stripNiqqud) — тут только UI-переключатель и перерисовка того, что
-  // сейчас видно на экране.
-  function updateNikudToggleLabel() {
-    const label = document.getElementById('nikudToggleLabel');
-    if (label) label.textContent = t(nikudMode === 'with' ? 'С никудами' : 'Без никудов');
-  }
-  document.getElementById('nikudToggleBtn').addEventListener('click', () => {
-    nikudMode = nikudMode === 'with' ? 'without' : 'with';
-    try { localStorage.setItem('tedabru_nikud_mode', nikudMode); } catch (e) {}
-    updateNikudToggleLabel();
-    // перерисовываем всё, что сейчас реально может быть на экране —
-    // личный словарь и (если открыта) вкладку "Поиск"
-    renderList();
-    if (typeof searchTabActive !== 'undefined' && searchTabActive) runSearchTabSearch();
-  });
-  updateNikudToggleLabel();
 
   // ===== Язык (RU/EN) =====
   function applyLangToggleUI() {
