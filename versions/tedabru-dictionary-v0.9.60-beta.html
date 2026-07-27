@@ -1667,7 +1667,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.61 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.60 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1935,21 +1935,13 @@
 </div>
 
 <nav class="bottom-nav" id="bottomNav">
-  <button type="button" class="bottom-nav-btn" id="bottomNavHomeBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    <span data-i18n="Главная">Главная</span>
-  </button>
   <button type="button" class="bottom-nav-btn" id="bottomNavTrainBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2" transform="rotate(-8 12 12)"/><rect x="6" y="4" width="14" height="18" rx="2" fill="var(--bg-dark)"/><path d="M9 9h6M9 13h4" stroke-linecap="round"/></svg>
-    <span data-i18n="Практика">Практика</span>
+    <span data-i18n="Тренировка">Тренировка</span>
   </button>
   <button type="button" class="bottom-nav-btn" id="bottomNavAddBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <span data-i18n="Добавить">Добавить</span>
-  </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavSearchBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round"/></svg>
-    <span data-i18n="Поиск">Поиск</span>
   </button>
   <button type="button" class="bottom-nav-btn" id="bottomNavSelectBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
@@ -2053,9 +2045,6 @@
   const I18N_EN = {
     // ===== Шапка, поиск =====
     'Тренировка': 'Training',
-    'Практика': 'Practice',
-    'Главная': 'Home',
-    'Поиск': 'Search',
     'Режим выбора': 'Selection mode',
     'Редактировать базу': 'Edit database',
     'Добавить слово': 'Add word',
@@ -2625,7 +2614,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.61';
+  const APP_VERSION = '0.9.60';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -8136,32 +8125,6 @@
     if (selectionMode || editDbMode || trainMode) return; // те же ограничения, что и у десктопной кнопки "+"
     if (addMode) { exitAddMode(); return; }
     enterAddMode();
-  });
-  document.getElementById('bottomNavHomeBtn').addEventListener('click', () => {
-    // выходим из любого активного режима обратно к обычному списку
-    if (selectionMode) exitSelectionMode();
-    if (addMode) exitAddMode();
-    if (editDbMode) exitEditDbMode();
-    if (trainMode) exitTrainMode();
-    if (categoryFilterPanelOpen) {
-      categoryFilterPanelOpen = false;
-      renderCategoryFilterPanel();
-      renderFilterBar();
-      renderList();
-    }
-    window.scrollTo(0, 0);
-  });
-  document.getElementById('bottomNavSearchBtn').addEventListener('click', () => {
-    // Временное поведение — отдельная вкладка "Поиск по всей базе" появится
-    // на следующем шаге рефактора; пока просто выводим на поле поиска по
-    // своей коллекции и фокусируемся на нём.
-    if (selectionMode) exitSelectionMode();
-    if (addMode) exitAddMode();
-    if (editDbMode) exitEditDbMode();
-    if (trainMode) exitTrainMode();
-    window.scrollTo(0, 0);
-    const si = document.getElementById('searchInput');
-    if (si) si.focus();
   });
 
   // ===== Первичный рендер =====
