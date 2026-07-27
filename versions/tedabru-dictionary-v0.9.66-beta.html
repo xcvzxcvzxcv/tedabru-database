@@ -531,44 +531,6 @@
        на мобильном больше не нужны (это упустили в первом заходе рефактора) */
     #themeToggleBtn, #zoomControl { display: none; }
 
-    /* ===== Компромисс по "танцу" первой отрисовки списка =====
-       На холодном старте список карточек и нижняя панель проходят через
-       несколько визуально нестабильных кадров (карточки временно в
-       состоянии "удалить", наложены друг на друга, панель оторвана), пока
-       WebKit не досчитает реальную геометрию/композитинг. Корень бага так
-       и не удалось убрать полностью — прячем сам процесс от глаз юзера:
-       список и панель скрыты (visibility:hidden — геометрия/layout всё
-       равно считается, так что подгонка шрифтов и т.п. работает корректно),
-       вместо них короткий спиннер, и через фиксированную паузу (с запасом
-       относительно наблюдаемых ~0.5-1с "танца") показываем готовый результат
-       одним разом, без мигания. */
-    .app.pre-reveal .list,
-    .app.pre-reveal .bottom-nav {
-      visibility: hidden;
-    }
-    .pre-reveal-spinner {
-      display: none;
-      position: fixed;
-      inset: 0;
-      align-items: center;
-      justify-content: center;
-      z-index: 500;
-    }
-    .app.pre-reveal .pre-reveal-spinner {
-      display: flex;
-    }
-    .pre-reveal-spinner-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 3px solid rgba(var(--ink-rgb), 0.15);
-      border-top-color: var(--gold);
-      animation: preRevealSpin 0.8s linear infinite;
-    }
-    @keyframes preRevealSpin {
-      to { transform: rotate(360deg); }
-    }
-
     /* Bug #6: версия переезжает из отдельной строки НАД заголовком в строку
        РЯДОМ с ним — освобождает много пустого пространства сверху, поднимаем
        весь блок контента ближе к динамическому острову/статус-бару */
@@ -1712,12 +1674,11 @@
   <svg id="themeToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
 </button>
 
-<div class="app pre-reveal" id="appRoot">
-  <div class="pre-reveal-spinner" id="preRevealSpinner"><div class="pre-reveal-spinner-dot"></div></div>
+<div class="app">
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.67 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.66 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2678,7 +2639,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.67';
+  const APP_VERSION = '0.9.66';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -2707,16 +2668,6 @@
   }
   window.addEventListener('load', nudgeIOSFixedPositionBug);
   window.addEventListener('pageshow', nudgeIOSFixedPositionBug);
-
-  // ===== Компромисс по "танцу" первой отрисовки (см. .pre-reveal CSS выше) —
-  // просто прячем список/панель на фиксированную паузу с запасом относительно
-  // наблюдаемых ~0.5-1с нестабильности, затем показываем готовый результат.
-  function revealApp() {
-    const appRoot = document.getElementById('appRoot');
-    if (appRoot) appRoot.classList.remove('pre-reveal');
-  }
-  setTimeout(revealApp, 900);
-  window.addEventListener('pageshow', () => setTimeout(revealApp, 50)); // при возврате из bfcache пауза не нужна — контент уже был отрисован
 
   // ===== Проверяем следующую гипотезу: дело не в высоте страницы самой по себе
   // (60px оверфлоу не почини­ли свайп), а в том, что WebKit строит нормальный
