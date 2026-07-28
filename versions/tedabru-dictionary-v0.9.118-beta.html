@@ -1940,7 +1940,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.119 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.118 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3384,7 +3384,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.119';
+  const APP_VERSION = '0.9.118';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4323,6 +4323,7 @@
             <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
             <div class="meta-col">
               <div class="translit">${disp.translit}</div>
+              <div class="pos">${mobileCompactPos(disp.pos)}</div>
             </div>
             <div class="translation">${disp.translation}</div>
             <div class="word-row-select-checkbox">${isSelected ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
@@ -4362,7 +4363,7 @@
       const metaColHtml = `
         <div class="meta-col">
           <div class="translit">${disp.translit}</div>
-          ${isMobileViewport() ? '' : `<div class="pos">${mobileCompactPos(disp.pos)}</div>`}
+          <div class="pos">${mobileCompactPos(disp.pos)}</div>
         </div>`;
       const ratingColHtml = `
         <div class="row-actions-cell" data-id="${w.id}">
@@ -4999,9 +5000,7 @@
     if (shouldSelect) selectedIds.add(id); else selectedIds.delete(id);
     if (row) {
       row.classList.toggle('row-selected', shouldSelect);
-      // десктоп использует .icon-btn (чекбокс первым), мобильный —
-      // .word-row-select-checkbox (чекбокс справа) — обновляем какой есть
-      const iconEl = row.querySelector('.word-row-select-checkbox') || row.querySelector('.icon-btn');
+      const iconEl = row.querySelector('.word-row-select-checkbox');
       if (iconEl) iconEl.innerHTML = shouldSelect ? CHECK_ON_ICON : CHECK_OFF_ICON;
     }
     if (selectionMode) headerTitleEl.textContent = selectionHeaderText();
@@ -5510,8 +5509,7 @@
   // визуально "раздвигается" под наведением.
   const filterBarEl = document.getElementById('filterBar');
   const COLLECTION_DRAG_MOVE_THRESHOLD = 10; // px — сдвиг больше этого сразу запускает драг
-  // Драг чипов подборок мышью на десктопе не конфликтует со скроллом
-  // (в отличие от тач-жеста на мобильном) — включаем только там
+  const COLLECTION_DRAG_ENABLED = false; // временно отключено — конфликтовало с горизонтальным скроллом строки чипов подборок; нужен другой способ объединения/удаления подборок
   let collectionDragArmedChip = null; // чип, за который держимся, пока не подтвердилось — драг это или просто клик
   let collectionDragArmedPointerId = null;
   let collectionDragArmedStartX = 0, collectionDragArmedStartY = 0;
@@ -5699,7 +5697,7 @@
   }
 
   filterBarEl.addEventListener('pointerdown', (e) => {
-    if (isMobileViewport()) return; // на мобильном конфликтует с горизонтальным скроллом строки чипов
+    if (!COLLECTION_DRAG_ENABLED) return; // временно отключено — конфликтовало с горизонтальным скроллом строки чипов
     const chip = e.target.closest('[data-coll]');
     if (!chip || !chip.dataset.coll) return;
     if (selectionMode) {
