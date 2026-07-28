@@ -1899,7 +1899,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.110 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.109 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3337,7 +3337,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.110';
+  const APP_VERSION = '0.9.109';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4804,8 +4804,6 @@
     selectModeBtn.classList.remove('active');
     updateHeaderForSelectionMode();
     if (typeof selectZoneContainer !== 'undefined') selectZoneContainer.innerHTML = '';
-    renderFilterBar();
-    renderList();
   }
 
   // Esc — закрывает открытую модалку, потом режим редактирования базы или
@@ -4822,6 +4820,8 @@
       exitTrainMode();
     } else if (selectionMode) {
       exitSelectionMode();
+      renderFilterBar();
+      renderList();
     }
   });
 
