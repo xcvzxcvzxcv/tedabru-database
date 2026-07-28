@@ -626,20 +626,20 @@
     .filter-row-wrap .filter-row {
       padding-left: 46px; /* место под оверлей слева, чтобы "Все" не пряталась под ним */
     }
-    .chip-overlay-left {
+    #cardInfoModeToggle.chip-overlay-left {
       display: flex;
       position: absolute;
       left: 0;
       top: 0;
       z-index: 3;
       width: 38px;
-      height: 42px; /* запасное значение — точная высота подгоняется через JS под реальный соседний чип, см. syncOverlayChipHeight() */
+      height: 42px; /* запасное значение — точная высота подгоняется через JS под реальный чип "Все", см. syncCardInfoToggleHeight() */
       padding: 0;
       align-items: center;
       justify-content: center;
       background: var(--bg-dark);
     }
-    .chip-overlay-left svg { width: 24px; height: 24px; }
+    #cardInfoModeToggle.chip-overlay-left svg { width: 24px; height: 24px; }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -884,22 +884,7 @@
        покоя — см. JS isMobileViewport), тренировка/выбор — в нижнюю панель.
        Редактирование базы и сама многофункциональная кнопка остаются. */
     #langToggleBtn { display: none; } /* именно header-кнопка; не класс — панель настроек переиспользует .lang-toggle-btn и должна остаться видимой */
-    #trainModeBtn, #selectModeBtn, #editDbBtn { display: none; }
-    /* Шапка "успокоена" — шестерёнка настроек переехала в нижнюю панель,
-       редактирование базы и режим выбора тоже никуда с главного экрана не
-       торчат. .header-actions теперь либо пуст, либо содержит только
-       кнопку выхода/корзины активного режима — выводим его из общего flex
-       (не отнимает место у центрирования) и приклеиваем к правому краю. */
-    .header-top {
-      justify-content: center;
-      position: relative;
-    }
-    .header-actions {
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-    }
+    #trainModeBtn, #selectModeBtn { display: none; }
 
     /* Чипы качества запоминания на мобильном не показываем вовсе — рейтинг
        переезжает в саму карточку слова (см. mastery-dots в компактной
@@ -1925,7 +1910,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.116 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.115 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2207,10 +2192,6 @@
       <span data-i18n="Никуды">Никуды</span>
       <button type="button" class="hebrew-font-toggle-btn" id="nikudToggleBtn"><span id="nikudToggleLabel"></span></button>
     </div>
-    <div class="settings-row">
-      <span data-i18n="Редактировать базу">Редактировать базу</span>
-      <button type="button" class="hebrew-font-toggle-btn" id="settingsEditDbBtn" data-i18n="Открыть">Открыть</button>
-    </div>
     <div class="action-modal-buttons">
       <button type="button" class="action-modal-btn" id="settingsCloseBtn" data-i18n="Закрыть">Закрыть</button>
     </div>
@@ -2237,9 +2218,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round"/></svg>
     <span data-i18n="Поиск">Поиск</span>
   </button>
-  <button type="button" class="bottom-nav-btn" id="bottomNavSettingsBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span data-i18n="Настройки">Настройки</span>
+  <button type="button" class="bottom-nav-btn" id="bottomNavSelectBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+    <span data-i18n="Выбор">Выбор</span>
   </button>
 </nav>
 
@@ -2444,8 +2425,6 @@
     'Тема': 'Theme',
     'Шрифт иврита': 'Hebrew font',
     'Никуды': 'Niqqud',
-    'Редактировать базу': 'Edit database',
-    'Открыть': 'Open',
     'С никудами': 'With niqqud',
     'Без никудов': 'Without niqqud',
     'Закрыть': 'Close',
@@ -3369,7 +3348,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.116';
+  const APP_VERSION = '0.9.115';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4001,13 +3980,8 @@
         </div>
       </div>
       <div class="filters-collapse ${filtersExpanded ? 'expanded' : ''}" id="filtersCollapse">
-        <div class="filter-row-wrap">
-          <button type="button" class="chip chip-icon-only chip-overlay-left ${selectionMode ? 'active' : ''}" id="selectModeToggle" title="${t('Режим выбора')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
-          </button>
-          <div class="filter-row">
-            ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
-          </div>
+        <div class="filter-row">
+          ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
         </div>
       </div>
       <select class="sort-select" id="sortSelect" style="display:none;">
@@ -4056,10 +4030,6 @@
         renderFilterBar(); // перерисовать сам чип (сменить подпись)
         renderList(); // САМИ карточки читают cardInfoMode при рендере — без этого список не обновится
       });
-    }
-    const selectModeToggleChip = document.getElementById('selectModeToggle');
-    if (selectModeToggleChip) {
-      selectModeToggleChip.addEventListener('click', toggleSelectionMode);
     }
 
     if (renamingCollectionId) {
@@ -4207,25 +4177,15 @@
     syncCardInfoToggleHeight();
   }
 
-  function syncOverlayChipHeight(toggleId, referenceId) {
+  function syncCardInfoToggleHeight() {
     // высота через CSS (padding/line-height) ненадёжна — уже дважды не
     // совпадала из-за конкурирующих правил (.chip.chip-icon-only и т.п.).
-    // Меряем реальную высоту соседнего чипа-ориентира и присваиваем впрямую —
-    // inline-стиль всегда побеждает любое правило из таблицы стилей.
-    const toggleBtn = document.getElementById(toggleId);
-    const referenceChip = document.getElementById(referenceId);
+    // Меряем реальную высоту чипа "Все" и присваиваем впрямую — inline-стиль
+    // всегда побеждает любое правило из таблицы стилей, гарантированно точно.
+    const toggleBtn = document.getElementById('cardInfoModeToggle');
+    const referenceChip = document.getElementById('allChip');
     if (toggleBtn && referenceChip) {
       toggleBtn.style.height = referenceChip.offsetHeight + 'px';
-    }
-  }
-  function syncCardInfoToggleHeight() {
-    syncOverlayChipHeight('cardInfoModeToggle', 'allChip');
-    // у тумблера режима выбора нет фиксированного id-ориентира (первый чип
-    // части речи создаётся динамически) — берём первый чип строки как есть
-    const selectToggleBtn = document.getElementById('selectModeToggle');
-    const firstPosChip = document.querySelector('#filtersCollapse .filter-row .chip');
-    if (selectToggleBtn && firstPosChip) {
-      selectToggleBtn.style.height = firstPosChip.offsetHeight + 'px';
     }
   }
 
@@ -4784,7 +4744,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = t('Удалить выбранное');
       primaryActionBtn.setAttribute('data-drop-delete', '1');
-      primaryActionBtn.style.display = '';
     } else if (addMode) {
       headerTitleEl.textContent = t('Добавление');
       primaryActionBtn.innerHTML = EXIT_ICON;
@@ -4792,7 +4751,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = t('Отменить добавление');
       primaryActionBtn.removeAttribute('data-drop-delete');
-      primaryActionBtn.style.display = '';
     } else if (editDbMode) {
       headerTitleEl.textContent = 'Редактирование базы';
       primaryActionBtn.innerHTML = EXIT_ICON;
@@ -4800,7 +4758,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = 'Выйти из редактирования';
       primaryActionBtn.removeAttribute('data-drop-delete');
-      primaryActionBtn.style.display = '';
     } else if (trainMode) {
       headerTitleEl.textContent = t('Тренировка');
       primaryActionBtn.innerHTML = EXIT_ICON;
@@ -4808,7 +4765,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = t('Выйти из тренировки');
       primaryActionBtn.removeAttribute('data-drop-delete');
-      primaryActionBtn.style.display = '';
     } else if (searchTabActive) {
       headerTitleEl.textContent = t('Поиск по базе');
       primaryActionBtn.innerHTML = isMobileViewport() ? GEAR_ICON : PLUS_ICON;
@@ -4816,7 +4772,6 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = isMobileViewport() ? t('Настройки') : 'Добавить слово';
       primaryActionBtn.removeAttribute('data-drop-delete');
-      primaryActionBtn.style.display = '';
     } else {
       headerTitleEl.textContent = t('Лексикариум');
       primaryActionBtn.innerHTML = isMobileViewport() ? GEAR_ICON : PLUS_ICON;
@@ -4824,22 +4779,20 @@
       primaryActionBtn.classList.add('header-icon-btn-gold');
       primaryActionBtn.title = isMobileViewport() ? t('Настройки') : 'Добавить слово';
       primaryActionBtn.removeAttribute('data-drop-delete');
-      // На мобильном шестерёнка тут больше не нужна — настройки переехали в
-      // нижнюю панель. Кнопка остаётся в DOM (нужна для остальных режимов
-      // как "выход"/корзина), просто скрыта в состоянии покоя.
-      primaryActionBtn.style.display = isMobileViewport() ? 'none' : '';
     }
     const navTrainBtn = document.getElementById('bottomNavTrainBtn');
+    const navSelectBtn = document.getElementById('bottomNavSelectBtn');
     const navAddBtn = document.getElementById('bottomNavAddBtn');
     const navHomeBtn = document.getElementById('bottomNavHomeBtn');
     const navSearchBtn = document.getElementById('bottomNavSearchBtn');
     if (navTrainBtn) navTrainBtn.classList.toggle('active', trainMode);
+    if (navSelectBtn) navSelectBtn.classList.toggle('active', selectionMode);
     if (navAddBtn) navAddBtn.classList.toggle('active', addMode);
     if (navSearchBtn) navSearchBtn.classList.toggle('active', searchTabActive);
     if (navHomeBtn) navHomeBtn.classList.toggle('active', !trainMode && !selectionMode && !addMode && !editDbMode && !searchTabActive);
   }
 
-  function toggleSelectionMode() {
+  selectModeBtn.addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
     cancelActiveSelectionGesture();
     if (searchTabActive) exitSearchTab();
@@ -4852,8 +4805,7 @@
     updateHeaderForSelectionMode();
     renderFilterBar();
     renderList();
-  }
-  selectModeBtn.addEventListener('click', toggleSelectionMode);
+  });
 
   function exitSelectionMode() {
     cancelActiveSelectionGesture();
@@ -4921,12 +4873,6 @@
 
   document.getElementById('editDbBtn').addEventListener('click', () => {
     if (selectionMode || addMode || trainMode) return; // не пересекаемся с другими режимами
-    if (editDbMode) { exitEditDbMode(); return; }
-    enterEditDbMode();
-  });
-  document.getElementById('settingsEditDbBtn').addEventListener('click', () => {
-    if (selectionMode || addMode || trainMode) return;
-    closeSettingsPanel();
     if (editDbMode) { exitEditDbMode(); return; }
     enterEditDbMode();
   });
@@ -9307,8 +9253,8 @@
   document.getElementById('bottomNavTrainBtn').addEventListener('click', () => {
     document.getElementById('trainModeBtn').click();
   });
-  document.getElementById('bottomNavSettingsBtn').addEventListener('click', () => {
-    openSettingsPanel();
+  document.getElementById('bottomNavSelectBtn').addEventListener('click', () => {
+    selectModeBtn.click();
   });
   document.getElementById('bottomNavAddBtn').addEventListener('click', () => {
     if (editDbMode) return; // редактирование базы — отдельный, более тяжёлый режим, не переключаем автоматически
