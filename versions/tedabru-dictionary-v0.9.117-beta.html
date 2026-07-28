@@ -205,8 +205,10 @@
     margin: 0 -20px 20px;
     padding-left: calc(20px + env(safe-area-inset-left));
     padding-right: calc(20px + env(safe-area-inset-right));
-    background: radial-gradient(ellipse at top, var(--bg-glow) 0%, var(--bg-dark) 60%);
+    background: radial-gradient(ellipse at top, rgba(26,13,51,0.5) 0%, rgba(13,6,24,0.5) 60%); /* было непрозрачным — теперь ~50%, как у нижней панели */
     background-attachment: fixed;
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
   }
   .header::after {
     content: '';
@@ -908,16 +910,6 @@
       top: 50%;
       transform: translateY(-50%);
     }
-    /* Стеклянный эффект шапки — только мобильный (десктоп остаётся сплошным,
-       как было всегда) */
-    .header {
-      background: radial-gradient(ellipse at top, rgba(26,13,51,0.5) 0%, rgba(13,6,24,0.5) 60%);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-    }
-    html[data-theme="light"] .header {
-      background: rgba(250, 250, 250, 0.5);
-    }
 
     /* Чипы качества запоминания на мобильном не показываем вовсе — рейтинг
        переезжает в саму карточку слова (см. mastery-dots в компактной
@@ -997,6 +989,9 @@
   html[data-theme="light"] .bottom-nav {
     background: rgba(242, 242, 240, 0.5); /* светлая тема — тон в цвет --card-bg на светлой теме */
     border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  html[data-theme="light"] .header {
+    background: rgba(250, 250, 250, 0.5); /* светлая тема — bg-glow и bg-dark совпадают, поэтому один тон */
   }
   .chip.active {
     background: var(--chip-active-bg);
@@ -1940,7 +1935,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.118 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.117 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3384,7 +3379,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.118';
+  const APP_VERSION = '0.9.117';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3988,7 +3983,7 @@
         ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="${t('Избранное')}">★ ${favoriteCount}</button>` : ''}
         ${creatingCollectionInline
           ? `<input type="text" class="chip chip-input" id="newCollectionInlineInput" placeholder="${t('Название')}" />`
-          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${t('Подборка')} +</button>`}
+          : `<button type="button" class="chip chip-add-collection" id="newCollectionChip">${isMobileViewport() ? t('Подборка') : t('Добавить подборку')} +</button>`}
         ${collections.map(c => {
           const isSelected = selectionMode && selectedCollectionIds.has(c.id);
           const isFilterActive = !selectionMode && filterCollectionId === c.id;
@@ -4317,39 +4312,21 @@
       listEl.innerHTML = filtered.map((w, i) => {
         const disp = personalWordDisplay(w);
         const isSelected = selectedIds.has(w.id);
-        if (isMobileViewport()) {
-          return `
-          <div class="word-row selectable ${isSelected ? 'row-selected' : ''}" data-id="${w.id}">
-            <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
-            <div class="meta-col">
-              <div class="translit">${disp.translit}</div>
-              <div class="pos">${mobileCompactPos(disp.pos)}</div>
-            </div>
-            <div class="translation">${disp.translation}</div>
-            <div class="word-row-select-checkbox">${isSelected ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
-            <div class="row-num">${i + 1}</div>
-          </div>
-        `;
-        }
-        // Десктоп — оригинальная 6-колоночная раскладка (как и всегда была):
-        // чекбокс первым, драг за подборку работает из "пустой" последней
-        // ячейки-заполнителя (там же, где на десктопе обычно actions)
         return `
         <div class="word-row selectable ${isSelected ? 'row-selected' : ''}" data-id="${w.id}">
-          <div class="icon-btn">${isSelected ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
           <div class="hebrew-word">${hebrewDisplay(w.hebrew)}</div>
           <div class="meta-col">
             <div class="translit">${disp.translit}</div>
             <div class="pos">${mobileCompactPos(disp.pos)}</div>
           </div>
           <div class="translation">${disp.translation}</div>
-          <div></div>
+          <div class="word-row-select-checkbox">${isSelected ? CHECK_ON_ICON : CHECK_OFF_ICON}</div>
           <div class="row-num">${i + 1}</div>
         </div>
       `;
       }).join('');
       fitHebrewWordsInList(listEl);
-      if (isMobileViewport()) requestAnimationFrame(renderSelectZoneOverlays); // ждём, пока раскладка реально применится
+      requestAnimationFrame(renderSelectZoneOverlays); // ждём, пока раскладка реально применится
       // клики/протаскивание в режиме выделения обрабатываются один раз при
       // инициализации (см. attachSelectionDragHandlers) через делегирование
       // на #wordList, а не тут — строки пересоздаются на каждый renderList(),
