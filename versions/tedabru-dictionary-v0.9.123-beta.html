@@ -985,18 +985,23 @@
   .filter-row-wrap-desktop-overlay {
     position: relative;
   }
-  #desktopFilterModeToggle {
+  .filter-row-wrap-desktop-overlay .filter-row {
+    padding-left: 46px;
+  }
+  .filter-row-wrap-desktop-overlay .chip-overlay-left {
+    display: flex;
     position: absolute;
     left: 0;
     top: 0;
     z-index: 3;
-    display: flex;
+    width: 38px;
+    height: 40px;
+    padding: 0;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
     background: var(--bg-dark);
-    white-space: nowrap;
   }
-  #desktopFilterModeToggle svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .filter-row-wrap-desktop-overlay .chip-overlay-left svg { width: 22px; height: 22px; }
   .chip.chip-static {
     cursor: default;
     color: var(--muted);
@@ -1965,7 +1970,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.124 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.123 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3528,7 +3533,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.124';
+  const APP_VERSION = '0.9.123';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3836,14 +3841,7 @@
     if (!posStr) return { base: '', sub: null };
     if (posStr.startsWith('глагол, ')) return { base: 'глагол', sub: posStr.slice('глагол, '.length) };
     if (posStr === 'глагол') return { base: 'глагол', sub: null };
-    const lowerPos = posStr.toLowerCase();
-    for (const binyan of KNOWN_BINYAN_NAMES) {
-      // startsWith, а не точное совпадение — у части слов в pos затесались
-      // хвосты вида "паал (он, прошедшее время)" (полное описание формы, а
-      // не просто биньян) — группируем их всё равно под сам биньян, а не
-      // даём каждому такому "хвосту" протечь в панель отдельной категорией
-      if (lowerPos.startsWith(binyan)) return { base: 'глагол', sub: binyan };
-    }
+    if (KNOWN_BINYAN_NAMES.has(posStr.toLowerCase())) return { base: 'глагол', sub: posStr };
     const genderMatch = posStr.match(/^(.+), (м\.р|ж\.р)$/);
     if (genderMatch) return { base: genderMatch[1], sub: genderMatch[2] };
     return { base: posStr, sub: null };
@@ -4125,8 +4123,8 @@
 
     const SWAP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
     const modeToggleBtn = `
-      <button type="button" class="chip" id="desktopFilterModeToggle" title="${t('Переключить область фильтрации')}">
-        ${SWAP_ICON}<span>${desktopFilterMode === 'collection' ? t('По коллекции') : t('По всей базе')}</span>
+      <button type="button" class="chip chip-icon-only chip-overlay-left" id="desktopFilterModeToggle" title="${desktopFilterMode === 'collection' ? t('По коллекции') : t('По всей базе')}">
+        ${SWAP_ICON}
       </button>`;
 
     if (desktopFilterMode === 'global') {
@@ -4195,7 +4193,7 @@
     const savedCollectionsScrollLeft = prevCollectionsRow ? prevCollectionsRow.scrollLeft : 0;
     const prevPosRow = el.querySelector('#filtersCollapse .filter-row');
     const savedPosScrollLeft = prevPosRow ? prevPosRow.scrollLeft : 0;
-    if (isMobileViewport() && (categoryFilterPanelOpen || categoryFilterActive())) {
+    if (categoryFilterPanelOpen || categoryFilterActive()) {
       el.innerHTML = '';
       return;
     }
@@ -4314,14 +4312,6 @@
         // коллекции (раньше тут ничего не происходило вообще, кнопка была
         // фактически мёртвой на десктопе)
         desktopFilterPanelOpen = !desktopFilterPanelOpen;
-        // categoryFilterPanelOpen — синхронизируем явно, а не как отдельное
-        // независимое состояние, иначе легко разойтись: закрыли панель
-        // иконкой, оставаясь в режиме "по всей базе" — тумблер бы пропал
-        // (панель не рендерится), а список карточек всё ещё показывал бы
-        // глобальные результаты без какой-либо видимой возможности вернуться
-        categoryFilterPanelOpen = desktopFilterPanelOpen && desktopFilterMode === 'global';
-        if (!categoryFilterPanelOpen) categoryFilter = null;
-        renderCategoryFilterPanel();
         renderFilterBar();
         renderList();
         return;
@@ -4342,16 +4332,6 @@
     if (desktopFilterModeToggleBtn) {
       desktopFilterModeToggleBtn.addEventListener('click', () => {
         desktopFilterMode = desktopFilterMode === 'collection' ? 'global' : 'collection';
-        // переиспользуем уже готовый движок category-browse (тот же, что
-        // строит богатую панель биньян/время/лицо/род для мобильной
-        // вкладки "Поиск") — рендерим его в #categoryFilterPanel, а
-        // renderList()/renderFilterBar() уже умеют скрывать личные
-        // карточки/подборки, когда categoryFilterPanelOpen === true.
-        // Синхронизируем явно с desktopFilterPanelOpen — см. комментарий в
-        // обработчике иконки фильтра выше.
-        categoryFilterPanelOpen = desktopFilterPanelOpen && desktopFilterMode === 'global';
-        if (!categoryFilterPanelOpen) categoryFilter = null;
-        renderCategoryFilterPanel();
         renderFilterBar();
         renderList();
       });
@@ -4530,21 +4510,6 @@
     });
 
     syncCardInfoToggleHeight();
-    syncDesktopFilterModeToggle();
-  }
-
-  // Тумблер "По коллекции/По всей базе" — ширина зависит от текста подписи
-  // (переменная в отличие от квадратных icon-only тумблеров), поэтому и
-  // высоту, и отступ слева синхронизируем через JS после рендера: меряем
-  // реальный размер кнопки и подгоняем соседний .filter-row.
-  function syncDesktopFilterModeToggle() {
-    const toggleBtn = document.getElementById('desktopFilterModeToggle');
-    if (!toggleBtn) return;
-    const wrap = toggleBtn.closest('.filter-row-wrap-desktop-overlay');
-    const row = wrap ? wrap.querySelector('.filter-row') : null;
-    const referenceChip = row ? row.querySelector('.chip') : null;
-    if (referenceChip) toggleBtn.style.height = referenceChip.offsetHeight + 'px';
-    if (row) row.style.paddingLeft = (toggleBtn.offsetWidth + 10) + 'px';
   }
 
   function syncOverlayChipHeight(toggleId, referenceId) {
