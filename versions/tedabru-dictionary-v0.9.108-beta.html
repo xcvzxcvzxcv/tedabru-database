@@ -547,8 +547,6 @@
     justify-content: space-around;
     align-items: stretch;
     touch-action: none; /* у панели нет своего скролла/зума — без этого браузер иногда трактовал жест на ней как жест страницы (скролл списка карточек "просачивался" через фиксированную панель) */
-    user-select: none;
-    -webkit-user-select: none;
   }
   .bottom-nav-btn {
     display: flex;
@@ -1899,7 +1897,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.109 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.108 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -1967,7 +1965,6 @@
       <div class="field">
         <label data-i18n="Часть речи">Часть речи</label>
         <select id="inputPos">
-          <option value="" data-i18n="Не выбрано">Не выбрано</option>
           <option value="сущ, м.р" data-i18n="Существительное, м.р.">Существительное, м.р.</option>
           <option value="сущ, ж.р" data-i18n="Существительное, ж.р.">Существительное, ж.р.</option>
           <option value="прил" data-i18n="Прилагательное">Прилагательное</option>
@@ -2386,7 +2383,6 @@
     'Добавить одно слово': 'Add one word',
     'Добавить несколько слов сразу': 'Add multiple words at once',
     'Введите слово, которое хотите добавить': 'Enter the word you want to add',
-    'Добавление': 'Adding',
     'Впишите слово, транскрипцию или перевод': 'Enter a word, transcription, or translation',
     'Слово на иврите (с огласовками)': 'Hebrew word (with niqqud)',
     'Добавить сразу в подборку (необязательно)': 'Add directly to a collection (optional)',
@@ -2460,7 +2456,6 @@
     'Устойчивое выражение': 'Set phrase',
     'Вопросительное слово': 'Question word',
     'Часть речи': 'Part of speech',
-    'Не выбрано': 'Not selected',
     'Прогресс': 'Progress',
     'Показывать в карточке: часть речи или прогресс изучения': 'Show in card: part of speech or study progress',
     'инф.': 'inf.',
@@ -3181,11 +3176,10 @@
     renderSearchTabFilterPanel();
   });
 
-  // ===== Свайп влево — "Добавить" (зеркало свайпа "Удалить" в личном
-  // словаре) — делегирование, вешается один раз на КАЖДЫЙ из двух
-  // контейнеров, где могут появиться результаты поиска (вкладка "Поиск" И
-  // обычный поиск по базе на главной), работает независимо от того,
-  // сколько раз внутри перерисовывались результаты
+  // ===== Свайп влево — "Добавить" на вкладке "Поиск" (зеркало свайпа
+  // "Удалить" в личном словаре) — делегирование на #searchTabResults,
+  // вешается один раз, работает независимо от того, сколько раз внутри
+  // перерисовывались результаты */
   const SEARCH_TAB_SWIPE_REVEAL_WIDTH = 80;
   const SEARCH_TAB_SWIPE_OPEN_THRESHOLD = SEARCH_TAB_SWIPE_REVEAL_WIDTH / 2;
   let searchTabSwipeState = null;
@@ -3200,6 +3194,31 @@
     if (searchTabOpenSwipeRow === row) searchTabOpenSwipeRow = null;
   }
 
+  searchTabResultsEl.addEventListener('pointerdown', (e) => {
+    if (!isMobileViewport()) return;
+    const row = e.target.closest('.search-result-row');
+    if (!row || !searchTabResultsEl.contains(row)) return;
+    if (e.target.closest('.swipe-add-btn')) return;
+    if (searchTabOpenSwipeRow && searchTabOpenSwipeRow !== row) closeSearchTabSwipeRow(searchTabOpenSwipeRow);
+    searchTabSwipeState = { row, startX: e.clientX, startY: e.clientY, currentX: 0, active: false, wasOpen: row.classList.contains('swipe-open') };
+  }, { passive: true });
+
+  searchTabResultsEl.addEventListener('pointermove', (e) => {
+    if (!searchTabSwipeState || !isMobileViewport()) return;
+    const dx = e.clientX - searchTabSwipeState.startX;
+    const dy = e.clientY - searchTabSwipeState.startY;
+    if (!searchTabSwipeState.active) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dy) > Math.abs(dx)) { searchTabSwipeState = null; return; }
+      searchTabSwipeState.active = true;
+      searchTabSwipeState.row.style.transition = 'none';
+    }
+    const base = searchTabSwipeState.wasOpen ? -SEARCH_TAB_SWIPE_REVEAL_WIDTH : 0;
+    const raw = base + dx;
+    searchTabSwipeState.currentX = Math.max(-SEARCH_TAB_SWIPE_REVEAL_WIDTH, Math.min(0, raw));
+    searchTabSwipeState.row.style.transform = `translateX(${searchTabSwipeState.currentX}px)`;
+  }, { passive: true });
+
   function finishSearchTabSwipe() {
     if (!searchTabSwipeState) return;
     const { row, active, currentX } = searchTabSwipeState;
@@ -3212,51 +3231,21 @@
     }
     searchTabSwipeState = null;
   }
-
-  function attachSearchResultSwipeHandlers(container) {
-    container.addEventListener('pointerdown', (e) => {
-      if (!isMobileViewport()) return;
-      const row = e.target.closest('.search-result-row');
-      if (!row || !container.contains(row)) return;
-      if (e.target.closest('.swipe-add-btn')) return;
-      if (searchTabOpenSwipeRow && searchTabOpenSwipeRow !== row) closeSearchTabSwipeRow(searchTabOpenSwipeRow);
-      searchTabSwipeState = { row, startX: e.clientX, startY: e.clientY, currentX: 0, active: false, wasOpen: row.classList.contains('swipe-open') };
-    }, { passive: true });
-
-    container.addEventListener('pointermove', (e) => {
-      if (!searchTabSwipeState || !isMobileViewport()) return;
-      const dx = e.clientX - searchTabSwipeState.startX;
-      const dy = e.clientY - searchTabSwipeState.startY;
-      if (!searchTabSwipeState.active) {
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-        if (Math.abs(dy) > Math.abs(dx)) { searchTabSwipeState = null; return; }
-        searchTabSwipeState.active = true;
-        searchTabSwipeState.row.style.transition = 'none';
-      }
-      const base = searchTabSwipeState.wasOpen ? -SEARCH_TAB_SWIPE_REVEAL_WIDTH : 0;
-      const raw = base + dx;
-      searchTabSwipeState.currentX = Math.max(-SEARCH_TAB_SWIPE_REVEAL_WIDTH, Math.min(0, raw));
-      searchTabSwipeState.row.style.transform = `translateX(${searchTabSwipeState.currentX}px)`;
-    }, { passive: true });
-
-    container.addEventListener('pointerup', finishSearchTabSwipe);
-    container.addEventListener('pointercancel', finishSearchTabSwipe);
-
-    container.addEventListener('click', (e) => {
-      const addBtn = e.target.closest('.swipe-add-btn');
-      if (!addBtn) return;
-      const row = addBtn.closest('.search-result-row-swipe-wrap').querySelector('.search-result-row');
-      closeSearchTabSwipeRow(row);
-      addWordFromSearchTabRow(row);
-    });
-  }
-  attachSearchResultSwipeHandlers(searchTabResultsEl);
-  attachSearchResultSwipeHandlers(document.getElementById('wordList')); // wordListEl объявлена позже по файлу — обращаемся напрямую, не через переменную
+  searchTabResultsEl.addEventListener('pointerup', finishSearchTabSwipe);
+  searchTabResultsEl.addEventListener('pointercancel', finishSearchTabSwipe);
 
   document.addEventListener('click', (e) => {
     if (!searchTabOpenSwipeRow) return;
     if (e.target.closest('.swipe-add-btn')) return;
     if (!searchTabOpenSwipeRow.contains(e.target)) closeSearchTabSwipeRow(searchTabOpenSwipeRow);
+  });
+
+  searchTabResultsEl.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.swipe-add-btn');
+    if (!addBtn) return;
+    const row = addBtn.closest('.search-result-row-swipe-wrap').querySelector('.search-result-row');
+    closeSearchTabSwipeRow(row);
+    addWordFromSearchTabRow(row);
   });
 
   // Логика добавления зеркалит "else"-ветку performQuickToggle (личный
@@ -3337,7 +3326,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.109';
+  const APP_VERSION = '0.9.108';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3837,14 +3826,14 @@
       const el2 = document.getElementById('instantDictResults');
       if (!el2) return;
       const { candidates, total } = computeCategoryBrowseCandidates(categoryFilter);
-      renderCandidatesInto(el2, candidates, total, true);
+      renderCandidatesInto(el2, candidates, total);
       return;
     }
     const candidates = await resolveCandidatesDictOnly(query);
     if (myGeneration !== instantSearchGeneration) return; // устарело — стартовал более новый ввод
     const el2 = document.getElementById('instantDictResults'); // список мог перерисоваться за время ожидания
     if (!el2) return;
-    renderCandidatesInto(el2, candidates, undefined, true);
+    renderCandidatesInto(el2, candidates);
     // кнопку "искать среди всех слов" показываем ТОЛЬКО когда локальный
     // поиск реально завершился — иначе она успевает мелькнуть раньше
     // результатов и человек может ткнуть на неё раньше времени, ещё не
@@ -4734,7 +4723,7 @@
       primaryActionBtn.title = t('Удалить выбранное');
       primaryActionBtn.setAttribute('data-drop-delete', '1');
     } else if (addMode) {
-      headerTitleEl.textContent = t('Добавление');
+      headerTitleEl.textContent = t('Введите слово, которое хотите добавить');
       primaryActionBtn.innerHTML = EXIT_ICON;
       primaryActionBtn.classList.remove('header-icon-btn-danger');
       primaryActionBtn.classList.add('header-icon-btn-gold');
