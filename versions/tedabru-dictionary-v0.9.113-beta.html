@@ -1910,7 +1910,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.114 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.113 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3348,7 +3348,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.114';
+  const APP_VERSION = '0.9.113';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -9288,44 +9288,18 @@
   });
 
   // ===== Фикс "прыжка" скролла при появлении клавиатуры на поле поиска =====
-  // Первая версия (просто откатывала scrollY после фокуса) технически
-  // работала, но браузер успевал ВИЗУАЛЬНО дёрнуть страницу до отката —
-  // получалось мигание "телепорт туда и обратно". Вместо коррекции постфактум
-  // — полная блокировка скролла на время анимации клавиатуры: body становится
-  // position:fixed с отрицательным top, равным текущей прокрутке — физически
-  // скроллить в этом состоянии нечего, браузеру просто не с чем "подготовить"
-  // прокрутку под клавиатуру, поэтому дёргаться нечему вообще.
-  let scrollLockSavedY = null;
-  function lockScroll() {
-    if (scrollLockSavedY !== null) return; // уже заблокировано
-    scrollLockSavedY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollLockSavedY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-  }
-  function unlockScroll() {
-    if (scrollLockSavedY === null) return;
-    const y = scrollLockSavedY;
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    window.scrollTo(0, y);
-    scrollLockSavedY = null;
-  }
+  // Мобильный Safari иногда сам скроллит страницу при фокусе на инпуте,
+  // готовясь под клавиатуру — даже если сам инпут уже и так виден. Запоминаем
+  // позицию скролла ДО фокуса и принудительно возвращаем её обратно и сразу,
+  // и ещё раз после того, как клавиатура доанимируется (300мс — стандартная
+  // длительность анимации появления клавиатуры).
   function preventScrollJumpOnFocus(input) {
     if (!input) return;
     input.addEventListener('focus', () => {
       if (!isMobileViewport()) return;
-      lockScroll();
-      // снимаем блокировку сама по себе, как только клавиатура доанимировала
-      // появление — иначе список вообще нельзя было бы проскроллить, пока
-      // не убрать фокус с поля
-      setTimeout(unlockScroll, 350);
-    });
-    input.addEventListener('blur', () => {
-      unlockScroll(); // на случай, если фокус ушёл раньше, чем сработал таймаут выше
+      const savedScrollY = window.scrollY;
+      requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
+      setTimeout(() => window.scrollTo(0, savedScrollY), 300);
     });
   }
   preventScrollJumpOnFocus(document.getElementById('searchInput'));
