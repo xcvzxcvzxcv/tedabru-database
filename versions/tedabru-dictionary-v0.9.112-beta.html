@@ -1910,7 +1910,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.113 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.112 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3348,7 +3348,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.113';
+  const APP_VERSION = '0.9.112';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -9286,24 +9286,6 @@
     window.scrollTo(0, 0);
     enterSearchTab();
   });
-
-  // ===== Фикс "прыжка" скролла при появлении клавиатуры на поле поиска =====
-  // Мобильный Safari иногда сам скроллит страницу при фокусе на инпуте,
-  // готовясь под клавиатуру — даже если сам инпут уже и так виден. Запоминаем
-  // позицию скролла ДО фокуса и принудительно возвращаем её обратно и сразу,
-  // и ещё раз после того, как клавиатура доанимируется (300мс — стандартная
-  // длительность анимации появления клавиатуры).
-  function preventScrollJumpOnFocus(input) {
-    if (!input) return;
-    input.addEventListener('focus', () => {
-      if (!isMobileViewport()) return;
-      const savedScrollY = window.scrollY;
-      requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
-      setTimeout(() => window.scrollTo(0, savedScrollY), 300);
-    });
-  }
-  preventScrollJumpOnFocus(document.getElementById('searchInput'));
-  preventScrollJumpOnFocus(document.getElementById('searchTabInput'));
 
   // ===== Первичный рендер =====
   updateHeaderForSelectionMode();
