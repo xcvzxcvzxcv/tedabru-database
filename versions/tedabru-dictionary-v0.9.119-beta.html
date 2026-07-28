@@ -1922,8 +1922,6 @@
     cursor: not-allowed;
   }
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -1942,7 +1940,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.120 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.119 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2324,7 +2322,6 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
     } catch (e) { /* тихо игнорируем — данные останутся только в этой сессии */ }
-    pushToCloud();
   }
 
   function loadCollections() {
@@ -2338,122 +2335,6 @@
   function saveCollections() {
     try { localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections)); }
     catch (e) { /* тихо игнорируем */ }
-    pushToCloud();
-  }
-
-  // ===== Синхронизация между устройствами (Firebase Realtime Database) =====
-  // Только для личного использования одним человеком — правки вносятся
-  // всегда на ОДНОМ устройстве за раз, поэтому настоящих конфликтов не
-  // ожидается. Синхронизация происходит: (1) при каждом открытии приложения
-  // — подтягиваем облако, сливаем с локальным, дедуплицируя слова строго по
-  // ивритскому написанию; (2) при каждом локальном изменении — пушим
-  // текущее состояние в облако.
-  //
-  // ВАЖНО: чтобы это заработало, нужно вставить свой конфиг Firebase ниже
-  // (создаётся бесплатно на console.firebase.google.com — Realtime Database,
-  // не Firestore). Пока значения — плейсхолдеры, синхронизация выключена.
-  const FIREBASE_CONFIG = {
-    apiKey: "ВСТАВЬ_СВОЙ_API_KEY",
-    authDomain: "ВСТАВЬ_СВОЙ_ПРОЕКТ.firebaseapp.com",
-    databaseURL: "https://ВСТАВЬ_СВОЙ_ПРОЕКТ-default-rtdb.firebaseio.com",
-    projectId: "ВСТАВЬ_СВОЙ_ПРОЕКТ",
-  };
-  let fbDb = null;
-  let cloudSyncEnabled = false;
-  try {
-    if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey !== 'ВСТАВЬ_СВОЙ_API_KEY') {
-      firebase.initializeApp(FIREBASE_CONFIG);
-      fbDb = firebase.database();
-      cloudSyncEnabled = true;
-    }
-  } catch (e) { console.error('Firebase init error:', e); }
-
-  // Слова — дедупликация СТРОГО по ивритскому написанию (w.hebrew). При
-  // дубликате побеждает тот, что добавлен позже (addedAt), но избранное и
-  // подборки объединяются из ОБОИХ версий — не теряем ручные пометки ни с
-  // одного устройства.
-  function mergeWordsByHebrew(localList, cloudList) {
-    const map = new Map();
-    const addOrMerge = (w) => {
-      const key = w.hebrew;
-      if (!map.has(key)) {
-        map.set(key, { ...w, collectionIds: [...(w.collectionIds || [])] });
-        return;
-      }
-      const existing = map.get(key);
-      const existingTime = existing.addedAt || 0;
-      const newTime = w.addedAt || 0;
-      const mergedCollectionIds = Array.from(new Set([...(existing.collectionIds || []), ...(w.collectionIds || [])]));
-      const mergedFavorite = existing.favorite || w.favorite;
-      const winner = newTime > existingTime ? w : existing;
-      map.set(key, { ...winner, collectionIds: mergedCollectionIds, favorite: mergedFavorite });
-    };
-    localList.forEach(addOrMerge);
-    cloudList.forEach(addOrMerge);
-    return Array.from(map.values());
-  }
-
-  // Подборки — дедупликация по НАЗВАНИЮ (не по id, у разных устройств id
-  // могли разойтись при создании одноимённой подборки независимо друг от
-  // друга). idRemap запоминает, какой id "проиграл" и на какой заменить
-  // ссылки в словах.
-  function mergeCollectionsByName(localList, cloudList) {
-    const byName = new Map();
-    const idRemap = new Map();
-    const addOrMerge = (c) => {
-      if (byName.has(c.name)) {
-        const existing = byName.get(c.name);
-        if (c.id !== existing.id) idRemap.set(c.id, existing.id);
-      } else {
-        byName.set(c.name, c);
-      }
-    };
-    localList.forEach(addOrMerge);
-    cloudList.forEach(addOrMerge);
-    return { merged: Array.from(byName.values()), idRemap };
-  }
-
-  async function syncWithCloud() {
-    if (!cloudSyncEnabled) return;
-    try {
-      const [wordsSnap, collSnap] = await Promise.all([
-        fbDb.ref('tedabru/words').once('value'),
-        fbDb.ref('tedabru/collections').once('value'),
-      ]);
-      const cloudWordsRaw = wordsSnap.val() || [];
-      const cloudCollectionsRaw = collSnap.val() || [];
-      const cloudWordsArr = Array.isArray(cloudWordsRaw) ? cloudWordsRaw : Object.values(cloudWordsRaw);
-      const cloudCollectionsArr = Array.isArray(cloudCollectionsRaw) ? cloudCollectionsRaw : Object.values(cloudCollectionsRaw);
-
-      const { merged: mergedCollections, idRemap } = mergeCollectionsByName(collections, cloudCollectionsArr);
-      let mergedWords = mergeWordsByHebrew(words, cloudWordsArr);
-      if (idRemap.size) {
-        mergedWords = mergedWords.map(w => ({
-          ...w,
-          collectionIds: Array.from(new Set((w.collectionIds || []).map(id => idRemap.get(id) || id)))
-        }));
-      }
-
-      words = mergedWords;
-      collections = mergedCollections;
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(words)); } catch (e) {}
-      try { localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections)); } catch (e) {}
-      renderFilterBar();
-      renderList();
-
-      await Promise.all([
-        fbDb.ref('tedabru/words').set(words),
-        fbDb.ref('tedabru/collections').set(collections),
-      ]);
-    } catch (e) {
-      console.error('Синхронизация с облаком не удалась:', e);
-    }
-  }
-
-  function pushToCloud() {
-    if (!cloudSyncEnabled) return;
-    fbDb.ref('tedabru/words').set(words).catch(e => console.error('Пуш слов в облако не удался:', e));
-    fbDb.ref('tedabru/collections').set(collections).catch(e => console.error('Пуш подборок в облако не удался:', e));
   }
 
   let words = loadWords();
@@ -3503,7 +3384,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.120';
+  const APP_VERSION = '0.9.119';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -9528,7 +9409,6 @@
   applyCardInfoModeClass();
   renderFilterBar();
   renderList();
-  syncWithCloud(); // при каждом открытии приложения — подтягиваем и сливаем с облаком
 </script>
 
 </body>
