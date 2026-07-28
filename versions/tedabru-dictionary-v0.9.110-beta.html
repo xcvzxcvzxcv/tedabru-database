@@ -541,10 +541,8 @@
     left: 0;
     right: 0;
     z-index: 200;
-    background: rgba(21, 10, 38, 0.5); /* было var(--card-bg) сплошным — теперь ~50% для эффекта стекла */
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    border-top: 1px solid rgba(255,255,255,0.08);
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-purple);
     padding: 8px 0 max(8px, env(safe-area-inset-bottom));
     justify-content: space-around;
     align-items: stretch;
@@ -958,10 +956,6 @@
   }
   html[data-theme="light"] .chip {
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  html[data-theme="light"] .bottom-nav {
-    background: rgba(242, 242, 240, 0.5); /* светлая тема — тон в цвет --card-bg на светлой теме */
-    border-top: 1px solid rgba(0,0,0,0.08);
   }
   .chip.active {
     background: var(--chip-active-bg);
@@ -1905,7 +1899,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.111 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.110 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3343,7 +3337,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.111';
+  const APP_VERSION = '0.9.110';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
