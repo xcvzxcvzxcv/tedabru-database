@@ -640,16 +640,6 @@
       background: var(--bg-dark);
     }
     .chip-overlay-left svg { width: 24px; height: 24px; }
-    /* #cardInfoModeToggle имеет базовое display:none (специфичность ID,
-       1,0,0) вне мобильного медиа-запроса — обычный класс .chip-overlay-left
-       (0,1,0) его не перебивает независимо от порядка правил. Нужна явная
-       ID+класс комбинация здесь, чтобы вернуть специфичность выше базового
-       скрытия. #selectModeToggle новый и такого базового скрытия не имеет,
-       но на всякий случай включён сюда же для единообразия. */
-    #cardInfoModeToggle.chip-overlay-left,
-    #selectModeToggle.chip-overlay-left {
-      display: flex;
-    }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
        На холодном старте список карточек и нижняя панель проходят через
@@ -1006,7 +996,7 @@
     box-sizing: border-box;
     text-align: center;
   }
-  #cardInfoModeToggle, #selectModeToggle { display: none; } /* мобильно-специфичная функция — показывается только в мобильном медиа-запросе */
+  #cardInfoModeToggle { display: none; } /* мобильно-специфичная функция — показывается только в мобильном медиа-запросе */
   .chip.chip-text-only {
     border-style: dashed;
     color: var(--muted);
@@ -1935,7 +1925,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.117 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.116 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3379,7 +3369,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.117';
+  const APP_VERSION = '0.9.116';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
