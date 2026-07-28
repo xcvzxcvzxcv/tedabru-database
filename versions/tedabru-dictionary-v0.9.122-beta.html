@@ -978,34 +978,6 @@
     scrollbar-width: none;
   }
   .filter-row::-webkit-scrollbar { display: none; }
-  /* Десктопная версия закреплённого слева тумблера — тот же приём, что и
-     мобильный .chip-overlay-left (там определён только внутри мобильного
-     медиа-запроса), но нужен и вне мобилки для новой панели фильтров
-     личной коллекции */
-  .filter-row-wrap-desktop-overlay {
-    position: relative;
-  }
-  .filter-row-wrap-desktop-overlay .filter-row {
-    padding-left: 46px;
-  }
-  .filter-row-wrap-desktop-overlay .chip-overlay-left {
-    display: flex;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 3;
-    width: 38px;
-    height: 40px;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-dark);
-  }
-  .filter-row-wrap-desktop-overlay .chip-overlay-left svg { width: 22px; height: 22px; }
-  .chip.chip-static {
-    cursor: default;
-    color: var(--muted);
-  }
   .chip {
     flex-shrink: 0;
     padding: 10px 16px;
@@ -1970,7 +1942,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.123 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.122 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3533,7 +3505,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.123';
+  const APP_VERSION = '0.9.122';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -3824,15 +3796,9 @@
   let filterFavorite = false;    // показывать только избранное
   let filterPos = null;          // null | конкретное значение w.pos
   // ===== Умная панель фильтров личной коллекции (только десктоп) =====
-  let desktopFilterPanelOpen = false;   // открывается иконкой фильтра в поисковой строке
   let desktopFilterMode = 'collection'; // 'collection' | 'global'
   let desktopCollFilterBase = null;     // базовая часть речи (напр. 'глагол', 'сущ')
   let desktopCollFilterSub = null;      // подкатегория (биньян/род), если различий 2+
-  // Известные названия биньянов — у части личных слов w.pos почему-то хранит
-  // ТОЛЬКО биньян без префикса "глагол, " (данные добавлялись в разное время
-  // разными путями) — без этой проверки такое слово ошибочно считалось бы
-  // отдельной "базовой категорией" наравне с "глагол"/"сущ" и т.д.
-  const KNOWN_BINYAN_NAMES = new Set(['паал', 'пааль', 'пиэль', 'hифиль', 'хифиль', 'нифъаль', 'hитпаэль', 'хитпаэль', 'хуфаль', 'пуаль']);
   // У личных слов w.pos — плоская строка вида "глагол, паал" или "сущ, м.р"
   // (нет отдельных полей время/лицо/число — это просто инфинитив). Разбираем
   // на базовую категорию + подкатегорию по тому же шаблону, что уже
@@ -3841,7 +3807,6 @@
     if (!posStr) return { base: '', sub: null };
     if (posStr.startsWith('глагол, ')) return { base: 'глагол', sub: posStr.slice('глагол, '.length) };
     if (posStr === 'глагол') return { base: 'глагол', sub: null };
-    if (KNOWN_BINYAN_NAMES.has(posStr.toLowerCase())) return { base: 'глагол', sub: posStr };
     const genderMatch = posStr.match(/^(.+), (м\.р|ж\.р)$/);
     if (genderMatch) return { base: genderMatch[1], sub: genderMatch[2] };
     return { base: posStr, sub: null };
@@ -4119,22 +4084,16 @@
   // базе" готовит место под глобальный поиск (сама логика поиска — в
   // следующем заходе), тут только скрытие подборок/mastery-строки.
   function renderDesktopCollectionFilterPanel() {
-    if (!desktopFilterPanelOpen) return '';
-
-    const SWAP_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
-    const modeToggleBtn = `
-      <button type="button" class="chip chip-icon-only chip-overlay-left" id="desktopFilterModeToggle" title="${desktopFilterMode === 'collection' ? t('По коллекции') : t('По всей базе')}">
-        ${SWAP_ICON}
-      </button>`;
+    const toggleRow = `
+      <div class="filter-row-wrap">
+        <div class="filter-row">
+          <button type="button" class="chip ${desktopFilterMode === 'collection' ? 'active' : ''}" data-desktop-filter-mode="collection">${t('По коллекции')}</button>
+          <button type="button" class="chip ${desktopFilterMode === 'global' ? 'active' : ''}" data-desktop-filter-mode="global">${t('По всей базе')}</button>
+        </div>
+      </div>`;
 
     if (desktopFilterMode === 'global') {
-      return `
-        <div class="filter-row-wrap-desktop-overlay">
-          ${modeToggleBtn}
-          <div class="filter-row">
-            <span class="chip chip-static">${t('По всей базе')}</span>
-          </div>
-        </div>`; // категории для глобального поиска — следующий шаг
+      return toggleRow; // категории для глобального поиска — следующий шаг
     }
 
     const baseCounts = {};
@@ -4149,11 +4108,8 @@
       desktopCollFilterSub = null;
     }
 
-    // Тумблер закреплён слева (как и остальные overlay-чипы) — части речи
-    // едут в той же строке и уходят под него при скролле вправо
     const posRow = `
-      <div class="filter-row-wrap-desktop-overlay">
-        ${modeToggleBtn}
+      <div class="filter-row-wrap">
         <div class="filter-row">
           ${baseList.map(b => `<button type="button" class="chip ${desktopCollFilterBase === b ? 'active' : ''}" data-coll-filter-base="${b}">${personalPosLabel(b)} · ${baseCounts[b]}</button>`).join('')}
         </div>
@@ -4181,7 +4137,7 @@
       }
     }
 
-    return posRow + subRow;
+    return toggleRow + posRow + subRow;
   }
 
   function renderFilterBar() {
@@ -4218,7 +4174,7 @@
     words.forEach(w => (w.collectionIds || []).forEach(cid => { countByCollection[cid] = (countByCollection[cid] || 0) + 1; }));
 
     const isDesktop = !isMobileViewport();
-    const hideCollectionsAndMastery = isDesktop && desktopFilterPanelOpen && desktopFilterMode === 'global';
+    const hideCollectionsAndMastery = isDesktop && desktopFilterMode === 'global';
     el.innerHTML = `
       ${isDesktop ? renderDesktopCollectionFilterPanel() : ''}
       ${hideCollectionsAndMastery ? '' : `
@@ -4307,34 +4263,17 @@
         renderList();
         return;
       }
-      if (!isMobileViewport()) {
-        // Десктоп — открывает/закрывает новую умную панель фильтров личной
-        // коллекции (раньше тут ничего не происходило вообще, кнопка была
-        // фактически мёртвой на десктопе)
-        desktopFilterPanelOpen = !desktopFilterPanelOpen;
-        renderFilterBar();
-        renderList();
-        return;
-      }
       togglePersonalFiltersCollapse();
     }
     const filtersToggleChipEl = document.getElementById('filtersToggleChip');
     if (filtersToggleChipEl) filtersToggleChipEl.addEventListener('click', togglePersonalFiltersCollapse);
     const posFilterBtn = document.getElementById('posFilterToggleBtn');
     if (posFilterBtn) {
-      posFilterBtn.classList.toggle('active', isMobileViewport() ? (filtersExpanded || !!filterPos) : desktopFilterPanelOpen);
+      posFilterBtn.classList.toggle('active', filtersExpanded || !!filterPos);
       if (!posFilterBtn.dataset.bound) {
         posFilterBtn.dataset.bound = '1'; // кнопка статична (не пересоздаётся при каждом renderFilterBar) — вешаем слушатель один раз
         posFilterBtn.addEventListener('click', handlePosFilterToggleBtnClick);
       }
-    }
-    const desktopFilterModeToggleBtn = document.getElementById('desktopFilterModeToggle');
-    if (desktopFilterModeToggleBtn) {
-      desktopFilterModeToggleBtn.addEventListener('click', () => {
-        desktopFilterMode = desktopFilterMode === 'collection' ? 'global' : 'collection';
-        renderFilterBar();
-        renderList();
-      });
     }
     const cardInfoModeBtn = document.getElementById('cardInfoModeToggle');
     if (cardInfoModeBtn) {
@@ -4400,6 +4339,12 @@
       btn.addEventListener('click', () => {
         const val = btn.dataset.pos;
         filterPos = (filterPos === val) ? null : val; // повторный клик снимает фильтр
+        renderFilterBar(); renderList();
+      });
+    });
+    el.querySelectorAll('[data-desktop-filter-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        desktopFilterMode = btn.dataset.desktopFilterMode;
         renderFilterBar(); renderList();
       });
     });
