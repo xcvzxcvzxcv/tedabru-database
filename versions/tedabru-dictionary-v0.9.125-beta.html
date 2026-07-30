@@ -629,7 +629,7 @@
       position: absolute;
       left: 0;
       top: 0;
-      z-index: 10;
+      z-index: 3;
       width: 38px;
       height: 42px; /* запасное значение — точная высота подгоняется через JS под реальный соседний чип, см. syncOverlayChipHeight() */
       padding: 0;
@@ -1965,7 +1965,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.126 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.125 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -2839,22 +2839,22 @@
   // спряжённых форм (там нет отдельных структурированных полей время/лицо/
   // число — только готовые русские формулировки)
   const TENSE_FILTER_OPTIONS = [
-    { key: 'прошедшее время', label: 'прош. в.р.', desktopLabel: 'Прошедшее время' },
-    { key: 'настоящее время', label: 'наст. в.р.', desktopLabel: 'Настоящее время' },
-    { key: 'будущее время', label: 'буд. в.р.', desktopLabel: 'Будущее время' },
-    { key: 'повелительное наклонение', label: 'повел. накл.', desktopLabel: 'Повелительное наклонение' },
+    { key: 'прошедшее время', label: 'прош. в.р.' },
+    { key: 'настоящее время', label: 'наст. в.р.' },
+    { key: 'будущее время', label: 'буд. в.р.' },
+    { key: 'повелительное наклонение', label: 'повел. накл.' },
   ];
   // Тумблер лица (1/2/3) — грамматическое лицо, а не перечисление местоимений
   // (я/ты/он/... сворачиваются в 1/2/3 — гендерно-числовые уточнения это уже
   // отдельные тумблеры рода/числа рядом, см. renderSearchTabFilterPanel)
   const PERSON_NUMBER_OPTIONS = [
-    { key: '1', label: '1 л.', desktopLabel: '1 лицо' },
-    { key: '2', label: '2 л.', desktopLabel: '2 лицо' },
-    { key: '3', label: '3 л.', desktopLabel: '3 лицо' },
+    { key: '1', label: '1 л.' },
+    { key: '2', label: '2 л.' },
+    { key: '3', label: '3 л.' },
   ];
   const NUMBER_FILTER_OPTIONS = [
-    { key: 'sg', label: 'ед.ч.', desktopLabel: 'Единственное число' },
-    { key: 'pl', label: 'мн.ч.', desktopLabel: 'Множественное число' },
+    { key: 'sg', label: 'ед.ч.' },
+    { key: 'pl', label: 'мн.ч.' },
   ];
   const GENDER_FILTER_OPTIONS = [
     { key: 'm', label: 'м.р.' },
@@ -3528,7 +3528,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.126';
+  const APP_VERSION = '0.9.125';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4148,32 +4148,16 @@
       let subRows = '';
       if (categoryFilter && categoryFilter.pos === 'verb') {
         const binyanChips = BINYAN_FILTER_OPTIONS.map(b => `<button type="button" class="chip ${categoryFilter.binyan === b.key ? 'active' : ''}" data-cat-binyan="${b.key}">${t(b.label)}</button>`).join('');
-        const infActive = !categoryFilter.tense && !categoryFilter.personNumber && !categoryFilter.gender && !categoryFilter.number;
-        const tenseChips = `<button type="button" class="chip ${infActive ? 'active' : ''}" data-cat-inf="1">${t('Инфинитив')}</button>`
-          + TENSE_FILTER_OPTIONS.map(o => `<button type="button" class="chip ${categoryFilter.tense === o.key ? 'active' : ''}" data-cat-tense="${o.key}">${t(o.desktopLabel)}</button>`).join('');
-        const personChips = PERSON_NUMBER_OPTIONS.map(p => `<button type="button" class="chip ${categoryFilter.personNumber === p.key ? 'active' : ''}" data-cat-personnumber="${p.key}">${t(p.desktopLabel)}</button>`).join('');
-        const numberChips = NUMBER_FILTER_OPTIONS.map(n => `<button type="button" class="chip ${categoryFilter.number === n.key ? 'active' : ''}" data-cat-number="${n.key}">${t(n.desktopLabel)}</button>`).join('');
+        const tenseChips = TENSE_FILTER_OPTIONS.map(o => `<button type="button" class="chip ${categoryFilter.tense === o.key ? 'active' : ''}" data-cat-tense="${o.key}">${t(o.label)}</button>`).join('');
+        const personChips = PERSON_NUMBER_OPTIONS.map(p => `<button type="button" class="chip ${categoryFilter.personNumber === p.key ? 'active' : ''}" data-cat-personnumber="${p.key}">${t(p.label)}</button>`).join('');
+        const numberChips = NUMBER_FILTER_OPTIONS.map(n => `<button type="button" class="chip ${categoryFilter.number === n.key ? 'active' : ''}" data-cat-number="${n.key}">${t(n.label)}</button>`).join('');
         subRows = `
           <div class="filter-row-wrap"><div class="filter-row">${binyanChips}</div></div>
           <div class="filter-row-wrap"><div class="filter-row">${tenseChips}</div></div>
           <div class="filter-row-wrap"><div class="filter-row">${personChips}</div></div>
           <div class="filter-row-wrap"><div class="filter-row">${numberChips}</div></div>
         `;
-      } else if (categoryFilter && categoryFilter.pos === 'pron') {
-        // как на мобильной вкладке "Поиск" — типы местоимений (заглушка, в
-        // базе пока нет структурированных данных под них)
-        const typeChips = STUB_PRONOUN_TYPE_OPTIONS.map(o => `<button type="button" class="chip stub-chip ${searchTabStubSelections.pronounType.has(o.key) ? 'active' : ''}" data-cat-stub-pronountype="${o.key}">${t(o.label)}</button>`).join('');
-        subRows = `<div class="filter-row-wrap"><div class="filter-row">${typeChips}</div></div>`;
-      } else if (categoryFilter && categoryFilter.pos === 'num') {
-        // род (реальные данные) + количественное/порядковое (заглушка, как
-        // и на мобильной вкладке "Поиск")
-        const genderChips = GENDER_FILTER_OPTIONS.map(g => `<button type="button" class="chip ${categoryFilter.gender === g.key ? 'active' : ''}" data-cat-gender="${g.key}">${t(g.label)}</button>`).join('');
-        const kindChips = STUB_NUMERAL_KIND_OPTIONS.map(o => `<button type="button" class="chip stub-chip ${searchTabStubSelections.numeralKind.has(o.key) ? 'active' : ''}" data-cat-stub-numeralkind="${o.key}">${t(o.label)}</button>`).join('');
-        subRows = `
-          <div class="filter-row-wrap"><div class="filter-row">${genderChips}</div></div>
-          <div class="filter-row-wrap"><div class="filter-row">${kindChips}</div></div>
-        `;
-      } else if (categoryFilter && ['noun', 'adj', 'name', 'det'].includes(categoryFilter.pos)) {
+      } else if (categoryFilter && ['noun', 'adj', 'pron', 'num', 'name', 'det'].includes(categoryFilter.pos)) {
         const genderChips = GENDER_FILTER_OPTIONS.map(g => `<button type="button" class="chip ${categoryFilter.gender === g.key ? 'active' : ''}" data-cat-gender="${g.key}">${t(g.label)}</button>`).join('');
         subRows = `<div class="filter-row-wrap"><div class="filter-row">${genderChips}</div></div>`;
       }
@@ -4522,33 +4506,6 @@
         const key = btn.dataset.catGender;
         categoryFilter.gender = categoryFilter.gender === key ? null : key;
         renderFilterBar(); renderList();
-      });
-    });
-    el.querySelectorAll('[data-cat-inf]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // "инфинитив" — сбрасывает все уточнения спряжения разом, назад к
-        // леммам (тот же приём, что и у мобильной вкладки "Поиск")
-        categoryFilter.tense = null;
-        categoryFilter.personNumber = null;
-        categoryFilter.gender = null;
-        categoryFilter.number = null;
-        renderFilterBar(); renderList();
-      });
-    });
-    el.querySelectorAll('[data-cat-stub-pronountype]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.catStubPronountype;
-        const set = searchTabStubSelections.pronounType;
-        if (set.has(key)) set.delete(key); else set.add(key);
-        renderFilterBar(); // заглушка — визуальное состояние, список не трогаем
-      });
-    });
-    el.querySelectorAll('[data-cat-stub-numeralkind]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.catStubNumeralkind;
-        const set = searchTabStubSelections.numeralKind;
-        if (set.has(key)) set.delete(key); else set.add(key);
-        renderFilterBar(); // заглушка — визуальное состояние, список не трогаем
       });
     });
     el.querySelectorAll('[data-coll]').forEach(btn => {
