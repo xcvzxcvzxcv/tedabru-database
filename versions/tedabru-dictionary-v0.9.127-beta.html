@@ -647,7 +647,6 @@
     #cardInfoModeToggle.chip-overlay-left,
     #selectModeToggle.chip-overlay-left {
       display: flex;
-      background: var(--card-bg);
     }
 
     /* ===== Компромисс по "танцу" первой отрисовки списка =====
@@ -1045,9 +1044,6 @@
   }
   .chip.chip-text-only svg { width: 15px; height: 15px; flex-shrink: 0; }
   .filters-collapse {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     max-height: 0;
     margin-top: -8px; /* компенсирует gap родительского flex-контейнера — иначе даже при нулевой высоте между строками оставался лишний зазор */
     opacity: 0;
@@ -1969,7 +1965,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.128 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.127 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3534,7 +3530,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.128';
+  const APP_VERSION = '0.9.127';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4334,7 +4330,7 @@
             ${mobilePosChipsHtml}
           </div>
         </div>
-        ${mobileSubChipsHtml ? `<div class="filter-row">${mobileSubChipsHtml}</div>` : ''}
+        ${mobileSubChipsHtml ? `<div class="filter-row-wrap"><div class="filter-row">${mobileSubChipsHtml}</div></div>` : ''}
       </div>
       `}
       <select class="sort-select" id="sortSelect" style="display:none;">
@@ -4483,32 +4479,9 @@
         renderFilterBar(); renderList();
       });
     });
-    // В режиме выбора клик по чипу части речи/подкатегории выделяет (или
-    // снимает выделение) сразу со ВСЕХ подходящих слов — не только
-    // отфильтровывает список, а реально выбирает их для массового действия
-    // (например, удалить все глаголы или все существительные женского рода)
-    function toggleSelectAllByPersonalPos(base, sub) {
-      const matching = words.filter(w => {
-        const p = parsePersonalPos(w.pos);
-        if (base && p.base !== base) return false;
-        if (sub && p.sub !== sub) return false;
-        return true;
-      });
-      if (!matching.length) return;
-      const allSelected = matching.every(w => selectedIds.has(w.id));
-      matching.forEach(w => {
-        if (allSelected) selectedIds.delete(w.id); else selectedIds.add(w.id);
-      });
-      renderFilterBar();
-      renderList();
-    }
     el.querySelectorAll('[data-coll-filter-base]').forEach(btn => {
       btn.addEventListener('click', () => {
         const val = btn.dataset.collFilterBase;
-        if (selectionMode) {
-          toggleSelectAllByPersonalPos(val, null);
-          return;
-        }
         desktopCollFilterBase = (desktopCollFilterBase === val) ? null : val;
         desktopCollFilterSub = null; // смена базовой категории сбрасывает подкатегорию
         renderFilterBar(); renderList();
@@ -4517,10 +4490,6 @@
     el.querySelectorAll('[data-coll-filter-sub]').forEach(btn => {
       btn.addEventListener('click', () => {
         const val = btn.dataset.collFilterSub;
-        if (selectionMode) {
-          toggleSelectAllByPersonalPos(desktopCollFilterBase, val);
-          return;
-        }
         desktopCollFilterSub = (desktopCollFilterSub === val) ? null : val;
         renderFilterBar(); renderList();
       });
@@ -5398,31 +5367,14 @@
   });
 
   function performBulkDelete() {
-    if (!selectedIds.size && !selectedCollectionIds.size) return;
+    if (!selectedIds.size) return;
     const idsToDelete = new Set(selectedIds); // на случай, если что-то изменит selectedIds пока открыта модалка
-    const collIdsToDelete = new Set(selectedCollectionIds);
-    const totalCount = idsToDelete.size + collIdsToDelete.size;
-    const titleParts = [];
-    if (idsToDelete.size) titleParts.push(currentLang === 'en' ? `${idsToDelete.size} word(s)` : `${idsToDelete.size} слов(о)`);
-    if (collIdsToDelete.size) titleParts.push(currentLang === 'en' ? `${collIdsToDelete.size} collection(s)` : `${collIdsToDelete.size} подборок/-у`);
-    const titleText = currentLang === 'en' ? `Delete ${titleParts.join(' and ')}?` : `Удалить ${titleParts.join(' и ')}?`;
     showActionModal({
-      title: titleText,
+      title: currentLang === 'en' ? `Delete ${idsToDelete.size} word(s) from the dictionary?` : `Удалить ${idsToDelete.size} слов(о) из справочника?`,
       buttons: [
         { label: t('Отмена'), variant: 'cancel' },
         { label: t('Удалить'), variant: 'danger', action: () => {
-            if (idsToDelete.size) words = words.filter(w => !idsToDelete.has(w.id));
-            if (collIdsToDelete.size) {
-              collections = collections.filter(c => !collIdsToDelete.has(c.id));
-              // убираем ссылки на удалённые подборки из слов, которые в них состояли —
-              // иначе оставались бы "битые" id без реальной подборки
-              words.forEach(w => {
-                if (w.collectionIds && w.collectionIds.some(id => collIdsToDelete.has(id))) {
-                  w.collectionIds = w.collectionIds.filter(id => !collIdsToDelete.has(id));
-                }
-              });
-              saveCollections();
-            }
+            words = words.filter(w => !idsToDelete.has(w.id));
             saveWords();
             exitSelectionMode();
             renderFilterBar();
