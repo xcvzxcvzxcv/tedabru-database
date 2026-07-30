@@ -635,7 +635,7 @@
       padding: 0;
       align-items: center;
       justify-content: center;
-      background: var(--card-bg);
+      background: var(--bg-dark);
     }
     .chip-overlay-left svg { width: 24px; height: 24px; }
     /* #cardInfoModeToggle имеет базовое display:none (специфичность ID,
@@ -989,11 +989,11 @@
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 10;
+    z-index: 3;
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--card-bg);
+    background: var(--bg-dark);
     white-space: nowrap;
   }
   #desktopFilterModeToggle svg { width: 16px; height: 16px; flex-shrink: 0; }
@@ -1965,7 +1965,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.127 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.126 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3478,7 +3478,6 @@
     if (anyExisting) {
       mergeSenseIntoWord(anyExisting, newTranslationRu, bilingual ? bilingual.en.translation : null);
       saveWords();
-      renderFilterBar(); // счётчик "Все" и т.п. — иначе не обновлялся, пока не откроешь другую вкладку
       const iconEl = row.querySelector('.search-status-icon');
       if (iconEl) iconEl.innerHTML = CHECK_ON_ICON;
       row.classList.add('search-result-row-added');
@@ -3504,7 +3503,6 @@
     }
     words.unshift(newWord);
     saveWords();
-    renderFilterBar(); // счётчик "Все" и т.п. — иначе не обновлялся, пока не откроешь другую вкладку
     const iconEl = row.querySelector('.search-status-icon');
     if (iconEl) iconEl.innerHTML = CHECK_ON_ICON;
     row.classList.add('search-result-row-added');
@@ -3530,7 +3528,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.127';
+  const APP_VERSION = '0.9.126';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4011,7 +4009,7 @@
     if (filterMastery) list = list.filter(w => getMasteryLevel(w) === filterMastery);
     if (filterFavorite) list = list.filter(w => w.favorite);
     if (filterPos) list = list.filter(w => w.pos === filterPos);
-    if (desktopCollFilterBase) {
+    if (!isMobileViewport() && desktopFilterMode === 'collection' && desktopCollFilterBase) {
       list = list.filter(w => parsePersonalPos(w.pos).base === desktopCollFilterBase);
       if (desktopCollFilterSub) list = list.filter(w => parsePersonalPos(w.pos).sub === desktopCollFilterSub);
     }
@@ -4122,44 +4120,6 @@
   // Тумблер "По коллекции / По всей базе" наверху; переключение на "По всей
   // базе" готовит место под глобальный поиск (сама логика поиска — в
   // следующем заходе), тут только скрытие подборок/mastery-строки.
-  // Общая для десктопа и мобилки логика — группировка личных слов по
-  // базовой части речи + подкатегория (биньян/род), если различий 2+.
-  // Возвращает готовый HTML чипов (без обёртки — обёртку каждая сторона
-  // строит по-своему, десктоп через .filter-row-wrap-desktop-overlay,
-  // мобилка через обычный .filter-row-wrap с selectModeToggle).
-  function buildPersonalPosFilterChips() {
-    const baseCounts = {};
-    words.forEach(w => {
-      const { base } = parsePersonalPos(w.pos);
-      if (base) baseCounts[base] = (baseCounts[base] || 0) + 1;
-    });
-    const baseList = Object.keys(baseCounts).sort();
-    if (desktopCollFilterBase && !baseCounts[desktopCollFilterBase]) {
-      // выбранная категория опустела (слова удалены/переехали) — сбрасываем
-      desktopCollFilterBase = null;
-      desktopCollFilterSub = null;
-    }
-    const posChipsHtml = baseList.map(b => `<button type="button" class="chip ${desktopCollFilterBase === b ? 'active' : ''}" data-coll-filter-base="${b}">${personalPosLabel(b)} · ${baseCounts[b]}</button>`).join('');
-
-    let subChipsHtml = '';
-    if (desktopCollFilterBase) {
-      const subCounts = {};
-      words.forEach(w => {
-        const { base, sub } = parsePersonalPos(w.pos);
-        if (base === desktopCollFilterBase && sub) subCounts[sub] = (subCounts[sub] || 0) + 1;
-      });
-      const subList = Object.keys(subCounts);
-      // подстрока показывается, только если подкатегорий реально 2+ —
-      // если все глаголы, скажем, паал, фильтровать нечего
-      if (subList.length > 1) {
-        subChipsHtml = subList.map(s => `<button type="button" class="chip ${desktopCollFilterSub === s ? 'active' : ''}" data-coll-filter-sub="${s}">${s} · ${subCounts[s]}</button>`).join('');
-      } else {
-        desktopCollFilterSub = null; // единственная подкатегория — сбрасываем возможный устаревший выбор
-      }
-    }
-    return { posChipsHtml, subChipsHtml };
-  }
-
   function renderDesktopCollectionFilterPanel() {
     if (!desktopFilterPanelOpen) return '';
 
@@ -4221,17 +4181,49 @@
       return posRow + subRows;
     }
 
-    const { posChipsHtml, subChipsHtml } = buildPersonalPosFilterChips();
+    const baseCounts = {};
+    words.forEach(w => {
+      const { base } = parsePersonalPos(w.pos);
+      if (base) baseCounts[base] = (baseCounts[base] || 0) + 1;
+    });
+    const baseList = Object.keys(baseCounts).sort();
+    if (desktopCollFilterBase && !baseCounts[desktopCollFilterBase]) {
+      // выбранная категория опустела (слова удалены/переехали) — сбрасываем
+      desktopCollFilterBase = null;
+      desktopCollFilterSub = null;
+    }
 
     // Тумблер закреплён слева (как и остальные overlay-чипы) — части речи
     // едут в той же строке и уходят под него при скролле вправо
     const posRow = `
       <div class="filter-row-wrap-desktop-overlay">
         ${modeToggleBtn}
-        <div class="filter-row">${posChipsHtml}</div>
+        <div class="filter-row">
+          ${baseList.map(b => `<button type="button" class="chip ${desktopCollFilterBase === b ? 'active' : ''}" data-coll-filter-base="${b}">${personalPosLabel(b)} · ${baseCounts[b]}</button>`).join('')}
+        </div>
       </div>`;
 
-    const subRow = subChipsHtml ? `<div class="filter-row-wrap"><div class="filter-row">${subChipsHtml}</div></div>` : '';
+    let subRow = '';
+    if (desktopCollFilterBase) {
+      const subCounts = {};
+      words.forEach(w => {
+        const { base, sub } = parsePersonalPos(w.pos);
+        if (base === desktopCollFilterBase && sub) subCounts[sub] = (subCounts[sub] || 0) + 1;
+      });
+      const subList = Object.keys(subCounts);
+      // подстрока показывается, только если подкатегорий реально 2+ —
+      // если все глаголы, скажем, паал, фильтровать нечего
+      if (subList.length > 1) {
+        subRow = `
+          <div class="filter-row-wrap">
+            <div class="filter-row">
+              ${subList.map(s => `<button type="button" class="chip ${desktopCollFilterSub === s ? 'active' : ''}" data-coll-filter-sub="${s}">${s} · ${subCounts[s]}</button>`).join('')}
+            </div>
+          </div>`;
+      } else {
+        desktopCollFilterSub = null; // единственная подкатегория — сбрасываем возможный устаревший выбор
+      }
+    }
 
     return posRow + subRow;
   }
@@ -4250,7 +4242,6 @@
       return;
     }
     const posValues = [...new Set(words.map(w => w.pos))].sort();
-    const { posChipsHtml: mobilePosChipsHtml, subChipsHtml: mobileSubChipsHtml } = buildPersonalPosFilterChips();
     const hasFavorites = words.some(w => w.favorite);
     // если избранных слов не осталось, а фильтр "Избранное" всё ещё был
     // включён — сбрасываем его: чип сейчас исчезнет, и включить обратно
@@ -4286,7 +4277,7 @@
         </button>
         <div class="filter-row">
         ${(() => {
-          const isAllActive = !filterMastery && !filterCollectionId && !filterFavorite && !filterPos && !desktopCollFilterBase;
+          const isAllActive = !filterMastery && !filterCollectionId && !filterFavorite && !filterPos;
           return `<button type="button" class="chip ${isAllActive ? 'active' : ''}" id="allChip">${t('Все')} · ${words.length}</button>`;
         })()}
         ${hasFavorites ? `<button type="button" class="chip ${filterFavorite ? 'active' : ''}" id="favChip" title="${t('Избранное')}">★ ${favoriteCount}</button>` : ''}
@@ -4327,10 +4318,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
           </button>
           <div class="filter-row">
-            ${mobilePosChipsHtml}
+            ${posValues.map(p => `<button type="button" class="chip ${filterPos === p ? 'active' : ''}" data-pos="${p}">${personalPosLabel(p)} · ${countByPos[p] || 0}</button>`).join('')}
           </div>
         </div>
-        ${mobileSubChipsHtml ? `<div class="filter-row-wrap"><div class="filter-row">${mobileSubChipsHtml}</div></div>` : ''}
       </div>
       `}
       <select class="sort-select" id="sortSelect" style="display:none;">
@@ -4385,7 +4375,7 @@
     if (filtersToggleChipEl) filtersToggleChipEl.addEventListener('click', togglePersonalFiltersCollapse);
     const posFilterBtn = document.getElementById('posFilterToggleBtn');
     if (posFilterBtn) {
-      posFilterBtn.classList.toggle('active', isMobileViewport() ? (filtersExpanded || !!desktopCollFilterBase) : desktopFilterPanelOpen);
+      posFilterBtn.classList.toggle('active', isMobileViewport() ? (filtersExpanded || !!filterPos) : desktopFilterPanelOpen);
       if (!posFilterBtn.dataset.bound) {
         posFilterBtn.dataset.bound = '1'; // кнопка статична (не пересоздаётся при каждом renderFilterBar) — вешаем слушатель один раз
         posFilterBtn.addEventListener('click', handlePosFilterToggleBtnClick);
@@ -4463,8 +4453,6 @@
       filterCollectionId = null;
       filterFavorite = false;
       filterPos = null;
-      desktopCollFilterBase = null;
-      desktopCollFilterSub = null;
       renderFilterBar(); renderList();
     });
     const favChipEl = document.getElementById('favChip');
