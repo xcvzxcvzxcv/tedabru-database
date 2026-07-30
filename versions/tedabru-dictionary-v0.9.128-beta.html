@@ -1969,7 +1969,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.129 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.128 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3534,7 +3534,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.129';
+  const APP_VERSION = '0.9.128';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4034,24 +4034,13 @@
     if (!searchQuery.trim() && !categoryFilterActive()) return '';
     if (categoryFilterActive()) {
       // Просмотр по категории (воронка фильтров) — юзер уже явно попросил
-      // браузинг всей базы, тут инстант-поиск остаётся автоматическим;
-      // DeepL-фоллбек тут не нужен — нет текста запроса, который переводить
+      // браузинг всей базы, тут инстант-поиск остаётся автоматическим
       return `<div id="instantDictResults"></div>`;
     }
-    if (!isMobileViewport()) {
-      // Десктоп — инстант-поиск по строке остаётся автоматическим (кнопка-
-      // триггер ниже — временная мера ТОЛЬКО для мобильного, чтобы не
-      // дёргать базу на каждое нажатие клавиши; на десктопе мгновенный
-      // поиск был всегда и должен оставаться)
-      return `
-        <div id="instantDictResults"></div>
-        <button type="button" class="global-search-btn" id="globalSearchBtn" style="display:none;">
-          ${t('Искать среди всех слов')} «${searchQuery}»
-        </button>
-        <div id="globalSearchResults"></div>
-      `;
-    }
-    // Мобильный обычный текстовый поиск — кнопка, ручной запуск
+    // Обычный текстовый поиск по строке — базу больше НЕ дёргаем
+    // автоматически на каждое нажатие клавиши. Кнопка видна сразу
+    // (независимо от того, есть личные результаты или нет), сам поиск по
+    // словарю запускается только по явному тапу.
     return `
       <button type="button" class="global-search-btn" id="globalSearchTriggerBtn">
         ${t('Поиск по всей базе')} «${searchQuery}»
@@ -4104,11 +4093,6 @@
     if (!q) return;
     const deepBtn = document.getElementById('globalSearchBtn');
     if (deepBtn) deepBtn.addEventListener('click', () => runGlobalTranscriptionSearch(q, deepBtn));
-    if (!isMobileViewport()) {
-      // Десктоп — сразу ищем, кнопки-триггера тут больше нет (см. globalSearchBlockHtml)
-      runInstantDictSearch(q);
-      return;
-    }
     const triggerBtn = document.getElementById('globalSearchTriggerBtn');
     if (triggerBtn) {
       triggerBtn.addEventListener('click', () => {
@@ -4515,7 +4499,6 @@
       matching.forEach(w => {
         if (allSelected) selectedIds.delete(w.id); else selectedIds.add(w.id);
       });
-      if (selectionMode) headerTitleEl.textContent = selectionHeaderText(); // applyRowSelection обновляет это по одной строке за раз — тут выделяем массово в обход неё
       renderFilterBar();
       renderList();
     }
@@ -7357,7 +7340,7 @@
       const skeleton = stripNiqqud(raw).normalize('NFC');
       const { sources, matchedSkeleton } = lookupSkeletonWithChaserFallback(skeleton);
       const { dictHit, formHit, verbHit, nounFormHit, genFormHit } = sources;
-      if (hasAnyHit(sources) && !opts.skipLocalShortcut) {
+      if (hasAnyHit(sources)) {
         if (matchedSkeleton !== skeleton) {
           console.log('[RC] точного скелета нет, но нашлось по краткому написанию (ktiv-chaser):', skeleton, '→', matchedSkeleton);
         }
@@ -8321,10 +8304,7 @@
       });
     };
 
-    if (!swipeToAdd || !isMobileViewport()) {
-      // На десктопе клик по всей карточке работает всегда, даже если сама
-      // разметка (swipeToAdd) обёрнута под свайп для мобильного — свайпа на
-      // десктопе всё равно нет, значит нужен клик
+    if (!swipeToAdd) {
       attachQuickToggleHandlers(resultsEl);
     }
     // swipeToAdd === true (вкладка "Поиск"): свайп обрабатывается через
