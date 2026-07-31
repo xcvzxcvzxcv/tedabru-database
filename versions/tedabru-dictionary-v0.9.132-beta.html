@@ -1969,7 +1969,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.133 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.132 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3543,7 +3543,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.133';
+  const APP_VERSION = '0.9.132';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -6350,54 +6350,35 @@
   let posCategoryCounts = {};
   function computeAllPosCategoryCounts() {
     if (!hebrewDictSkeleton) return {};
-    // Считаем ТОЧНО так же, как реально схлопываются карточки в
-    // mergeCandidatesBySense (группировка по word+translit+grammarLabel) —
-    // раньше считали по одному слову-ключу словаря, но это не совпадало с
-    // тем, что видно в результатах: несколько значений одного ключа могут
-    // иметь РАЗНУЮ огласовку (напр. לְמָה/לָמָּה под одним "למה"), а такие
-    // не схлопываются в одну карточку. grammarLabel для сущ/местоим/имя/
-    // определителя/числительного включает ещё и род — значит и группировать
-    // нужно с учётом рода именно для этих категорий (см. grammarLabelForEntry).
-    const GENDER_AWARE_POS = new Set(['noun', 'pron', 'name', 'det', 'num']);
-    const groupSets = {}; // pos -> Set("word|tr|gender?")
-    function addToGroup(pos, word, tr, gender) {
-      if (!groupSets[pos]) groupSets[pos] = new Set();
-      const key = GENDER_AWARE_POS.has(pos) ? `${word}|${tr}|${gender || ''}` : `${word}|${tr}`;
-      groupSets[pos].add(key);
-    }
+    const counts = {};
     for (const sk in hebrewDictSkeleton) {
       const senses = hebrewDictSkeleton[sk];
+      // считаем ключ (ивритское слово), а не отдельные значения — на экране
+      // мы всё равно схлопываем несколько значений одного слова в одну
+      // карточку, поэтому счётчик должен отражать число слов, а не смыслов.
+      // Если у слова 2 значения с одинаковым pos — считаем один раз; если
+      // значения разных pos (напр. сущ + прил) — засчитываем в обе категории
+      const seenPos = new Set();
       for (let i = 0; i < senses.length; i++) {
-        const e = senses[i];
-        const p = e.pos;
-        if (!p) continue;
-        addToGroup(p, e.word, e.tr, e.gender);
-        // "Предлог" в реальном поиске дополнительно включает prep_phrase и
-        // postp (см. isPrepMatch в computeCategoryBrowseCandidates) — эти
-        // значения нужно засчитать И под своим родным pos, И под 'prep'
-        if (p === 'prep_phrase' || p === 'postp') addToGroup('prep', e.word, e.tr, e.gender);
+        const p = senses[i].pos;
+        if (p && !seenPos.has(p)) {
+          seenPos.add(p);
+          counts[p] = (counts[p] || 0) + 1;
+        }
       }
     }
-    const counts = {};
-    for (const pos in groupSets) counts[pos] = groupSets[pos].size;
-    // "Вопросительное слово" — не отдельный pos, а жёстко закодированный
-    // список ключей (QUESTION_WORD_SKELETONS); группируем так же, по
-    // word+tr — у "למה" два разных значения (лама/лема) реально показываются
-    // как 2 отдельные карточки, не одна
-    const questionGroup = new Set();
+    // "Вопросительное слово" — не отдельный pos в данных, а жёстко
+    // закодированный список ключей (см. QUESTION_WORD_SKELETONS) — тут и
+    // так по определению один ключ = одно слово, дублей внутри не бывает
+    let questionCount = 0;
     QUESTION_WORD_SKELETONS.forEach(sk => {
-      (hebrewDictSkeleton[sk] || []).forEach(e => questionGroup.add(`${e.word}|${e.tr}`));
+      if (hebrewDictSkeleton[sk] && hebrewDictSkeleton[sk].length) questionCount++;
     });
-    counts.question = questionGroup.size;
-    // "Глагол" считаем по числу ЗАПИСЕЙ в verbsDict (не числу скелетов —
-    // некоторые скелеты содержат несколько омографов разных биньянов) —
+    counts.question = questionCount;
+    // "Глагол" считаем по числу лемм (инфинитивов) в verbsDict — точное
     // число спряжённых форм по всем биньянам/временам было бы гораздо
     // больше и не совпадало бы с тем, что видит юзер по умолчанию (леммы)
-    let verbCount = 0;
-    if (verbsDict) {
-      for (const sk in verbsDict) verbCount += verbsDict[sk].length;
-    }
-    counts.verb = verbCount;
+    counts.verb = verbsDict ? Object.keys(verbsDict).length : 0;
     return counts;
   }
   let nounFormsIndex = null;
