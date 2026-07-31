@@ -1969,7 +1969,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.131 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.130 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3027,7 +3027,7 @@
     panel.style.display = 'block';
 
     const posChips = POS_FILTER_CATEGORIES.map(c => `
-      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.label)} · ${posCategoryCounts[c.key] || 0}</button>
+      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.label)}</button>
     `).join('');
 
     let subRows = '';
@@ -3139,15 +3139,8 @@
     }
     panel.style.display = 'block';
 
-    // строка частей речи (первая .category-filter-row-scroll) теряла позицию
-    // скролла при каждом клике, т.к. panel.innerHTML пересобирается целиком —
-    // сохраняем и восстанавливаем явно, тот же приём, что уже применён к
-    // строкам подборок/частей речи на главном экране
-    const prevPosRow = panel.querySelector('.category-filter-row-scroll');
-    const savedPosScrollLeft = prevPosRow ? prevPosRow.scrollLeft : 0;
-
     const posChips = POS_FILTER_CATEGORIES.map(c => `
-      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.short)} · ${posCategoryCounts[c.key] || 0}</button>
+      <button type="button" class="category-filter-chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-pos="${c.key}">${t(c.short)}</button>
     `).join('');
 
     // Горизонтальный скролл вместо переноса на несколько строк (как строки
@@ -3212,8 +3205,6 @@
       ${subRows}
       ${categoryFilterActive() ? `<button type="button" class="category-filter-clear" id="searchTabFilterClearBtn">${t('Сбросить фильтр')}</button>` : ''}
     `;
-    const newPosRow = panel.querySelector('.category-filter-row-scroll');
-    if (newPosRow && savedPosScrollLeft) newPosRow.scrollLeft = savedPosScrollLeft;
 
     panel.querySelectorAll('[data-pos]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -3543,7 +3534,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.131';
+  const APP_VERSION = '0.9.130';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -4205,7 +4196,7 @@
       // строкой чипов коллекции. Логика (categoryFilter/computeCategoryBrowseCandidates)
       // та же самая, просто своя разметка.
       const posChips = POS_FILTER_CATEGORIES.map(c => `
-        <button type="button" class="chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-cat-pos="${c.key}">${t(c.label)} · ${posCategoryCounts[c.key] || 0}</button>
+        <button type="button" class="chip ${categoryFilter && categoryFilter.pos === c.key ? 'active' : ''}" data-cat-pos="${c.key}">${t(c.label)}</button>
       `).join('');
 
       const posRow = `
@@ -4274,8 +4265,6 @@
     const savedCollectionsScrollLeft = prevCollectionsRow ? prevCollectionsRow.scrollLeft : 0;
     const prevPosRow = el.querySelector('#filtersCollapse .filter-row');
     const savedPosScrollLeft = prevPosRow ? prevPosRow.scrollLeft : 0;
-    const prevDesktopGlobalPosRow = el.querySelector('.filter-row-wrap-desktop-overlay .filter-row');
-    const savedDesktopGlobalScrollLeft = prevDesktopGlobalPosRow ? prevDesktopGlobalPosRow.scrollLeft : 0;
     if (isMobileViewport() && (categoryFilterPanelOpen || categoryFilterActive())) {
       el.innerHTML = '';
       return;
@@ -4706,10 +4695,6 @@
     const newPosRow = el.querySelector('#filtersCollapse .filter-row');
     if (newPosRow && savedPosScrollLeft) {
       newPosRow.scrollLeft = savedPosScrollLeft;
-    }
-    const newDesktopGlobalPosRow = el.querySelector('.filter-row-wrap-desktop-overlay .filter-row');
-    if (newDesktopGlobalPosRow && savedDesktopGlobalScrollLeft) {
-      newDesktopGlobalPosRow.scrollLeft = savedDesktopGlobalScrollLeft;
     }
 
     el.querySelectorAll('.filter-row').forEach(row => {
@@ -6343,34 +6328,6 @@
   let verbsReverse = null;
   let verbsReverseEn = null;
   let translitIndex = null;
-  // Число слов в каждой категории частей речи (для подписей чипов вида
-  // "Существительное · 3456") — считается ОДИН РАЗ за проход по всему
-  // словарю сразу после загрузки данных (см. computeAllPosCategoryCounts),
-  // а не пересчитывается на каждый рендер панели фильтров.
-  let posCategoryCounts = {};
-  function computeAllPosCategoryCounts() {
-    if (!hebrewDictSkeleton) return {};
-    const counts = {};
-    for (const sk in hebrewDictSkeleton) {
-      const senses = hebrewDictSkeleton[sk];
-      for (let i = 0; i < senses.length; i++) {
-        const p = senses[i].pos;
-        if (p) counts[p] = (counts[p] || 0) + 1;
-      }
-    }
-    // "Вопросительное слово" — не отдельный pos в данных, а жёстко
-    // закодированный список ключей (см. QUESTION_WORD_SKELETONS)
-    let questionCount = 0;
-    QUESTION_WORD_SKELETONS.forEach(sk => {
-      questionCount += (hebrewDictSkeleton[sk] || []).length;
-    });
-    counts.question = questionCount;
-    // "Глагол" считаем по числу лемм (инфинитивов) в verbsDict — точное
-    // число спряжённых форм по всем биньянам/временам было бы гораздо
-    // больше и не совпадало бы с тем, что видит юзер по умолчанию (леммы)
-    counts.verb = verbsDict ? Object.keys(verbsDict).length : 0;
-    return counts;
-  }
   let nounFormsIndex = null;
   let generatedVerbForms = null;
   let functionWordForms = null;
@@ -6687,7 +6644,6 @@
       verbsEntrySkeleton = buildEntrySkeletonMap(verbsDict);
       hebrewDictKeyCountAtLoad = Object.keys(hebrewDictSkeleton).length;
       verbsDictKeyCountAtLoad = Object.keys(verbsDict).length;
-      posCategoryCounts = computeAllPosCategoryCounts();
       console.log('[DICT] загружено: словарь —', Object.keys(hebrewDictSkeleton).length, ', обратный индекс —', Object.keys(hebrewDictReverse).length, ', формы глаголов —', Object.keys(hebrewVerbForms).length, ', глаголы (инфинитивы) —', Object.keys(verbsDict).length, ', индекс транскрипции —', Object.keys(translitIndex).length, ', формы сущ/прил —', Object.keys(nounFormsIndex).length, ', сгенерированные формы глаголов —', Object.keys(generatedVerbForms).length, ', формы служебных слов —', Object.keys(functionWordForms).length);
     }).catch(e => {
       console.log('[DICT] словари не загрузились, работаем только через DeepL:', e);
@@ -6695,7 +6651,6 @@
       verbsDict = {}; verbsReverse = {}; translitIndex = {}; nounFormsIndex = {};
       generatedVerbForms = {}; functionWordForms = {}; functionWordFormsReverse = {};
       hebrewDictEntrySkeleton = new WeakMap(); verbsEntrySkeleton = new WeakMap();
-      posCategoryCounts = {};
     });
     return hebrewDictLoadPromise;
   }
