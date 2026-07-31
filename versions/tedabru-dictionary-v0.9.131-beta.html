@@ -1969,7 +1969,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.132 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.131 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3543,7 +3543,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.132';
+  const APP_VERSION = '0.9.131';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -6353,26 +6353,16 @@
     const counts = {};
     for (const sk in hebrewDictSkeleton) {
       const senses = hebrewDictSkeleton[sk];
-      // считаем ключ (ивритское слово), а не отдельные значения — на экране
-      // мы всё равно схлопываем несколько значений одного слова в одну
-      // карточку, поэтому счётчик должен отражать число слов, а не смыслов.
-      // Если у слова 2 значения с одинаковым pos — считаем один раз; если
-      // значения разных pos (напр. сущ + прил) — засчитываем в обе категории
-      const seenPos = new Set();
       for (let i = 0; i < senses.length; i++) {
         const p = senses[i].pos;
-        if (p && !seenPos.has(p)) {
-          seenPos.add(p);
-          counts[p] = (counts[p] || 0) + 1;
-        }
+        if (p) counts[p] = (counts[p] || 0) + 1;
       }
     }
     // "Вопросительное слово" — не отдельный pos в данных, а жёстко
-    // закодированный список ключей (см. QUESTION_WORD_SKELETONS) — тут и
-    // так по определению один ключ = одно слово, дублей внутри не бывает
+    // закодированный список ключей (см. QUESTION_WORD_SKELETONS)
     let questionCount = 0;
     QUESTION_WORD_SKELETONS.forEach(sk => {
-      if (hebrewDictSkeleton[sk] && hebrewDictSkeleton[sk].length) questionCount++;
+      questionCount += (hebrewDictSkeleton[sk] || []).length;
     });
     counts.question = questionCount;
     // "Глагол" считаем по числу лемм (инфинитивов) в verbsDict — точное
