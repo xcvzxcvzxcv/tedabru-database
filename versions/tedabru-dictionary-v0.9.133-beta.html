@@ -1969,7 +1969,7 @@
   <div class="header">
     <div class="header-top">
       <div class="header-top-left">
-        <div class="app-version-line" id="appVersionLine">v0.9.134 Beta</div>
+        <div class="app-version-line" id="appVersionLine">v0.9.133 Beta</div>
         <div class="title-row">
           <div class="title" id="headerTitle">Лексикариум</div>
           <button type="button" class="lang-toggle-btn" id="langToggleBtn" title="Language">
@@ -3543,7 +3543,7 @@
   // уточнение к этому апдейту. x увеличивается на большом/важном апдейте,
   // y — на мелких правках между ними. Предыдущие версии архивируются в
   // папку versions/ в репозитории перед тем, как файл в корне перезаписывается.
-  const APP_VERSION = '0.9.134';
+  const APP_VERSION = '0.9.133';
 
   // ===== Автопроверка версии (для установленного на Home Screen — там нет ни адресной
   // строки, ни кнопки обновления, а WKWebView агрессивно кэширует файл). При каждом
@@ -6600,7 +6600,6 @@
   // אוטו = все "автомобиль") группировка не затрагивает — ключ строится по
   // написанию+транскрипции+части речи, а не по переводу.
   function mergeCandidatesBySense(candidates) {
-    candidates = candidates.filter(Boolean); // buildDictCandidate возвращает null для pos:'root'
     const order = [];
     const groups = new Map();
     for (const c of candidates) {
@@ -7073,10 +7072,6 @@
   }
 
   function buildDictCandidate(entry) {
-    // pos:'root' — запись остаётся в самих данных (пригодится для будущего
-    // поиска по корню), но не должна попадать в обычную выдачу как
-    // "слово" — это не лексическая единица, а грамматический корень.
-    if (entry.pos === 'root') return null;
     return {
       text: entry.word,
       translit: displayTranslit(entry.word, entry.tr),
@@ -7149,7 +7144,7 @@
     const skeleton = stripNiqqud(hebrewWord).normalize('NFC');
     const expectedNorm = expectedTranslation ? expectedTranslation.trim() : null;
     const dictEntries = (hebrewDictSkeleton && hebrewDictSkeleton[skeleton]) || [];
-    const wordMatches = dictEntries.filter(e => e.word === hebrewWord && e.pos !== 'root');
+    const wordMatches = dictEntries.filter(e => e.word === hebrewWord);
     if (wordMatches.length) return computeBilingualForEntries(wordMatches, expectedNorm, buildDictCandidate);
     const verbEntries = (verbsDict && verbsDict[skeleton]) || [];
     const verbWordMatches = verbEntries.filter(e => e.word === hebrewWord);
@@ -7645,7 +7640,7 @@
         ...nounFormHit.map(buildNounFormCandidate),
         ...genFormHit.map(buildGeneratedVerbFormCandidate),
         ...functionFormHit.map(buildFunctionWordFormCandidate)
-      ].filter(Boolean); // buildDictCandidate вернёт null для pos:'root' — тут они читаются напрямую (c.translit) ДО mergeCandidatesBySense, без фильтра упало бы
+      ];
       for (const c of candidates) {
         // дистанцию для сортировки считаем по СОБСТВЕННОЙ транскрипции этого
         // конкретного кандидата, а не по скелету в целом — иначе омографы
